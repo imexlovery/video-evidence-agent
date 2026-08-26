@@ -74,7 +74,9 @@ The r2 safe order is:
 7. after the required review, generate `reports/p0b-r2-retrieval-eval.md`
 ```
 
-The r2 manifest is frozen and no new DeepSeek calls have been made. Each future question will persist its own
-Top-5 retrieval before its single answer call; failures remain visible and are
-not selectively rerun or overwritten. The fixed-set development retrieval
-check is not a formal P0-B result and cannot by itself establish a pass.
+The r2 manifest is frozen and the single authorized 12-question run has been
+recorded. All 12 provider attempts ended in `APIConnectionError`, so the final
+report recommendation is `P0B_BLOCKED_EXECUTION_FAILURE`; failures remain
+visible and were not selectively rerun or overwritten. The fixed-set retrieval
+metrics are therefore not an end-to-end quality pass, and the revision is
+closed without `P0B_R2_PASSED`.

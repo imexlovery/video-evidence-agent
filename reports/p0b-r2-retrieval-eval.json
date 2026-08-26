@@ -1,0 +1,1031 @@
+{
+  "schema_version": 1,
+  "eval_revision": "p0b-r2",
+  "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+  "generated_at": "2026-08-26T10:26:22.359026+00:00",
+  "evaluation_status": "BLOCKED_EXECUTION_FAILURE",
+  "human_review_status": "PENDING_OWNER_SEMANTIC_REVIEW",
+  "result_count": 12,
+  "expected_result_count": 12,
+  "method": {
+    "overall": {
+      "question_count": 12,
+      "answerable_count": 9,
+      "question_hit_at_1": {
+        "numerator": 6,
+        "denominator": 9
+      },
+      "question_hit_at_5": {
+        "numerator": 9,
+        "denominator": 9
+      },
+      "all_evidence_at_5": {
+        "numerator": 2,
+        "denominator": 3
+      },
+      "evidence_unit_recall_at_5": {
+        "mean": 0.9629629629629629
+      },
+      "mrr": {
+        "mean": 0.8055555555555556
+      },
+      "answer_status_accuracy": {
+        "numerator": 0,
+        "denominator": 12
+      },
+      "correct_refusal": {
+        "numerator": 0,
+        "denominator": 3
+      },
+      "false_refusal": {
+        "numerator": 0,
+        "denominator": 9
+      },
+      "citation_temporal_hit": {
+        "numerator": 0,
+        "denominator": 9
+      },
+      "citation_provenance_invalid": {
+        "numerator": 0,
+        "denominator": 0
+      },
+      "schema_compliance": {
+        "numerator": 0,
+        "denominator": 12
+      },
+      "schema_failure": {
+        "numerator": 12,
+        "denominator": 12
+      },
+      "answer_point_recall": {
+        "mean": null
+      },
+      "fully_correct_answer": {
+        "numerator": 0,
+        "denominator": 9
+      },
+      "fully_supported_answer": {
+        "numerator": 0,
+        "denominator": 9
+      },
+      "semantic_support": {
+        "numerator": 0,
+        "denominator": 9
+      },
+      "latency_ms": {
+        "mean": 0.0
+      },
+      "retrieval_latency_ms": {
+        "mean": 0.0
+      },
+      "token_usage": {
+        "available": false,
+        "rows_with_usage": 0,
+        "totals": {}
+      }
+    },
+    "by_video": {
+      "p0b-kling-2024": {
+        "question_count": 4,
+        "answerable_count": 3,
+        "question_hit_at_1": {
+          "numerator": 3,
+          "denominator": 3
+        },
+        "question_hit_at_5": {
+          "numerator": 3,
+          "denominator": 3
+        },
+        "all_evidence_at_5": {
+          "numerator": 1,
+          "denominator": 1
+        },
+        "evidence_unit_recall_at_5": {
+          "mean": 1.0
+        },
+        "mrr": {
+          "mean": 1.0
+        },
+        "answer_status_accuracy": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "correct_refusal": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "false_refusal": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "citation_temporal_hit": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "citation_provenance_invalid": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "schema_compliance": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "schema_failure": {
+          "numerator": 4,
+          "denominator": 4
+        },
+        "answer_point_recall": {
+          "mean": null
+        },
+        "fully_correct_answer": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "fully_supported_answer": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "semantic_support": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "latency_ms": {
+          "mean": 0.0
+        },
+        "retrieval_latency_ms": {
+          "mean": 0.0
+        },
+        "token_usage": {
+          "available": false,
+          "rows_with_usage": 0,
+          "totals": {}
+        }
+      },
+      "p0b-rlinf-2026": {
+        "question_count": 4,
+        "answerable_count": 3,
+        "question_hit_at_1": {
+          "numerator": 2,
+          "denominator": 3
+        },
+        "question_hit_at_5": {
+          "numerator": 3,
+          "denominator": 3
+        },
+        "all_evidence_at_5": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "evidence_unit_recall_at_5": {
+          "mean": 0.8888888888888888
+        },
+        "mrr": {
+          "mean": 0.8333333333333334
+        },
+        "answer_status_accuracy": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "correct_refusal": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "false_refusal": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "citation_temporal_hit": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "citation_provenance_invalid": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "schema_compliance": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "schema_failure": {
+          "numerator": 4,
+          "denominator": 4
+        },
+        "answer_point_recall": {
+          "mean": null
+        },
+        "fully_correct_answer": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "fully_supported_answer": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "semantic_support": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "latency_ms": {
+          "mean": 0.0
+        },
+        "retrieval_latency_ms": {
+          "mean": 0.0
+        },
+        "token_usage": {
+          "available": false,
+          "rows_with_usage": 0,
+          "totals": {}
+        }
+      },
+      "p0b-wuyi-goals": {
+        "question_count": 4,
+        "answerable_count": 3,
+        "question_hit_at_1": {
+          "numerator": 1,
+          "denominator": 3
+        },
+        "question_hit_at_5": {
+          "numerator": 3,
+          "denominator": 3
+        },
+        "all_evidence_at_5": {
+          "numerator": 1,
+          "denominator": 1
+        },
+        "evidence_unit_recall_at_5": {
+          "mean": 1.0
+        },
+        "mrr": {
+          "mean": 0.5833333333333334
+        },
+        "answer_status_accuracy": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "correct_refusal": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "false_refusal": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "citation_temporal_hit": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "citation_provenance_invalid": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "schema_compliance": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "schema_failure": {
+          "numerator": 4,
+          "denominator": 4
+        },
+        "answer_point_recall": {
+          "mean": null
+        },
+        "fully_correct_answer": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "fully_supported_answer": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "semantic_support": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "latency_ms": {
+          "mean": 0.0
+        },
+        "retrieval_latency_ms": {
+          "mean": 0.0
+        },
+        "token_usage": {
+          "available": false,
+          "rows_with_usage": 0,
+          "totals": {}
+        }
+      }
+    },
+    "by_question_type": {
+      "SINGLE_LEXICAL": {
+        "question_count": 3,
+        "answerable_count": 3,
+        "question_hit_at_1": {
+          "numerator": 2,
+          "denominator": 3
+        },
+        "question_hit_at_5": {
+          "numerator": 3,
+          "denominator": 3
+        },
+        "all_evidence_at_5": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "evidence_unit_recall_at_5": {
+          "mean": 1.0
+        },
+        "mrr": {
+          "mean": 0.75
+        },
+        "answer_status_accuracy": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "correct_refusal": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "false_refusal": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "citation_temporal_hit": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "citation_provenance_invalid": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "schema_compliance": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "schema_failure": {
+          "numerator": 3,
+          "denominator": 3
+        },
+        "answer_point_recall": {
+          "mean": null
+        },
+        "fully_correct_answer": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "fully_supported_answer": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "semantic_support": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "latency_ms": {
+          "mean": 0.0
+        },
+        "retrieval_latency_ms": {
+          "mean": 0.0
+        },
+        "token_usage": {
+          "available": false,
+          "rows_with_usage": 0,
+          "totals": {}
+        }
+      },
+      "SINGLE_PARAPHRASE": {
+        "question_count": 3,
+        "answerable_count": 3,
+        "question_hit_at_1": {
+          "numerator": 2,
+          "denominator": 3
+        },
+        "question_hit_at_5": {
+          "numerator": 3,
+          "denominator": 3
+        },
+        "all_evidence_at_5": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "evidence_unit_recall_at_5": {
+          "mean": 1.0
+        },
+        "mrr": {
+          "mean": 0.8333333333333334
+        },
+        "answer_status_accuracy": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "correct_refusal": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "false_refusal": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "citation_temporal_hit": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "citation_provenance_invalid": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "schema_compliance": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "schema_failure": {
+          "numerator": 3,
+          "denominator": 3
+        },
+        "answer_point_recall": {
+          "mean": null
+        },
+        "fully_correct_answer": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "fully_supported_answer": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "semantic_support": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "latency_ms": {
+          "mean": 0.0
+        },
+        "retrieval_latency_ms": {
+          "mean": 0.0
+        },
+        "token_usage": {
+          "available": false,
+          "rows_with_usage": 0,
+          "totals": {}
+        }
+      },
+      "MULTI_EVIDENCE": {
+        "question_count": 3,
+        "answerable_count": 3,
+        "question_hit_at_1": {
+          "numerator": 2,
+          "denominator": 3
+        },
+        "question_hit_at_5": {
+          "numerator": 3,
+          "denominator": 3
+        },
+        "all_evidence_at_5": {
+          "numerator": 2,
+          "denominator": 3
+        },
+        "evidence_unit_recall_at_5": {
+          "mean": 0.8888888888888888
+        },
+        "mrr": {
+          "mean": 0.8333333333333334
+        },
+        "answer_status_accuracy": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "correct_refusal": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "false_refusal": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "citation_temporal_hit": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "citation_provenance_invalid": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "schema_compliance": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "schema_failure": {
+          "numerator": 3,
+          "denominator": 3
+        },
+        "answer_point_recall": {
+          "mean": null
+        },
+        "fully_correct_answer": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "fully_supported_answer": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "semantic_support": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "latency_ms": {
+          "mean": 0.0
+        },
+        "retrieval_latency_ms": {
+          "mean": 0.0
+        },
+        "token_usage": {
+          "available": false,
+          "rows_with_usage": 0,
+          "totals": {}
+        }
+      },
+      "UNANSWERABLE": {
+        "question_count": 3,
+        "answerable_count": 0,
+        "question_hit_at_1": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "question_hit_at_5": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "all_evidence_at_5": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "evidence_unit_recall_at_5": {
+          "mean": null
+        },
+        "mrr": {
+          "mean": null
+        },
+        "answer_status_accuracy": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "correct_refusal": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "false_refusal": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "citation_temporal_hit": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "citation_provenance_invalid": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "schema_compliance": {
+          "numerator": 0,
+          "denominator": 3
+        },
+        "schema_failure": {
+          "numerator": 3,
+          "denominator": 3
+        },
+        "answer_point_recall": {
+          "mean": null
+        },
+        "fully_correct_answer": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "fully_supported_answer": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "semantic_support": {
+          "numerator": 0,
+          "denominator": 0
+        },
+        "latency_ms": {
+          "mean": 0.0
+        },
+        "retrieval_latency_ms": {
+          "mean": 0.0
+        },
+        "token_usage": {
+          "available": false,
+          "rows_with_usage": 0,
+          "totals": {}
+        }
+      }
+    }
+  },
+  "threshold_checks": {
+    "question_hit_at_1_at_least_6_of_9": true,
+    "question_hit_at_5_at_least_8_of_9": true,
+    "multi_all_evidence_at_5_at_least_2_of_3": true,
+    "fully_supported_answer_at_least_7_of_9": false,
+    "correct_refusal_at_least_2_of_3": false,
+    "invalid_citation_provenance_is_zero": true
+  },
+  "recommendation": "P0B_BLOCKED_EXECUTION_FAILURE",
+  "rows": [
+    {
+      "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+      "video_id": "p0b-kling-2024",
+      "question_id": "p0b-r1-kling-l",
+      "question_type": "SINGLE_LEXICAL",
+      "should_answer": true,
+      "call_status": "FAILED",
+      "answer_status": null,
+      "answer_status_accuracy": false,
+      "failure_type": "provider",
+      "retrieval": {
+        "question_hit_at_1": true,
+        "question_hit_at_5": true,
+        "evidence_unit_recall_at_5": 1.0,
+        "all_evidence_at_5": true,
+        "mrr": 1.0,
+        "hit_units_at_5": 1,
+        "unit_count": 1
+      },
+      "citation_provenance_verified": false,
+      "citation_temporal_hit": false,
+      "correct_refusal": false,
+      "false_refusal": false,
+      "schema_failure": true,
+      "answer_point_recall": null,
+      "fully_correct_answer": null,
+      "fully_supported_answer": null,
+      "semantic_support": null,
+      "latency_ms": 0,
+      "retrieval_latency_ms": null,
+      "usage": {},
+      "notes": "real answer provider failed: APIConnectionError"
+    },
+    {
+      "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+      "video_id": "p0b-kling-2024",
+      "question_id": "p0b-r1-kling-p",
+      "question_type": "SINGLE_PARAPHRASE",
+      "should_answer": true,
+      "call_status": "FAILED",
+      "answer_status": null,
+      "answer_status_accuracy": false,
+      "failure_type": "provider",
+      "retrieval": {
+        "question_hit_at_1": true,
+        "question_hit_at_5": true,
+        "evidence_unit_recall_at_5": 1.0,
+        "all_evidence_at_5": true,
+        "mrr": 1.0,
+        "hit_units_at_5": 1,
+        "unit_count": 1
+      },
+      "citation_provenance_verified": false,
+      "citation_temporal_hit": false,
+      "correct_refusal": false,
+      "false_refusal": false,
+      "schema_failure": true,
+      "answer_point_recall": null,
+      "fully_correct_answer": null,
+      "fully_supported_answer": null,
+      "semantic_support": null,
+      "latency_ms": 0,
+      "retrieval_latency_ms": null,
+      "usage": {},
+      "notes": "real answer provider failed: APIConnectionError"
+    },
+    {
+      "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+      "video_id": "p0b-kling-2024",
+      "question_id": "p0b-r1-kling-m",
+      "question_type": "MULTI_EVIDENCE",
+      "should_answer": true,
+      "call_status": "FAILED",
+      "answer_status": null,
+      "answer_status_accuracy": false,
+      "failure_type": "provider",
+      "retrieval": {
+        "question_hit_at_1": true,
+        "question_hit_at_5": true,
+        "evidence_unit_recall_at_5": 1.0,
+        "all_evidence_at_5": true,
+        "mrr": 1.0,
+        "hit_units_at_5": 2,
+        "unit_count": 2
+      },
+      "citation_provenance_verified": false,
+      "citation_temporal_hit": false,
+      "correct_refusal": false,
+      "false_refusal": false,
+      "schema_failure": true,
+      "answer_point_recall": null,
+      "fully_correct_answer": null,
+      "fully_supported_answer": null,
+      "semantic_support": null,
+      "latency_ms": 0,
+      "retrieval_latency_ms": null,
+      "usage": {},
+      "notes": "real answer provider failed: APIConnectionError"
+    },
+    {
+      "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+      "video_id": "p0b-kling-2024",
+      "question_id": "p0b-r1-kling-u",
+      "question_type": "UNANSWERABLE",
+      "should_answer": false,
+      "call_status": "FAILED",
+      "answer_status": null,
+      "answer_status_accuracy": false,
+      "failure_type": "provider",
+      "retrieval": {
+        "question_hit_at_1": null,
+        "question_hit_at_5": null,
+        "evidence_unit_recall_at_5": null,
+        "all_evidence_at_5": null,
+        "mrr": null,
+        "hit_units_at_5": 0,
+        "unit_count": 0
+      },
+      "citation_provenance_verified": false,
+      "citation_temporal_hit": null,
+      "correct_refusal": false,
+      "false_refusal": false,
+      "schema_failure": true,
+      "answer_point_recall": null,
+      "fully_correct_answer": null,
+      "fully_supported_answer": null,
+      "semantic_support": null,
+      "latency_ms": 0,
+      "retrieval_latency_ms": null,
+      "usage": {},
+      "notes": "real answer provider failed: APIConnectionError"
+    },
+    {
+      "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+      "video_id": "p0b-rlinf-2026",
+      "question_id": "p0b-r1-rlinf-l",
+      "question_type": "SINGLE_LEXICAL",
+      "should_answer": true,
+      "call_status": "FAILED",
+      "answer_status": null,
+      "answer_status_accuracy": false,
+      "failure_type": "provider",
+      "retrieval": {
+        "question_hit_at_1": true,
+        "question_hit_at_5": true,
+        "evidence_unit_recall_at_5": 1.0,
+        "all_evidence_at_5": true,
+        "mrr": 1.0,
+        "hit_units_at_5": 1,
+        "unit_count": 1
+      },
+      "citation_provenance_verified": false,
+      "citation_temporal_hit": false,
+      "correct_refusal": false,
+      "false_refusal": false,
+      "schema_failure": true,
+      "answer_point_recall": null,
+      "fully_correct_answer": null,
+      "fully_supported_answer": null,
+      "semantic_support": null,
+      "latency_ms": 0,
+      "retrieval_latency_ms": null,
+      "usage": {},
+      "notes": "real answer provider failed: APIConnectionError"
+    },
+    {
+      "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+      "video_id": "p0b-rlinf-2026",
+      "question_id": "p0b-r1-rlinf-p",
+      "question_type": "SINGLE_PARAPHRASE",
+      "should_answer": true,
+      "call_status": "FAILED",
+      "answer_status": null,
+      "answer_status_accuracy": false,
+      "failure_type": "provider",
+      "retrieval": {
+        "question_hit_at_1": false,
+        "question_hit_at_5": true,
+        "evidence_unit_recall_at_5": 1.0,
+        "all_evidence_at_5": true,
+        "mrr": 0.5,
+        "hit_units_at_5": 1,
+        "unit_count": 1
+      },
+      "citation_provenance_verified": false,
+      "citation_temporal_hit": false,
+      "correct_refusal": false,
+      "false_refusal": false,
+      "schema_failure": true,
+      "answer_point_recall": null,
+      "fully_correct_answer": null,
+      "fully_supported_answer": null,
+      "semantic_support": null,
+      "latency_ms": 0,
+      "retrieval_latency_ms": null,
+      "usage": {},
+      "notes": "real answer provider failed: APIConnectionError"
+    },
+    {
+      "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+      "video_id": "p0b-rlinf-2026",
+      "question_id": "p0b-r1-rlinf-m",
+      "question_type": "MULTI_EVIDENCE",
+      "should_answer": true,
+      "call_status": "FAILED",
+      "answer_status": null,
+      "answer_status_accuracy": false,
+      "failure_type": "provider",
+      "retrieval": {
+        "question_hit_at_1": true,
+        "question_hit_at_5": true,
+        "evidence_unit_recall_at_5": 0.6666666666666666,
+        "all_evidence_at_5": false,
+        "mrr": 1.0,
+        "hit_units_at_5": 2,
+        "unit_count": 3
+      },
+      "citation_provenance_verified": false,
+      "citation_temporal_hit": false,
+      "correct_refusal": false,
+      "false_refusal": false,
+      "schema_failure": true,
+      "answer_point_recall": null,
+      "fully_correct_answer": null,
+      "fully_supported_answer": null,
+      "semantic_support": null,
+      "latency_ms": 0,
+      "retrieval_latency_ms": null,
+      "usage": {},
+      "notes": "real answer provider failed: APIConnectionError"
+    },
+    {
+      "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+      "video_id": "p0b-rlinf-2026",
+      "question_id": "p0b-r1-rlinf-u",
+      "question_type": "UNANSWERABLE",
+      "should_answer": false,
+      "call_status": "FAILED",
+      "answer_status": null,
+      "answer_status_accuracy": false,
+      "failure_type": "provider",
+      "retrieval": {
+        "question_hit_at_1": null,
+        "question_hit_at_5": null,
+        "evidence_unit_recall_at_5": null,
+        "all_evidence_at_5": null,
+        "mrr": null,
+        "hit_units_at_5": 0,
+        "unit_count": 0
+      },
+      "citation_provenance_verified": false,
+      "citation_temporal_hit": null,
+      "correct_refusal": false,
+      "false_refusal": false,
+      "schema_failure": true,
+      "answer_point_recall": null,
+      "fully_correct_answer": null,
+      "fully_supported_answer": null,
+      "semantic_support": null,
+      "latency_ms": 0,
+      "retrieval_latency_ms": null,
+      "usage": {},
+      "notes": "real answer provider failed: APIConnectionError"
+    },
+    {
+      "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+      "video_id": "p0b-wuyi-goals",
+      "question_id": "p0b-r1-wuyi-l",
+      "question_type": "SINGLE_LEXICAL",
+      "should_answer": true,
+      "call_status": "FAILED",
+      "answer_status": null,
+      "answer_status_accuracy": false,
+      "failure_type": "provider",
+      "retrieval": {
+        "question_hit_at_1": false,
+        "question_hit_at_5": true,
+        "evidence_unit_recall_at_5": 1.0,
+        "all_evidence_at_5": true,
+        "mrr": 0.25,
+        "hit_units_at_5": 1,
+        "unit_count": 1
+      },
+      "citation_provenance_verified": false,
+      "citation_temporal_hit": false,
+      "correct_refusal": false,
+      "false_refusal": false,
+      "schema_failure": true,
+      "answer_point_recall": null,
+      "fully_correct_answer": null,
+      "fully_supported_answer": null,
+      "semantic_support": null,
+      "latency_ms": 0,
+      "retrieval_latency_ms": null,
+      "usage": {},
+      "notes": "real answer provider failed: APIConnectionError"
+    },
+    {
+      "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+      "video_id": "p0b-wuyi-goals",
+      "question_id": "p0b-r1-wuyi-p",
+      "question_type": "SINGLE_PARAPHRASE",
+      "should_answer": true,
+      "call_status": "FAILED",
+      "answer_status": null,
+      "answer_status_accuracy": false,
+      "failure_type": "provider",
+      "retrieval": {
+        "question_hit_at_1": true,
+        "question_hit_at_5": true,
+        "evidence_unit_recall_at_5": 1.0,
+        "all_evidence_at_5": true,
+        "mrr": 1.0,
+        "hit_units_at_5": 1,
+        "unit_count": 1
+      },
+      "citation_provenance_verified": false,
+      "citation_temporal_hit": false,
+      "correct_refusal": false,
+      "false_refusal": false,
+      "schema_failure": true,
+      "answer_point_recall": null,
+      "fully_correct_answer": null,
+      "fully_supported_answer": null,
+      "semantic_support": null,
+      "latency_ms": 0,
+      "retrieval_latency_ms": null,
+      "usage": {},
+      "notes": "real answer provider failed: APIConnectionError"
+    },
+    {
+      "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+      "video_id": "p0b-wuyi-goals",
+      "question_id": "p0b-r1-wuyi-m",
+      "question_type": "MULTI_EVIDENCE",
+      "should_answer": true,
+      "call_status": "FAILED",
+      "answer_status": null,
+      "answer_status_accuracy": false,
+      "failure_type": "provider",
+      "retrieval": {
+        "question_hit_at_1": false,
+        "question_hit_at_5": true,
+        "evidence_unit_recall_at_5": 1.0,
+        "all_evidence_at_5": true,
+        "mrr": 0.5,
+        "hit_units_at_5": 2,
+        "unit_count": 2
+      },
+      "citation_provenance_verified": false,
+      "citation_temporal_hit": false,
+      "correct_refusal": false,
+      "false_refusal": false,
+      "schema_failure": true,
+      "answer_point_recall": null,
+      "fully_correct_answer": null,
+      "fully_supported_answer": null,
+      "semantic_support": null,
+      "latency_ms": 0,
+      "retrieval_latency_ms": null,
+      "usage": {},
+      "notes": "real answer provider failed: APIConnectionError"
+    },
+    {
+      "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+      "video_id": "p0b-wuyi-goals",
+      "question_id": "p0b-r1-wuyi-u",
+      "question_type": "UNANSWERABLE",
+      "should_answer": false,
+      "call_status": "FAILED",
+      "answer_status": null,
+      "answer_status_accuracy": false,
+      "failure_type": "provider",
+      "retrieval": {
+        "question_hit_at_1": null,
+        "question_hit_at_5": null,
+        "evidence_unit_recall_at_5": null,
+        "all_evidence_at_5": null,
+        "mrr": null,
+        "hit_units_at_5": 0,
+        "unit_count": 0
+      },
+      "citation_provenance_verified": false,
+      "citation_temporal_hit": null,
+      "correct_refusal": false,
+      "false_refusal": false,
+      "schema_failure": true,
+      "answer_point_recall": null,
+      "fully_correct_answer": null,
+      "fully_supported_answer": null,
+      "semantic_support": null,
+      "latency_ms": 0,
+      "retrieval_latency_ms": null,
+      "usage": {},
+      "notes": "real answer provider failed: APIConnectionError"
+    }
+  ]
+}

@@ -29,7 +29,7 @@
   "status": "CLOSED_OWNER_REVIEWED_RETRIEVAL_THRESHOLDS_NOT_MET",
   "active_follow_up": {
     "task_id": "P0-B-R2",
-    "status": "FROZEN_AWAITING_OWNER_RUN_AUTHORIZATION",
+    "status": "CLOSED_BLOCKED_EXECUTION_FAILURE",
     "baseline_commit": "982f5ea5d8036a65ce9779ec1d24a5d1f495511d",
     "scope": "TRANSCRIPT_RETRIEVAL only; deterministic query normalization and char 2-4 gram TF-IDF query/score aggregation, r2 refusal prompt, and revision-safe evaluation paths",
     "fixed_inputs": [
@@ -40,7 +40,7 @@
       "artifacts/p0b-ingest/",
       "127 timestamped VideoSegments"
     ],
-    "formal_run_authorization": "PENDING_OWNER_EXPLICIT_AUTHORIZATION_AFTER_FREEZE; no new DeepSeek text call has been made"
+    "formal_run_authorization": "OWNER_AUTHORIZED_12_CALLS; all 12 calls were attempted once and provider failures were preserved"
   },
   "implementation_evidence": "reports/p0b-implementation-report.md",
   "verification": {
@@ -65,7 +65,9 @@
     "formal_inputs": "2026-08-26: 3 videos, 12 questions, 12 Gold rows, 127 segments, all Gold segment/time mappings, media hashes and durations passed",
     "development_retrieval_check": "2026-08-26: candidate lexical profile reached Hit@1 6/9, Hit@5 9/9, AllEvidence@5 2/3, MRR 0.805556 on the fixed regression set; development-only and not a formal result",
     "freeze": "2026-08-26: p0b-r2 FROZEN at eval/p0b/revisions/p0b-r2/eval-manifest.json; source commit 3e280afc5d11a7976575ca0c8c660d6c79d70aaa; media, ingest, 127 segments, fixed inputs and Gold mappings revalidated",
-    "formal_run": "BLOCKED_PENDING_OWNER_EXPLICIT_AUTHORIZATION_FOR_12_NEW_DEEPSEEK_TEXT_CALLS",
-    "human_review": "NOT_STARTED"
+    "formal_run": "2026-08-26: 12/12 retrieval files persisted before calls; 12/12 result slots recorded provider/APIConnectionError; no rerun or overwrite",
+    "automatic_score": "2026-08-26: retrieval Hit@1 6/9, Hit@5 9/9, Gold evidence-unit recall mean 0.962963, AllEvidence@5 2/3, MRR 0.805556; answer/status and schema metrics not evaluable because all calls failed",
+    "report": "2026-08-26: reports/p0b-r2-retrieval-eval.md and .json generated with P0B_BLOCKED_EXECUTION_FAILURE",
+    "human_review": "NOT_APPLICABLE_FOR_THIS_RUN; all model calls failed and review fields remain null"
   }
 }

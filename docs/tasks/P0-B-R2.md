@@ -188,10 +188,12 @@ r1 保护文件哈希校验
 - `P0B-R2-01`：已完成；失败分析见 `docs/tasks/p0b-r2/failure-analysis.md`。
 - `P0B-R2-02` 至 `P0B-R2-04`：已完成，当前改动为通用字符 2–4 gram TF-IDF
   查询视图/固定分数聚合、r2 拒答 prompt 和 revision-safe 路径隔离。
-- `P0B-R2-05` 至 `P0B-R2-06`：已完成；`p0b-r2` manifest 已冻结并通过冻结复核，
-  尚未执行新的 12 次 DeepSeek 调用。
-- 当前状态为 `FROZEN / AWAITING_OWNER_RUN_AUTHORIZATION`；API 调用授权仍按
-  `P0B-R2-07` 单独确认。
+- `P0B-R2-05` 至 `P0B-R2-06`：已完成；`p0b-r2` manifest 已冻结并通过冻结复核。
+- `P0B-R2-07`：已按 owner 授权执行一次；12/12 retrieval 先落盘，12/12 DeepSeek
+  调用均原样记录为 `provider / APIConnectionError`，没有 raw response。
+- `P0B-R2-08`：已完成自动评分和最终报告；由于没有成功回答，语义审核字段保持
+  空值，不将本次运行判为通过。
+- 当前状态为 `CLOSED / BLOCKED_EXECUTION_FAILURE`；不在本 revision 重试或覆盖结果。
 
 ## 7. 验收与状态
 
@@ -222,9 +224,8 @@ r1 保护文件哈希校验
 
 ## 9. 本任务当前状态
 
-当前为 `FROZEN / AWAITING_OWNER_RUN_AUTHORIZATION`。r2 manifest 位于
-`eval/p0b/revisions/p0b-r2/eval-manifest.json`，结果根目录锁定为
-`artifacts/p0b/p0b-r2/`；冻结复核已通过。按照 `P0B-R2-07`，在执行新的 12 次
-真实 DeepSeek 文本调用前，必须取得 owner 的明确授权；在此之前不得执行正式回答
-评测。正式运行、自动评分完成后，仍须在 owner 语义审核点暂停，不得提前声明
-`P0B_R2_PASSED`。
+当前为 `CLOSED / BLOCKED_EXECUTION_FAILURE`。r2 manifest 位于
+`eval/p0b/revisions/p0b-r2/eval-manifest.json`，结果根目录为
+`artifacts/p0b/p0b-r2/`，最终报告为 `reports/p0b-r2-retrieval-eval.md` 及其 JSON
+文件。12 次真实调用已按授权执行且失败结果已锁定；不得在本 revision 重试、覆盖
+或把检索开发指标冒充为 P0B 通过。未形成 `P0B_R2_PASSED`。

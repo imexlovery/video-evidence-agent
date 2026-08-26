@@ -137,3 +137,33 @@ at `eval/p0b/revisions/p0b-r2/eval-manifest.json`; it pins source commit
 `artifacts/p0b/p0b-r2/`. No new DeepSeek calls have been made. A separate explicit
 owner authorization is required for the one-call-per-question 12-question formal
 run.
+
+## P0-B R2 formal run and closeout — 2026-08-26
+
+The owner then explicitly authorized the 12 new DeepSeek text calls. The locked
+run executed once against the frozen manifest. All 12 question-specific
+`retrieval.json` files were persisted before their answer attempt, and all 12
+formal result slots were created. Every answer attempt failed with
+`provider / APIConnectionError`; no raw provider response or token usage was
+available. The failure artifacts retain the failure class without exposing a
+credential, and no question was retried or overwritten.
+
+The retrieval-only automatic audit of the persisted Top-5 files was:
+
+| metric | r2 result |
+| --- | ---: |
+| QuestionHit@1 | 6/9 |
+| QuestionHit@5 | 9/9 |
+| Gold evidence-unit recall@5 | 0.962963 |
+| AllEvidence@5 | 2/3 |
+| MRR | 0.805556 |
+
+Answer/refusal accuracy, schema compliance, citation temporal/provenance
+validity, latency, token usage, and semantic support were not evaluable because
+no model call succeeded. The automatically generated report is
+`reports/p0b-r2-retrieval-eval.md` with its JSON companion; it records
+`BLOCKED_EXECUTION_FAILURE`. The generated
+`artifacts/p0b/p0b-r2/human-review.json` and `.jsonl` contain all 12 rows with
+semantic review fields left null. There is no answer content for meaningful
+owner semantic adjudication, so this revision is closed blocked and is not
+`P0B_R2_PASSED`.

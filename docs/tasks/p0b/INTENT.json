@@ -16,11 +16,11 @@
   ],
   "active_follow_up": {
     "task_id": "P0-B-R2",
-    "status": "FROZEN_AWAITING_OWNER_RUN_AUTHORIZATION",
+    "status": "CLOSED_BLOCKED_EXECUTION_FAILURE",
     "baseline_commit": "982f5ea5d8036a65ce9779ec1d24a5d1f495511d",
     "objective": "Improve the fixed regression set with a transparent lexical query-view/score aggregation and a stricter evidence insufficiency prompt without changing media, ASR, segments, questions, Gold, or the TRANSCRIPT_RETRIEVAL boundary.",
     "stop_boundary": "After the new 12-question run, automatic grading, final report, and the required owner semantic-review checkpoint; no automatic r3 or P1.",
-    "deepseek_calls": "r2 is frozen; a new explicit owner authorization is required before the 12 real text calls, and no call has been made yet."
+    "deepseek_calls": "Owner authorized the 12-call run; all 12 calls were attempted once and preserved as provider/APIConnectionError failures. No rerun is permitted in this revision."
   },
   "verification": [
     "uv run pytest -q",
