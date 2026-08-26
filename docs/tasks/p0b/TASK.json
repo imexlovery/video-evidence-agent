@@ -27,6 +27,21 @@
     "Tests and Ruff pass."
   ],
   "status": "CLOSED_OWNER_REVIEWED_RETRIEVAL_THRESHOLDS_NOT_MET",
+  "active_follow_up": {
+    "task_id": "P0-B-R2",
+    "status": "IMPLEMENTATION_IN_PROGRESS_PREFREEZE",
+    "baseline_commit": "982f5ea5d8036a65ce9779ec1d24a5d1f495511d",
+    "scope": "TRANSCRIPT_RETRIEVAL only; deterministic query normalization and char 2-4 gram TF-IDF query/score aggregation, r2 refusal prompt, and revision-safe evaluation paths",
+    "fixed_inputs": [
+      "eval/p0b/corpus.jsonl",
+      "eval/p0b/questions.jsonl",
+      "eval/p0b/gold.jsonl",
+      "eval/p0b/media/",
+      "artifacts/p0b-ingest/",
+      "127 timestamped VideoSegments"
+    ],
+    "formal_run_authorization": "NOT_YET_REQUESTED; freeze first, then obtain explicit authorization for 12 new DeepSeek text calls"
+  },
   "implementation_evidence": "reports/p0b-implementation-report.md",
   "verification": {
     "pytest": "2026-08-26: 22 passed",
@@ -40,5 +55,17 @@
     "run": "2026-08-26: 12/12 TRANSCRIPT_RETRIEVAL result slots recorded; 12 retrieval.json artifacts persisted before the 12 DeepSeek text calls; no video upload",
     "automatic_score": "2026-08-26: 12/12 calls succeeded and schema-compliant; QuestionHit@1 2/9, QuestionHit@5 7/9, Gold evidence-unit recall@5 mean 0.648148, AllEvidence@5 1/3, MRR mean 0.435185, answer/refusal accuracy 10/12, correct refusal 2/3, invalid provenance 0/9, mean latency 3645.08ms",
     "human_review": "2026-08-26: OWNER reviewed all 12 rows and explicitly authorized Codex to record the frozen-rubric semantic labels; answer-point coverage mean 0.685185, fully correct 5/9 answerable, fully supported 5/9 answerable, semantic support 8/9 answerable; evaluation closed without a P0B PASSED claim"
+  },
+  "follow_up_verification": {
+    "baseline": "2026-08-26: r1 protected artifact hashes verified; baseline commit 982f5ea5d8036a65ce9779ec1d24a5d1f495511d",
+    "pytest": "2026-08-26: 28 passed",
+    "ruff": "2026-08-26: All checks passed",
+    "git_diff_check": "2026-08-26: passed",
+    "jsonl": "2026-08-26: formal corpus/questions/gold/decision-evidence valid JSONL",
+    "formal_inputs": "2026-08-26: 3 videos, 12 questions, 12 Gold rows, 127 segments, all Gold segment/time mappings, media hashes and durations passed",
+    "development_retrieval_check": "2026-08-26: candidate lexical profile reached Hit@1 6/9, Hit@5 9/9, AllEvidence@5 2/3, MRR 0.805556 on the fixed regression set; development-only and not a formal result",
+    "freeze": "PENDING_OWNER_RUN_AUTHORIZATION",
+    "formal_run": "NOT_STARTED",
+    "human_review": "NOT_STARTED"
   }
 }

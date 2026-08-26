@@ -43,3 +43,39 @@ For the frozen `p0b-r1` run, the owner reviewed all 12 materials and explicitly
 authorized Codex to record the rubric booleans. The final recommendation is
 `P0B_RETRIEVAL_THRESHOLDS_NOT_MET`; this is a closed evaluation, not a P0-B
 quality pass.
+
+## P0-B R2 follow-up
+
+`p0b-r2` is a new revision of the same single method, not a second baseline.
+It reuses the three owner-confirmed videos, the 127 existing ingest segments,
+the 12 questions, and the 12 Gold rows. The only implementation changes are a
+deterministic character 2–4 gram TF-IDF query-view/score-aggregation profile,
+an evidence-insufficiency answer prompt, and revision-safe output paths. No
+video is uploaded and no Gemini, Dense, Hybrid, Reranker, Embedding, VLM, Agent,
+FastAPI, or database path is active.
+
+The r2 prompt is `prompts/transcript-retrieval-r2.md`. Its manifest is planned
+at `revisions/p0b-r2/eval-manifest.json`, with formal results under
+`artifacts/p0b/p0b-r2/` and the report under
+`reports/p0b-r2-retrieval-eval.md` plus its JSON companion. The r1 manifest at
+`eval-manifest.json` and all r1 artifacts remain immutable.
+
+The r2 safe order is:
+
+```text
+1. run the offline tests, strict JSONL checks, r1 protection checks, and media/
+   ingest/Gold validation
+2. `video-evidence p0b-freeze --eval-revision p0b-r2 --gold-revision p0b-r1 \
+   --manifest-out eval/p0b/revisions/p0b-r2/eval-manifest.json`
+3. obtain explicit owner authorization for 12 new real DeepSeek text calls
+4. `video-evidence p0b-run --manifest eval/p0b/revisions/p0b-r2/eval-manifest.json`
+5. `video-evidence p0b-grade --manifest eval/p0b/revisions/p0b-r2/eval-manifest.json`
+6. pause for owner semantic review of the generated 12-question materials
+7. after the required review, generate `reports/p0b-r2-retrieval-eval.md`
+```
+
+At the current construction stage the r2 manifest has not been frozen and no
+new DeepSeek calls have been made. Each future question will persist its own
+Top-5 retrieval before its single answer call; failures remain visible and are
+not selectively rerun or overwritten. The fixed-set development retrieval
+check is not a formal P0-B result and cannot by itself establish a pass.

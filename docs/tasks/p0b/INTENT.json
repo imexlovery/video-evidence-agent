@@ -14,6 +14,14 @@
     "Web/API productization",
     "Automatic promotion of question or Gold drafts to frozen inputs"
   ],
+  "active_follow_up": {
+    "task_id": "P0-B-R2",
+    "status": "IMPLEMENTATION_IN_PROGRESS_PREFREEZE",
+    "baseline_commit": "982f5ea5d8036a65ce9779ec1d24a5d1f495511d",
+    "objective": "Improve the fixed regression set with a transparent lexical query-view/score aggregation and a stricter evidence insufficiency prompt without changing media, ASR, segments, questions, Gold, or the TRANSCRIPT_RETRIEVAL boundary.",
+    "stop_boundary": "After the new 12-question run, automatic grading, final report, and the required owner semantic-review checkpoint; no automatic r3 or P1.",
+    "deepseek_calls": "A new explicit owner authorization is required after r2 freeze and before the 12 real text calls."
+  },
   "verification": [
     "uv run pytest -q",
     "uv run ruff check .",

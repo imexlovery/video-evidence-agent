@@ -93,12 +93,12 @@ The implementation is file-backed and fail-closed:
 - `p0b-ingest` reuses the P0-A FFmpeg/Chinese ASR/VideoSegment pipeline for each
   corpus video;
 - `p0b-freeze` records media, questions, Gold, the answer prompt, dependency and source
-  hashes in an immutable `eval/p0b/eval-manifest.json`;
+  hashes in an immutable, revision-specific manifest;
 - `p0b-run` persists the current question's Top-5 before its single DeepSeek
   text call and writes one `TRANSCRIPT_RETRIEVAL` result or explicit failure
   artifact for every question; it never uploads video;
 - `p0b-report` computes temporal retrieval/provenance metrics and keeps semantic
-  answer review separate in `artifacts/p0b/p0b-r1/human-review.json`.
+  answer review separate in the revision's artifact root.
 
 The frozen `p0b-r1` run is closed after owner review and owner-authorized
 per-question semantic labeling. Its final recommendation is
@@ -111,3 +111,15 @@ hashes before creating the manifest. The answer call uses the project-root
 `.env` values `OPENAI_API_KEY`, `OPENAI_BASE_URL`, and
 `VIDEO_EVIDENCE_MODEL`; no separate video-provider configuration exists and
 there is no Mock answer path.
+
+The historical `p0b-r1` evaluation remains frozen at
+`eval/p0b/eval-manifest.json` with results under `artifacts/p0b/p0b-r1/`; its
+retrieval thresholds were not met and it is not labeled `PASSED`. The active
+follow-up is the narrow `p0b-r2` revision: it keeps the same three videos,
+127 segments, 12 questions, and Gold, and only adds deterministic lexical
+query-view/score aggregation, an evidence-insufficiency prompt, and revision
+isolation. It does not use Gemini, upload video, or add Dense/Hybrid/Reranker,
+VLM, Agent, or service components. Its planned manifest and results are
+`eval/p0b/revisions/p0b-r2/eval-manifest.json` and
+`artifacts/p0b/p0b-r2/`. The new 12-call DeepSeek run starts only after that
+manifest is frozen and separately authorized by the owner.

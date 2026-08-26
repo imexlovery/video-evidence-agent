@@ -1,6 +1,12 @@
 import pytest
 
-from video_evidence_agent.p0b_eval import _grade_one, _retrieval_metrics
+from video_evidence_agent.p0b_eval import (
+    _artifact_root_for_manifest,
+    _assert_artifact_root_available,
+    _grade_one,
+    _manifest_path_for_manifest,
+    _retrieval_metrics,
+)
 from video_evidence_agent.p0b_schemas import (
     CorpusRecord,
     EvaluationMethod,
@@ -168,3 +174,31 @@ def test_unanswerable_retrieval_metrics_are_not_counted_as_ranked_hits() -> None
     assert metrics["question_hit_at_1"] is None
     assert metrics["question_hit_at_5"] is None
     assert metrics["mrr"] is None
+
+
+def test_revision_manifest_paths_are_isolated_and_cannot_escape_project_root(tmp_path) -> None:
+    manifest = {
+        "eval_revision": "p0b-r2",
+        "manifest_path": "eval/p0b/revisions/p0b-r2/eval-manifest.json",
+        "artifact_root": "artifacts/p0b/p0b-r2",
+    }
+
+    assert _manifest_path_for_manifest(tmp_path, manifest) == (
+        tmp_path / "eval/p0b/revisions/p0b-r2/eval-manifest.json"
+    )
+    assert _artifact_root_for_manifest(tmp_path, manifest) == tmp_path / "artifacts/p0b/p0b-r2"
+
+    with pytest.raises(RuntimeError, match="inside the project root"):
+        _artifact_root_for_manifest(
+            tmp_path,
+            {"eval_revision": "p0b-r2", "artifact_root": "../outside"},
+        )
+
+
+def test_formal_artifact_root_refuses_existing_payload(tmp_path) -> None:
+    artifact_root = tmp_path / "artifacts" / "p0b" / "p0b-r2"
+    artifact_root.mkdir(parents=True)
+    (artifact_root / "run-manifest.json").write_text("{}\n", encoding="utf-8")
+
+    with pytest.raises(RuntimeError, match="already contains data"):
+        _assert_artifact_root_available(artifact_root)

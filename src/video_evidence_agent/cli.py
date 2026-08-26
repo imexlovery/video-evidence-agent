@@ -956,6 +956,10 @@ def _p0b_freeze(args: argparse.Namespace) -> int:
         gold_path=(project_root / args.gold).resolve(),
         answer_prompt_path=(project_root / args.answer_prompt).resolve(),
         media_root=(project_root / args.media_root).resolve(),
+        manifest_path=(project_root / args.manifest_out).resolve()
+        if args.manifest_out
+        else None,
+        gold_revision=args.gold_revision,
     )
     print(
         f"froze {manifest['eval_revision']}: {manifest['corpus']['video_count']} videos, "
@@ -1125,6 +1129,15 @@ def build_parser() -> argparse.ArgumentParser:
     p0b_freeze.add_argument("--corpus", type=Path, default=Path("eval/p0b/corpus.jsonl"))
     p0b_freeze.add_argument("--questions", type=Path, default=Path("eval/p0b/questions.jsonl"))
     p0b_freeze.add_argument("--gold", type=Path, default=Path("eval/p0b/gold.jsonl"))
+    p0b_freeze.add_argument(
+        "--manifest-out",
+        type=Path,
+        help="write a new revision-specific manifest without touching the default r1 manifest",
+    )
+    p0b_freeze.add_argument(
+        "--gold-revision",
+        help="revision of a deliberately reused Gold file, for example p0b-r1",
+    )
     p0b_freeze.add_argument(
         "--answer-prompt", type=Path, default=Path("eval/p0b/prompts/transcript-retrieval-v1.md")
     )

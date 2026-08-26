@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "evaluation_revision": "p0b-r1",
+  "baseline_commit": "982f5ea5d8036a65ce9779ec1d24a5d1f495511d",
+  "purpose": "Recoverable r1 baseline recorded before the r2 source migration.",
+  "protected_artifacts": {
+    "eval/p0b/eval-manifest.json": "64740249c48e6aba2a48705f6cb6a641c620bc61d864266485f59085838bd819",
+    "artifacts/p0b/p0b-r1/run-manifest.json": "2b338f7f7f9e18a631fc3985eb928695d7c9ed581d82116cc0e214b3341dffda",
+    "artifacts/p0b/p0b-r1/metrics.json": "e65fe13805e5f4c80a273814355434e2478eeae177f60c7fe7543d9d8b97c816",
+    "artifacts/p0b/p0b-r1/human-review.json": "06f6902694e7adaabcd4a3de6691cab8cf3c3c314b9b0b636509d9a9440713a8",
+    "artifacts/p0b/p0b-r1/human-review.jsonl": "5e9d24a35e5acb26578ad1a4076492b934abe6ed021458cdb27a2c19d0b6a24c",
+    "reports/p0b-retrieval-eval.md": "5a9fe96bee0c827074ea6f2deff6538bce2b99a44c2883ef6cc6c2a89070e9bf",
+    "reports/p0b-retrieval-eval.json": "e65fe13805e5f4c80a273814355434e2478eeae177f60c7fe7543d9d8b97c816"
+  },
+  "media_and_ingest": "The r1 manifest remains the authoritative hash snapshot for the three media files and 127 ingest segments; no media or ingest artifact is copied or rewritten by r2."
+}

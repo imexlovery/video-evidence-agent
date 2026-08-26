@@ -3,8 +3,8 @@
 | 字段 | 内容 |
 | --- | --- |
 | 任务编号 | `P0-B-R2` |
-| 发布状态 | `ISSUED_DOCUMENT_ONLY` |
-| 施工授权 | `NOT_AUTHORIZED`；本次只发布任务，不开始实现 |
+| 发布状态 | `IMPLEMENTATION_IN_PROGRESS`（原始发布记录为 `ISSUED_DOCUMENT_ONLY`） |
+| 施工授权 | `OWNER_AUTHORIZED`；owner 已明确“开始施工” |
 | 项目等级 | `G1 PROTOTYPE`，本地离线评测 |
 | 前置结果 | `p0b-r1 FROZEN / OWNER_REVIEW_COMPLETE / P0B_RETRIEVAL_THRESHOLDS_NOT_MET` |
 | 唯一目标 | 在不扩展技术栈的前提下，提高现有 TF-IDF Top-5 检索与拒答质量，并以新的 `p0b-r2` 完整评测判断是否通过 P0-B |
@@ -66,10 +66,9 @@ r2 不再重复验证这些工程事实，只处理检索排序、多证据召�
 
 `docs/requirements/p0b/decision-evidence.jsonl` 只能追加，不能改写或删除历史记录。
 
-当前 Git `HEAD` 为 `0de7f74`，但 r1 的 P0-B 文件仍包含未提交工作树内容。
-因此实施 r2 的第一个前置动作必须是建立可恢复的 r1 Git baseline；在此之前不得
-修改冻结源码。baseline 只保存代码、配置和可提交文档，不提交媒体、密钥或被忽略
-的 provider 原始响应。
+实施前已建立可恢复的 r1 Git baseline：`982f5ea5d8036a65ce9779ec1d24a5d1f495511d`。
+baseline 只保存代码、配置和可提交文档，不提交媒体、密钥或被忽略的 provider
+原始响应。r1 冻结 manifest、结果、人工标签、报告和媒体/ingest 快照继续保持不变。
 
 ## 4. r2 允许改动
 
@@ -182,6 +181,16 @@ r1 保护文件哈希校验
 - 人工审核完成后生成 r1→r2 对照，只比较同口径指标，不删除失败题。
 - 发布最终 r2 报告并立即停止。
 
+## 6.1 当前施工进度
+
+- `P0B-R2-00`：已完成；r1 baseline commit 与保护哈希已记录在
+  `docs/tasks/p0b-r2/r1-baseline.json`。
+- `P0B-R2-01`：已完成；失败分析见 `docs/tasks/p0b-r2/failure-analysis.md`。
+- `P0B-R2-02` 至 `P0B-R2-04`：实现中，当前改动为通用字符 2–4 gram TF-IDF
+  查询视图/固定分数聚合、r2 拒答 prompt 和 revision-safe 路径隔离。
+- 当前尚未冻结 `p0b-r2`，尚未执行新的 12 次 DeepSeek 调用；API 调用授权仍按
+  `P0B-R2-07` 在冻结后单独确认。
+
 ## 7. 验收与状态
 
 只有以下六项全部满足，且 owner 语义审核完成，才可记录
@@ -209,9 +218,10 @@ r1 保护文件哈希校验
 - `reports/p0b-r2-retrieval-eval.md`；
 - append-only 的 r2 决策与证据记录。
 
-## 9. 本任务当前停止状态
+## 9. 本任务当前状态
 
-本文件发布后状态保持 `ISSUED_DOCUMENT_ONLY / NOT_AUTHORIZED`。现在不得执行
-P0B-R2-00，不得修改代码、创建 baseline commit、调用 DeepSeek、冻结 r2 或运行
-正式评测。只有 owner 后续明确说“开始实施 P0B-R2”或同等授权后，实施阶段才可
-开始。
+当前为 `IMPLEMENTATION_IN_PROGRESS / PREFREEZE`。owner 已授权开始施工；实现、
+测试、冻结前校验和 r2 manifest 创建可以继续。按照 `P0B-R2-07`，在 r2 manifest
+成功冻结后，必须再次取得对新的 12 次真实 DeepSeek 文本调用的明确授权；在此之前
+不得执行正式回答评测。正式运行、自动评分完成后，仍须在 owner 语义审核点暂停，
+不得提前声明 `P0B_R2_PASSED`。

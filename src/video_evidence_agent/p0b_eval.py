@@ -38,7 +38,12 @@ from video_evidence_agent.p0b_schemas import (
     validate_gold_segments,
     validate_p0b_dataset,
 )
-from video_evidence_agent.retrieval import RetrievalError, retrieve
+from video_evidence_agent.retrieval import (
+    R2_QUERY_VIEW_WEIGHTS,
+    R2_RETRIEVAL_PROFILE,
+    RetrievalError,
+    retrieve_transcript_r2,
+)
 from video_evidence_agent.schemas import AnswerStatus, RetrievalHit, VideoSegment
 from video_evidence_agent.segments import validate_video_segments
 
@@ -193,6 +198,49 @@ def _manifest_path(project_root: Path) -> Path:
     return project_root / "eval" / "p0b" / "eval-manifest.json"
 
 
+def _project_path(project_root: Path, path: Path, *, label: str) -> Path:
+    """Resolve a manifest-controlled path without allowing root escape."""
+
+    resolved = path.resolve() if path.is_absolute() else (project_root / path).resolve()
+    try:
+        resolved.relative_to(project_root.resolve())
+    except ValueError as exc:
+        raise P0BEvaluationError(f"{label} must remain inside the project root") from exc
+    return resolved
+
+
+def _manifest_path_for_manifest(project_root: Path, manifest: dict[str, Any]) -> Path:
+    raw_path = manifest.get("manifest_path")
+    if raw_path is None:
+        return _manifest_path(project_root)
+    if not isinstance(raw_path, str) or not raw_path.strip():
+        raise P0BEvaluationError("frozen manifest manifest_path is invalid")
+    return _project_path(project_root, Path(raw_path), label="manifest_path")
+
+
+def _artifact_root_for_manifest(project_root: Path, manifest: dict[str, Any]) -> Path:
+    raw_path = manifest.get("artifact_root")
+    if raw_path is None:
+        eval_revision = str(manifest.get("eval_revision", "")).strip()
+        if not eval_revision or Path(eval_revision).name != eval_revision:
+            raise P0BEvaluationError("frozen manifest eval_revision is invalid")
+        raw_path = Path("artifacts") / "p0b" / eval_revision
+    elif not isinstance(raw_path, str) or not raw_path.strip():
+        raise P0BEvaluationError("frozen manifest artifact_root is invalid")
+    return _project_path(project_root, Path(raw_path), label="artifact_root")
+
+
+def _assert_artifact_root_available(artifact_root: Path) -> None:
+    """Refuse to create a formal revision over an existing artifact payload."""
+
+    if artifact_root.exists() and (
+        not artifact_root.is_dir() or any(artifact_root.iterdir())
+    ):
+        raise P0BEvaluationError(
+            f"P0-B artifact root already contains data and is immutable: {artifact_root}"
+        )
+
+
 def _resolve_media(media_root: Path, local_path_alias: str) -> Path:
     alias = Path(local_path_alias).expanduser()
     if alias.is_absolute():
@@ -264,10 +312,10 @@ def _validate_formal_artifacts(
     corpus: list[CorpusRecord],
     questions: list[P0BQuestion],
     gold: list[P0BGoldRecord],
-    eval_revision: str,
+    gold_revision: str,
     media_root: Path | None,
 ) -> tuple[dict[str, list[VideoSegment]], list[dict[str, Any]], list[dict[str, Any]]]:
-    validate_p0b_dataset(corpus, questions, gold, eval_revision=eval_revision)
+    validate_p0b_dataset(corpus, questions, gold, eval_revision=gold_revision)
     media_snapshots: list[dict[str, Any]] = []
     if media_root is not None:
         for record in corpus:
@@ -303,14 +351,31 @@ def freeze_p0b(
     gold_path: Path,
     answer_prompt_path: Path,
     media_root: Path | None = None,
+    manifest_path: Path | None = None,
+    gold_revision: str | None = None,
 ) -> dict[str, Any]:
     """Create the immutable P0-B manifest before the single formal run."""
 
-    manifest_path = _manifest_path(project_root)
+    manifest_path = _project_path(
+        project_root,
+        manifest_path or _manifest_path(project_root),
+        label="manifest_path",
+    )
     if manifest_path.exists():
         raise P0BEvaluationError(
             f"P0-B manifest already exists and is immutable: {manifest_path}; create a new revision"
         )
+    if not eval_revision.strip() or Path(eval_revision).name != eval_revision:
+        raise P0BEvaluationError("eval_revision must be a non-empty single path component")
+    artifact_root = _project_path(
+        project_root,
+        Path("artifacts") / "p0b" / eval_revision,
+        label="artifact_root",
+    )
+    _assert_artifact_root_available(artifact_root)
+    gold_revision = (gold_revision or eval_revision).strip()
+    if not gold_revision or Path(gold_revision).name != gold_revision:
+        raise P0BEvaluationError("gold_revision must be a non-empty single path component")
     corpus = load_jsonl(corpus_path, CorpusRecord)
     questions = load_jsonl(questions_path, P0BQuestion)
     gold = load_jsonl(gold_path, P0BGoldRecord)
@@ -322,7 +387,7 @@ def freeze_p0b(
         corpus=corpus,
         questions=questions,
         gold=gold,
-        eval_revision=eval_revision,
+        gold_revision=gold_revision,
         media_root=media_root,
     )
     p0a_hashes = _expected_p0a_hashes(project_root)
@@ -337,6 +402,9 @@ def freeze_p0b(
     manifest = {
         "schema_version": 1,
         "eval_revision": eval_revision,
+        "gold_revision": gold_revision,
+        "manifest_path": _relative(manifest_path, project_root),
+        "artifact_root": _relative(artifact_root, project_root),
         "evaluation_method": METHOD,
         "status": "FROZEN",
         "locked_at": _utc_now(),
@@ -369,6 +437,13 @@ def freeze_p0b(
         "prompt": {
             "path": _relative(answer_prompt_path, project_root),
             "sha256": _sha256(answer_prompt_path),
+        },
+        "retrieval_profile": R2_RETRIEVAL_PROFILE,
+        "retrieval_parameters": {
+            "analyzer": "char",
+            "ngram_range": [2, 4],
+            "sublinear_tf": True,
+            "query_view_weights": R2_QUERY_VIEW_WEIGHTS,
         },
         "answer_model": answer_model,
         "media_snapshots": media_snapshots,
@@ -404,18 +479,22 @@ def verify_frozen_manifest(
 
     if manifest.get("evaluation_method") != METHOD:
         raise P0BEvaluationError("frozen manifest does not use TRANSCRIPT_RETRIEVAL")
+    if manifest.get("status") != "FROZEN":
+        raise P0BEvaluationError("P0-B manifest is not frozen")
+    if manifest.get("retrieval_profile") != R2_RETRIEVAL_PROFILE:
+        raise P0BEvaluationError("P0-B manifest does not use the frozen R2 retrieval profile")
     expected_paths = [
-        (manifest["corpus"]["path"], manifest["corpus"]["sha256"]),
-        (manifest["questions"]["path"], manifest["questions"]["sha256"]),
-        (manifest["gold"]["path"], manifest["gold"]["sha256"]),
-        (manifest["prompt"]["path"], manifest["prompt"]["sha256"]),
+        ("corpus", manifest["corpus"]["path"], manifest["corpus"]["sha256"]),
+        ("questions", manifest["questions"]["path"], manifest["questions"]["sha256"]),
+        ("gold", manifest["gold"]["path"], manifest["gold"]["sha256"]),
+        ("prompt", manifest["prompt"]["path"], manifest["prompt"]["sha256"]),
     ]
-    for relative_path, expected_hash in expected_paths:
-        path = project_root / relative_path
+    for label, relative_path, expected_hash in expected_paths:
+        path = _project_path(project_root, Path(relative_path), label=f"{label} path")
         if not path.is_file() or _sha256(path) != expected_hash:
             raise P0BEvaluationError(f"frozen P0-B input changed: {relative_path}")
     for relative_path, expected_hash in manifest["source_revision"]["files"].items():
-        path = project_root / relative_path
+        path = _project_path(project_root, Path(relative_path), label="source path")
         if not path.is_file() or _sha256(path) != expected_hash:
             raise P0BEvaluationError(f"frozen P0-B source changed: {relative_path}")
 
@@ -454,6 +533,7 @@ def _retrieval_payload(
         "schema_version": 1,
         "eval_revision": eval_revision,
         "evaluation_method": METHOD,
+        "retrieval_profile": R2_RETRIEVAL_PROFILE,
         "video_id": question.video_id,
         "question_id": question.question_id,
         "question": question.question,
@@ -529,7 +609,7 @@ def _run_transcript_question(
     result_path = result_dir / "result.json"
     try:
         retrieval_started_at = perf_counter()
-        hits = retrieve(question.question, segments, top_k=5)
+        hits = retrieve_transcript_r2(question.question, segments, top_k=5)
         retrieval_elapsed_ms = round((perf_counter() - retrieval_started_at) * 1000)
         # This write is intentionally before the only answer-model call.
         _write_json(
@@ -598,9 +678,8 @@ def run_p0b_transcript_retrieval(
 
     verify_frozen_manifest(project_root, manifest, media_root=media_root)
     eval_revision = str(manifest["eval_revision"])
-    artifact_root = project_root / "artifacts" / "p0b" / eval_revision
-    if artifact_root.exists() and any(artifact_root.iterdir()):
-        raise P0BEvaluationError(f"P0-B run already exists and is immutable: {artifact_root}")
+    artifact_root = _artifact_root_for_manifest(project_root, manifest)
+    _assert_artifact_root_available(artifact_root)
     corpus = load_jsonl(project_root / manifest["corpus"]["path"], CorpusRecord)
     questions = load_jsonl(project_root / manifest["questions"]["path"], P0BQuestion)
     validate_p0b_dataset(corpus, questions, eval_revision=eval_revision)
@@ -640,7 +719,9 @@ def run_p0b_transcript_retrieval(
         "status": "RESULTS_RECORDED",
         "started_at": started_at,
         "completed_at": _utc_now(),
-        "eval_manifest_sha256": _sha256(_manifest_path(project_root)),
+        "manifest_path": manifest.get("manifest_path"),
+        "artifact_root": _relative(artifact_root, project_root),
+        "eval_manifest_sha256": _sha256(_manifest_path_for_manifest(project_root, manifest)),
         "question_count": len(questions),
         "result_count": len(questions),
         "expected_result_count": len(questions),
@@ -1063,7 +1144,8 @@ def grade_p0b(*, project_root: Path, manifest: dict[str, Any]) -> dict[str, Any]
     corpus = load_jsonl(project_root / manifest["corpus"]["path"], CorpusRecord)
     questions = load_jsonl(project_root / manifest["questions"]["path"], P0BQuestion)
     gold = load_jsonl(project_root / manifest["gold"]["path"], P0BGoldRecord)
-    validate_p0b_dataset(corpus, questions, gold, eval_revision=eval_revision)
+    gold_revision = str(manifest.get("gold_revision", eval_revision))
+    validate_p0b_dataset(corpus, questions, gold, eval_revision=gold_revision)
     corpus_by_video = {record.video_id: record for record in corpus}
     segments_by_video: dict[str, list[VideoSegment]] = {}
     for record in corpus:
@@ -1073,7 +1155,7 @@ def grade_p0b(*, project_root: Path, manifest: dict[str, Any]) -> dict[str, Any]
         )
     validate_gold_segments(gold, segments_by_video, corpus_by_video)
 
-    artifact_root = project_root / "artifacts" / "p0b" / eval_revision
+    artifact_root = _artifact_root_for_manifest(project_root, manifest)
     run_manifest = _read_json(artifact_root / "run-manifest.json")
     if run_manifest.get("evaluation_method") != METHOD:
         raise P0BEvaluationError("run manifest method mismatch")
