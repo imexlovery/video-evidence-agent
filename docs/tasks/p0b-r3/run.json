@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "task_id": "P0B-R3",
+  "evidence_id": "P0B-R3-FORMAL-RUN-001",
+  "status": "PASSED",
+  "executed_at": "2026-08-26T11:18:57.270125+00:00",
+  "completed_at": "2026-08-26T11:19:55.335264+00:00",
+  "manifest_path": "eval/p0b/revisions/p0b-r3/eval-manifest.json",
+  "manifest_sha256": "45000b84fc5c0902993d5e7d81ed16e912e34b87a8c750b0018357375e535e1a",
+  "artifact_root": "artifacts/p0b/p0b-r3",
+  "formal_call_policy": {
+    "authorized_calls": 12,
+    "executed_calls": 12,
+    "remaining_calls": 0,
+    "one_call_per_question": true,
+    "retries": 0,
+    "overwrites": 0
+  },
+  "population": {
+    "questions": 12,
+    "retrieval_files_persisted_before_answer": 12,
+    "result_slots_recorded": 12,
+    "succeeded": 12,
+    "failed": 0,
+    "schema_compliant": 12
+  },
+  "answer_model": {
+    "provider": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash",
+    "credential_present": true,
+    "temperature": 0,
+    "timeout_seconds": 120.0,
+    "response_schema": "AnswerProposal: status, answer, citation_segment_ids"
+  },
+  "boundary": {
+    "video_upload": false,
+    "full_transcript_upload": false,
+    "gold_upload": false,
+    "historical_answers_upload": false,
+    "mock_used": false,
+    "secret_recorded": false
+  },
+  "artifacts": {
+    "run_manifest": "artifacts/p0b/p0b-r3/run-manifest.json",
+    "retrieval_directory": "artifacts/p0b/p0b-r3/transcript-retrieval",
+    "result_directory": "artifacts/p0b/p0b-r3/transcript-retrieval",
+    "human_review": "artifacts/p0b/p0b-r3/human-review.json",
+    "human_review_jsonl": "artifacts/p0b/p0b-r3/human-review.jsonl"
+  },
+  "formal_score_counted": 12
+}

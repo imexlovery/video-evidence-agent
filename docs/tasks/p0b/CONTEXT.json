@@ -3,7 +3,7 @@
   "workspace": "/Users/tristana/Develop/video-evidence-agent",
   "base_commit": "0de7f74",
   "base_scope": "P0-A PASSED / OWNER_ACCEPTED",
-  "current_stage": "P0-B p0b-r1 TRANSCRIPT_RETRIEVAL frozen and closed with thresholds not met; active follow-up p0b-r2 is in implementation pre-freeze",
+  "current_stage": "P0-B p0b-r1 closed with thresholds not met; p0b-r2 is closed blocked by provider execution failure; p0b-r3 is closed as P0B_PASSED_OWNER_ACCEPTED after all six gates and owner decision, with P1 still unstarted",
   "evaluation_revision": "p0b-r1",
   "follow_up_revision": "p0b-r2",
   "follow_up_stage": "CLOSED_BLOCKED_EXECUTION_FAILURE",
@@ -14,6 +14,12 @@
   "follow_up_scope": "TRANSCRIPT_RETRIEVAL only: deterministic lexical query views and char 2-4 gram TF-IDF score aggregation, r2 refusal prompt, and revision-safe paths",
   "follow_up_call_boundary": "The owner authorized one r2 run; all 12 calls failed with provider/APIConnectionError and are immutable. Do not rerun this revision.",
   "deepseek_connection_diagnosis": "Project .env endpoint and credential validated from a network-enabled context; the original APIConnectionError was caused by sandbox outbound-network denial.",
+  "active_follow_up_revision": "p0b-r3",
+  "active_follow_up_stage": "CLOSED_P0B_PASSED_OWNER_ACCEPTED",
+  "active_follow_up_manifest": "eval/p0b/revisions/p0b-r3/eval-manifest.json",
+  "active_follow_up_artifact_root": "artifacts/p0b/p0b-r3",
+  "active_follow_up_baseline": "docs/tasks/p0b-r3/r2-baseline.json",
+  "active_follow_up_call_boundary": "One authorized P0-A preflight and twelve authorized formal calls are consumed. No further provider call is permitted. Semantic review, the R3 report, and the explicit owner decision are complete; P1 remains unstarted and unauthorized.",
   "source_of_truth": [
     "docs/requirements/p0b/decision-evidence.jsonl",
     "eval/p0b/eval-manifest.json",
@@ -22,7 +28,17 @@
     "docs/tasks/p0b/EVIDENCE.md",
     "docs/tasks/P0-B-R2.md",
     "docs/tasks/p0b-r2/failure-analysis.md",
-    "docs/tasks/p0b-r2/r1-baseline.json"
+    "docs/tasks/p0b-r2/r1-baseline.json",
+    "docs/tasks/P0-B-R3.md",
+    "docs/tasks/p0b-r3/r2-baseline.json",
+    "docs/tasks/p0b-r3/preflight.json",
+    "docs/tasks/p0b-r3/freeze.json",
+    "docs/tasks/p0b-r3/run.json",
+    "docs/tasks/p0b-r3/grade.json",
+    "docs/tasks/p0b-r3/semantic-review.json",
+    "docs/tasks/p0b-r3/final-report.json",
+    "reports/p0b-r3-retrieval-eval.md",
+    "reports/p0b-r3-retrieval-eval.json"
   ],
   "freshness_rule": "The manifest is created only after implementation and frozen inputs are complete; any post-freeze input or source change requires a new revision."
 }

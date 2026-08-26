@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "task_id": "P0B-R3",
+  "evidence_id": "P0B-R3-PREFLIGHT-001",
+  "status": "PASSED",
+  "executed_at": "2026-08-26T11:15:47.737394+00:00",
+  "completed_at": "2026-08-26T11:15:50.112413+00:00",
+  "command_exit_code": 0,
+  "command": "UV_CACHE_DIR=/private/tmp/video-evidence-agent-uv-cache uv run video-evidence ask chinese-lips-mini-val-kj-001 --question <P0-A development question> --question-id p0b-r3-connectivity-preflight --artifacts-dir <disposable /private/tmp artifact directory>",
+  "sample": {
+    "video_id": "chinese-lips-mini-val-kj-001",
+    "question_id": "p0b-r3-connectivity-preflight",
+    "question": "人工智能系统可以通过什么方式提高自身性能？",
+    "retrieved_segment_ids": [
+      "chinese-lips-mini-val-kj-001-seg-003",
+      "chinese-lips-mini-val-kj-001-seg-004",
+      "chinese-lips-mini-val-kj-001-seg-002",
+      "chinese-lips-mini-val-kj-001-seg-001",
+      "chinese-lips-mini-val-kj-001-seg-005"
+    ],
+    "top_k": 5,
+    "video_upload": false
+  },
+  "provider": {
+    "endpoint": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash",
+    "credential_present": true,
+    "temperature": 0,
+    "response_schema": "AnswerProposal: status, answer, citation_segment_ids"
+  },
+  "answer_proposal": {
+    "status": "ANSWERED",
+    "schema_parsed": true,
+    "citation_segment_ids": [
+      "chinese-lips-mini-val-kj-001-seg-003"
+    ]
+  },
+  "evidence_gate": {
+    "status": "PASSED",
+    "reason": "citation_provenance_verified"
+  },
+  "timing": {
+    "observed_end_to_end_ms": 2375,
+    "measurement": "retrieval artifact generated_at to gate artifact generated_at; includes provider call, parsing, and local artifact write",
+    "provider_only_latency_available": false
+  },
+  "usage": {
+    "available": false,
+    "value": null,
+    "note": "The P0-A ask command does not persist AnswerTrace usage; no second call was made to obtain it."
+  },
+  "error": {
+    "category": null,
+    "class": null
+  },
+  "artifact_root": "/private/tmp/video-evidence-r3-preflight.czD1gL/artifacts",
+  "formal_score_counted": false,
+  "project_artifacts_modified": [
+    "docs/tasks/p0b-r3/preflight.json"
+  ],
+  "secret_recorded": false
+}

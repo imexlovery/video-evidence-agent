@@ -27,7 +27,7 @@
     "Tests and Ruff pass."
   ],
   "status": "CLOSED_OWNER_REVIEWED_RETRIEVAL_THRESHOLDS_NOT_MET",
-  "active_follow_up": {
+  "closed_follow_up": {
     "task_id": "P0-B-R2",
     "status": "CLOSED_BLOCKED_EXECUTION_FAILURE",
     "baseline_commit": "982f5ea5d8036a65ce9779ec1d24a5d1f495511d",
@@ -71,5 +71,54 @@
     "human_review": "NOT_APPLICABLE_FOR_THIS_RUN; all model calls failed and review fields remain null",
     "connection_diagnosis": "2026-08-26: sandbox outbound network denied with PermissionError Errno 1; network-enabled no-auth endpoint check returned 401 and authenticated models.list returned 3 models; endpoint and credential are valid",
     "connection_resolution": "Use a network-enabled execution context for any future formally authorized revision; do not rerun frozen p0b-r2"
+  },
+  "active_follow_up": {
+    "task_id": "P0-B-R3",
+    "status": "CLOSED_P0B_PASSED_OWNER_ACCEPTED",
+    "objective": "Execution-only rerun of the fixed p0b-r2 transcript-retrieval evaluation: one disposable P0-A connectivity preflight after authorization, then twelve new real answer calls, automatic grading, owner semantic review, and final report.",
+    "execution_mode": "EXECUTION_ONLY",
+    "protected_revision": "p0b-r2",
+    "fixed_inputs": [
+      "eval/p0b/corpus.jsonl",
+      "eval/p0b/questions.jsonl",
+      "eval/p0b/gold.jsonl",
+      "eval/p0b/prompts/transcript-retrieval-r2.md",
+      "eval/p0b/media/",
+      "artifacts/p0b-ingest/",
+      "127 timestamped VideoSegments"
+    ],
+    "allowed_actions": [
+      "create docs/tasks/p0b-r3/r2-baseline.json",
+      "one disposable P0-A provider preflight after explicit owner authorization",
+      "freeze a new p0b-r3 manifest after successful preflight",
+      "run twelve formal answer calls once after explicit owner authorization",
+      "automatic grading and owner semantic-review checkpoint",
+      "final report and owner decision checkpoint"
+    ],
+    "prohibited_actions": [
+      "application code, tests, dependency, lockfile, retrieval, prompt, question, or Gold changes",
+      "rerun, overwrite, or rescore p0b-r2",
+      "Mock, cached, or hand-written formal answers",
+      "P1, R4, holdout, Agent, VLM, OCR, or product engineering"
+    ],
+    "external_authorization": "OWNER_CONFIRMED_MAX_1_P0A_PREFLIGHT_PLUS_12_FORMAL_CALLS",
+    "current_checkpoint": "P0B-R3-08_REPORT_COMPLETE_OWNER_DECISION_ACCEPTED",
+    "execution_evidence": {
+      "preflight": "docs/tasks/p0b-r3/preflight.json",
+      "freeze": "docs/tasks/p0b-r3/freeze.json",
+      "formal_run": "docs/tasks/p0b-r3/run.json",
+      "automatic_grade": "docs/tasks/p0b-r3/grade.json",
+      "semantic_review": "docs/tasks/p0b-r3/semantic-review.json",
+      "final_report": "docs/tasks/p0b-r3/final-report.json",
+      "report_markdown": "reports/p0b-r3-retrieval-eval.md",
+      "report_json": "reports/p0b-r3-retrieval-eval.json",
+      "formal_calls_executed": 12,
+      "formal_calls_remaining": 0,
+      "six_gate_checks_passed": 6,
+      "owner_final_decision": "P0B_PASSED_OWNER_ACCEPTED",
+      "p0b_passed": true,
+      "p1_authorized": false
+    },
+    "stop_boundary": "R3 is closed as P0B_PASSED_OWNER_ACCEPTED. P1 remains unstarted and requires a separate explicit task and authorization."
   }
 }

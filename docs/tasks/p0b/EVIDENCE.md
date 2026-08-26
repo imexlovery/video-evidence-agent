@@ -183,3 +183,142 @@ models. This confirms the root cause was the sandbox network restriction, not
 an invalid DeepSeek endpoint or credential. The operational fix is to run any
 future formal revision from a network-enabled environment. The frozen r2
 manifest and its 12 failed result slots remain immutable; r2 is not rerun.
+
+## P0-B R3 takeover and offline verification — 2026-08-26
+
+Status: `IN_PROGRESS / P0B-R3-02_WAITING_OWNER_AUTHORIZATION`.
+
+The execution-only R3 task was read and accepted as the active follow-up. The
+closed R2 state remains `P0B_BLOCKED_EXECUTION_FAILURE`; no R2 result, report,
+metric, review, prompt, input, or failure slot was rewritten. The R2 protection
+snapshot is `docs/tasks/p0b-r3/r2-baseline.json` and records hashes for the R2
+manifest, run manifest, metrics, human-review artifacts, report files, and all
+24 question-specific retrieval/result artifacts.
+
+Offline verification completed before any provider call:
+
+- `UV_CACHE_DIR=/private/tmp/video-evidence-agent-uv-cache uv run pytest -q` —
+  exit 0, `28 passed`;
+- `UV_CACHE_DIR=/private/tmp/video-evidence-agent-uv-cache uv run ruff check .` —
+  exit 0, all checks passed;
+- `git diff --check` — exit 0;
+- the protected R2 source commit to current HEAD diff for `src`, `tests`,
+  `pyproject.toml`, and `uv.lock` is empty;
+- corpus, questions, Gold, and decision ledger JSONL validation — exit 0;
+- R2 frozen-manifest input/source/media/ingest pins, P0-A anchors, all three
+  media hashes/durations, all 127 non-empty timestamped segments, and every
+  Gold segment/time mapping — verified by the existing read-only validation
+  path;
+- fixed population is 3 videos, 12 questions, 12 Gold rows, and 127 segments;
+- R3 manifest, artifact root, and report paths were absent at takeover and
+  remain uncreated; `docs/tasks/p0b-r3/` now contains only the allowed R2
+  protection baseline;
+- external calls: `0` (P0-A preflight `0`, formal R3 calls `0`), video upload:
+  `false`, mock result: `false`.
+
+The working-tree `.DS_Store` files, the pre-existing modified decision ledger,
+the issued R3 task document, and the two draft JSONL files were recorded. The
+existing decision-ledger lines were preserved; only the allowed append-only R3
+evidence line was added. The next action is the owner authorization checkpoint for
+`最多 1 次 P0-A 预检 + 12 次正式调用`; until that explicit authorization,
+no provider command may run.
+
+## P0-B R3 preflight and freeze — 2026-08-26
+
+The owner authorization for the approved question/Top-K transcript payload was
+recorded before the call. Exactly one disposable P0-A preflight was executed
+against `https://api.deepseek.com` with `deepseek-v4-flash`; it exited 0,
+returned a parsed `AnswerProposal` with `ANSWERED`, and passed the existing
+Evidence Gate with `citation_provenance_verified`. The preflight evidence is
+`docs/tasks/p0b-r3/preflight.json`; it records the five segment IDs, model,
+status, the observed 2,375ms end-to-end interval, unavailable provider-only
+latency, unavailable usage, and no error. It is not part of the P0-B score.
+
+After that success, `p0b-r3` was frozen at
+`eval/p0b/revisions/p0b-r3/eval-manifest.json`; its SHA-256 is
+`45000b84fc5c0902993d5e7d81ed16e912e34b87a8c750b0018357375e535e1a`.
+The manifest revalidated the fixed inputs, media, ingest artifacts, Gold
+mappings, P0-A anchors, and source pins. Formal calls completed before the
+next step: `0`; remaining formal budget: `12`. The next command is the single
+`p0b-run`; no other preflight or formal call is permitted.
+
+## P0-B R3 formal run and automatic grading — 2026-08-26
+
+The single authorized `p0b-run` executed once against the frozen R3 manifest.
+All 12 question-specific retrieval artifacts were persisted before answering;
+all 12 formal result slots completed successfully and were schema-compliant.
+There were no retries, overwrites, Mock results, video uploads, or provider
+failures. The formal run evidence is `docs/tasks/p0b-r3/run.json`; the raw
+retrieval/result artifacts remain under `artifacts/p0b/p0b-r3/`.
+
+Automatic grading is recorded in `docs/tasks/p0b-r3/grade.json` and
+`artifacts/p0b/p0b-r3/metrics.json`:
+
+| metric | R3 result | frozen threshold/status |
+| --- | ---: | --- |
+| QuestionHit@1 | 6/9 | meets >= 6/9 |
+| QuestionHit@5 | 9/9 | meets >= 8/9 |
+| Gold evidence-unit recall@5 | 0.962963 mean | diagnostic |
+| Multi AllEvidence@5 | 2/3 | meets >= 2/3 |
+| MRR | 0.805556 mean | diagnostic |
+| answer/refusal status accuracy | 11/12 | diagnostic |
+| correct refusal | 2/3 | meets >= 2/3 |
+| invalid citation provenance | 0/10 | meets 0 |
+| schema failures | 0/12 | diagnostic |
+| mean answer latency | 4799.58 ms | diagnostic |
+| reported token usage | 23,858 total | cost not computed |
+
+The current status is `AUTO_SCORED_PENDING_OWNER_REVIEW`. Fully-supported
+answer, fully-correct answer, semantic support, and answer-point coverage are
+not yet scored: `artifacts/p0b/p0b-r3/human-review.json` and `.jsonl` contain
+all 12 rows, the complete current model answer/evidence/quote material, and
+the unchanged Gold reference material, with owner review fields still null.
+The R3 report has not been generated, no P0-B pass is claimed, and P1 has not
+started. The next and final in-scope checkpoint is owner semantic review.
+
+## P0-B R3 owner-authorized semantic review and final report — 2026-08-26
+
+After the owner inspected the presented per-question R3 material, the owner
+explicitly authorized Codex to fill the frozen-rubric semantic labels and
+complete the remaining R3 report work. The authorization is recorded as
+`DEC-P0B-033`; it does not itself select a final P0-B decision or authorize P1.
+
+All 12 rows in `artifacts/p0b/p0b-r3/human-review.json` and `.jsonl` now contain
+review labels. The nine answerable rows have answer-point coverage mean `1.0`,
+fully-correct answer `9/9`, fully-supported answer `9/9`, and semantic support
+`9/9`. Two of the three unanswerable rows correctly emitted
+`INSUFFICIENT_EVIDENCE`. `p0b-r1-kling-u` instead answered that the parameter
+count was not disclosed; its statement is citation-supported, but the frozen
+contract required an explicit refusal, so its `fully_correct` and
+`fully_supported` labels are false.
+
+The required report command exited 0 and generated
+`reports/p0b-r3-retrieval-eval.md` plus its JSON companion. All six frozen Gate
+checks pass:
+
+| Gate | R3 result | threshold |
+| --- | ---: | ---: |
+| QuestionHit@1 | 6/9 | >= 6/9 |
+| QuestionHit@5 | 9/9 | >= 8/9 |
+| Multi AllEvidence@5 | 2/3 | >= 2/3 |
+| FullySupportedAnswer | 9/9 | >= 7/9 |
+| CorrectRefusal | 2/3 | >= 2/3 |
+| Invalid citation provenance | 0/10 | 0 |
+
+The final R3 recommendation is `READY_FOR_OWNER_P0B_DECISION`, not an automatic
+P0-B pass. The owner must still explicitly choose `P0B_PASSED_OWNER_ACCEPTED`,
+`P0B_THRESHOLDS_NOT_MET`, or `P0B_BLOCKED`. No P1 work has started or been
+authorized.
+
+## P0-B R3 owner decision and closeout — 2026-08-26
+
+The owner explicitly selected `P0B_PASSED_OWNER_ACCEPTED` after reviewing the
+complete R3 report and semantic-review evidence. This decision is recorded as
+`DEC-P0B-037`. The R3 closeout status is now
+`P0B_PASSED_OWNER_ACCEPTED`; the scoped P0-B evaluation is accepted, while P1
+remains unstarted and unauthorized.
+
+The report and closeout evidence preserve the six passed Gate counts, the
+12-call execution boundary, the known Kling refusal-contract failure, the
+fixed-regression-set limitations, and the distinction between P0-B acceptance
+and any future P1 authorization.

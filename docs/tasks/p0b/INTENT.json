@@ -14,13 +14,22 @@
     "Web/API productization",
     "Automatic promotion of question or Gold drafts to frozen inputs"
   ],
-  "active_follow_up": {
+  "closed_follow_up": {
     "task_id": "P0-B-R2",
     "status": "CLOSED_BLOCKED_EXECUTION_FAILURE",
     "baseline_commit": "982f5ea5d8036a65ce9779ec1d24a5d1f495511d",
     "objective": "Improve the fixed regression set with a transparent lexical query-view/score aggregation and a stricter evidence insufficiency prompt without changing media, ASR, segments, questions, Gold, or the TRANSCRIPT_RETRIEVAL boundary.",
     "stop_boundary": "After the new 12-question run, automatic grading, final report, and the required owner semantic-review checkpoint; no automatic r3 or P1.",
     "deepseek_calls": "Owner authorized the 12-call run; all 12 calls were attempted once and preserved as provider/APIConnectionError failures. No rerun is permitted in this revision."
+  },
+  "active_follow_up": {
+    "task_id": "P0-B-R3",
+    "status": "CLOSED_P0B_PASSED_OWNER_ACCEPTED",
+    "intent": "Execute the fixed R2 transcript-retrieval evaluation in a network-enabled context without changing its source, retrieval profile, prompt, questions, Gold, or evidence boundary.",
+    "preflight": "At most one disposable P0-A development-sample Chat Completion, only after explicit owner authorization; a failed preflight stops R3 before freeze.",
+    "formal_calls": "At most twelve one-call-per-question real answer calls, only after explicit owner authorization; twelve were executed once with no retries or overwrites.",
+    "data_boundary": "Provider receives only the current question and current Top-5 transcript segments; no video upload, full transcript, Gold, answer points, or historical answers.",
+    "stop_boundary": "Owner-authorized semantic review, the R3 report, and P0B_PASSED_OWNER_ACCEPTED are complete. Stop here; do not make more provider calls or enter P1 without a separate explicit task and authorization."
   },
   "verification": [
     "uv run pytest -q",

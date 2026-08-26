@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "task_id": "P0B-R3",
+  "captured_at": "2026-08-26T10:56:59Z",
+  "purpose": "Protect the closed p0b-r2 revision before the execution-only p0b-r3 run.",
+  "protected_revision": "p0b-r2",
+  "protected_status": "CLOSED_BLOCKED_EXECUTION_FAILURE",
+  "source_commit": "3e280afc5d11a7976575ca0c8c660d6c79d70aaa",
+  "r2_manifest_sha256": "aa4fd956b03aeb7a2707edbf921ffb4e1d0f204193dd2f0f1b354e1312b758d5",
+  "protected_artifacts": {
+    "eval/p0b/revisions/p0b-r2/eval-manifest.json": "aa4fd956b03aeb7a2707edbf921ffb4e1d0f204193dd2f0f1b354e1312b758d5",
+    "artifacts/p0b/p0b-r2/run-manifest.json": "f252fe17b7d46aa8eab3e8278eeded41492fe67e08c6705bd6f47c53ebd720f8",
+    "artifacts/p0b/p0b-r2/metrics.json": "405e6c6ab2bea6cc0f679c283a1a7edf49d07279ac132c3571619b4856851089",
+    "artifacts/p0b/p0b-r2/human-review.json": "6fc9355dad8df5b21d11ece01eb5a6f27ed3f4d2b3014aca3931103c8f934fba",
+    "artifacts/p0b/p0b-r2/human-review.jsonl": "6e8dbb11f502088efbf12f962845ff3006978aaeb690a1befe933d990171aace",
+    "reports/p0b-r2-retrieval-eval.md": "80931f6ec97074bef49a466fa6fa119617f3cd677c4e80ebbd83c2435e502a59",
+    "reports/p0b-r2-retrieval-eval.json": "405e6c6ab2bea6cc0f679c283a1a7edf49d07279ac132c3571619b4856851089",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-kling-l/result.json": "fab14048b325c48c6ffe68a5049e4c06410dfde6f1aeb0a7582ab52c7fbe68c9",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-kling-l/retrieval.json": "a3243904ed53ba1e7e6b2beb5d39964d84a331eda848381033dbb64f93320a3a",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-kling-m/result.json": "a6e9518094005fd3e27efa0940c88449245f5a84f72d63894f4eb6ec2afd3ad3",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-kling-m/retrieval.json": "a5b7cc57b98a5d070c8d1536efdb791ea06d83c5604df7ccbcdd462294568483",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-kling-p/result.json": "53617aaf7471d796a42173b03594e5841e8ddbb0a17d19c53f1aa7f8f0e0b411",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-kling-p/retrieval.json": "3dbb2e49a3772c255a638951fca57459092edda44acc03634da87addd2d1748e",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-kling-u/result.json": "786f44cdc1e544049b144830e4acf2ced1d0188cf7c11f577d5c45b0af833fde",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-kling-u/retrieval.json": "3cab4afc3fe105d4b93d74e540fcf72d0262b18dbc5eee5f101e42af155120ae",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-rlinf-l/result.json": "ea66da027621d544b67da743ca6cb30d532fbcf925d9d425c97a13277d8259de",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-rlinf-l/retrieval.json": "24c56ab55d45963416c7b194ef11b758983601887af51bfdbffbcd1660d87c8a",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-rlinf-m/result.json": "6ed8ae5456923d881f32220d4dc2b95c766fd42a2b87ab1d8bbee0dfe269d081",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-rlinf-m/retrieval.json": "ad4b4276450a7cf41709f8c628f3cc834b60a30d76544e2ad33be1af09ec6e9c",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-rlinf-p/result.json": "58ace3de59d1ce4e3b340f33f260f012b77a4752e7d6efb5d9637dec62b46d30",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-rlinf-p/retrieval.json": "a182cbff3d5e8933ac72c60ae6bab6370d734e91351f8210299969417594d3b2",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-rlinf-u/result.json": "cbd0bb72b3157f6ce24258b13a5cee5bf5b4393cb7bbb692614ef081155a79cd",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-rlinf-u/retrieval.json": "bec21ff951282e1ed82aafbbf8a4088f2200ec98e7ffcb962f8fc5147bb8c584",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-wuyi-l/result.json": "3bbe4f0a0234ffdd2889c4beacf078204a4e81226fc47b5ef98d2f638a99e30d",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-wuyi-l/retrieval.json": "9d261bc5a5eae16d2a0a827c9eeb5b1e42806d1b60aebc07cdc68f641d015d55",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-wuyi-m/result.json": "4fff0a463a04cbd5ded199235d986f668a26cd7cbfc89a7193c7b30b8bdad402",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-wuyi-m/retrieval.json": "c595e61e25bd1a5f2d780ba026bac36c80b245c884ac6729d52059d71b6f4986",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-wuyi-p/result.json": "ce797433a46709e03ab12ef1cb76f664e3850b04453722e90539f1d5eea2b6b7",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-wuyi-p/retrieval.json": "a69995c524f54f6deff4851adee60b99f81c932cc93b728f42a6f48c1d4c2425",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-wuyi-u/result.json": "8628c9f691ccdd6d2e4fed651c682d1a0a6fd86603456b31e029ad76e7bfee75",
+    "artifacts/p0b/p0b-r2/transcript-retrieval/p0b-r1-wuyi-u/retrieval.json": "89ee5d65920fb0106cd966d34f60f5afc4b6f9170bf5c40d63a42381455e3f07"
+  },
+  "fixed_inputs": {
+    "corpus": {
+      "path": "eval/p0b/corpus.jsonl",
+      "sha256": "5a8e1beb0af1404ed6aed9df5959512315abd9915db6b6760c55b7db3368ce43",
+      "count": 3
+    },
+    "questions": {
+      "path": "eval/p0b/questions.jsonl",
+      "sha256": "c82990972d75776a2758373fd78afdd5ccb8651cfcb780041b5925e07dc485a0",
+      "count": 12
+    },
+    "gold": {
+      "path": "eval/p0b/gold.jsonl",
+      "sha256": "66be91ce13987e0da67ec9fd95ddabfe90a04ce159fc40921631ae38ea2a8381",
+      "revision": "p0b-r1",
+      "count": 12,
+      "segment_time_mappings_verified": true
+    },
+    "answer_prompt": {
+      "path": "eval/p0b/prompts/transcript-retrieval-r2.md",
+      "sha256": "781704adc442dd65c7ced5dd4f8b581176d444ac51f5753988189869ec23dab8"
+    },
+    "retrieval_profile": "char_tfidf_2_4_query_views_v1"
+  },
+  "media": [
+    {
+      "video_id": "p0b-kling-2024",
+      "sha256": "e539a0b0e85e19596bf9666b33ad4c47c30ca15aeb482cc3c064f71275bb1e31",
+      "duration_ms": 2022421
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "sha256": "f0d0dc489a1df2284154920af8fb70b2d54070332c70964af65aafe596b2f33d",
+      "duration_ms": 2093120
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "sha256": "04b383544d961241f9472010bd56086f591cd2f05b6c5b731f9f6b22a553221a",
+      "duration_ms": 1763207
+    }
+  ],
+  "ingest": [
+    {
+      "video_id": "p0b-kling-2024",
+      "artifact_relpath": "artifacts/p0b-ingest/p0b-kling-2024",
+      "manifest_sha256": "82487e503cb428f3987350c7cf3332e04b004ad332a3b05eec202dfbb4d6ed8a",
+      "segments_sha256": "c350e1c6a69ca13ae0349061dfa1436782704ef737a9a28092504b18eb75010b",
+      "segment_count": 43,
+      "nonempty_timestamped_segments": true
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "artifact_relpath": "artifacts/p0b-ingest/p0b-rlinf-2026",
+      "manifest_sha256": "9e75a3bb97b93aeb97c5324f0031a1c67060d6f23a5c3e241cea81edd06ebb4e",
+      "segments_sha256": "d284cb127b4cdd2c56d556cdf80c8c77754b6e2bdec7a51bb6565976de1ae9c0",
+      "segment_count": 46,
+      "nonempty_timestamped_segments": true
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "artifact_relpath": "artifacts/p0b-ingest/p0b-wuyi-goals",
+      "manifest_sha256": "1f58070ad91b67cf7c8dd080873aff35952956f17ccb2bf3569ba6003993475e",
+      "segments_sha256": "2abcaf3c8582c293d869bdd4af8284a641cc934275f00f40842abc560040d37f",
+      "segment_count": 38,
+      "nonempty_timestamped_segments": true
+    }
+  ],
+  "total_segment_count": 127,
+  "p0a_anchors_verified": true,
+  "r2_manifest_source_pins_verified": true,
+  "r2_source_pin_count": 25,
+  "offline_verification": {
+    "pytest": "28 passed",
+    "ruff": "All checks passed",
+    "git_diff_check": "passed",
+    "r2_source_diff_from_protected_commit": "empty",
+    "jsonl_validation": "corpus/questions/gold/decision-evidence valid",
+    "formal_artifact_validation": "passed without writes",
+    "external_calls": 0,
+    "mock_used": false,
+    "video_upload": false
+  },
+  "r3_targets_absent_at_capture": [
+    "eval/p0b/revisions/p0b-r3",
+    "artifacts/p0b/p0b-r3",
+    "reports/p0b-r3-retrieval-eval.md",
+    "reports/p0b-r3-retrieval-eval.json",
+    "docs/tasks/p0b-r3"
+  ],
+  "preexisting_dirty_paths_recorded": [
+    ".DS_Store",
+    "docs/requirements/p0b/decision-evidence.jsonl",
+    "docs/tasks/P0-B-R3.md",
+    "eval/.DS_Store",
+    "eval/p0b/.DS_Store",
+    "eval/p0b/gold.draft.jsonl",
+    "eval/p0b/questions.draft.jsonl"
+  ]
+}

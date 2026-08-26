@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "task_id": "P0B-R3",
+  "evidence_id": "P0B-R3-FREEZE-001",
+  "status": "PASSED",
+  "frozen_at": "2026-08-26T11:16:00Z",
+  "manifest_path": "eval/p0b/revisions/p0b-r3/eval-manifest.json",
+  "manifest_sha256": "45000b84fc5c0902993d5e7d81ed16e912e34b87a8c750b0018357375e535e1a",
+  "eval_revision": "p0b-r3",
+  "gold_revision": "p0b-r1",
+  "artifact_root": "artifacts/p0b/p0b-r3",
+  "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+  "retrieval_profile": "char_tfidf_2_4_query_views_v1",
+  "prompt_sha256": "781704adc442dd65c7ced5dd4f8b581176d444ac51f5753988189869ec23dab8",
+  "source_commit": "7cedce5475b928ded3d7c071f09132963cd0f9fa",
+  "source_pin_count": 25,
+  "fixed_population": {
+    "videos": 3,
+    "questions": 12,
+    "gold_rows": 12,
+    "segments": 127
+  },
+  "p0a_anchors_verified": true,
+  "r2_input_media_ingest_and_gold_pins_verified": true,
+  "answer_model": {
+    "provider": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash",
+    "temperature": 0,
+    "timeout_seconds": 120.0,
+    "response_schema": "AnswerProposal: status, answer, citation_segment_ids"
+  },
+  "preflight_evidence": "docs/tasks/p0b-r3/preflight.json",
+  "preflight_calls": 1,
+  "formal_calls_before_run": 0,
+  "formal_call_budget_remaining": 12,
+  "video_upload": false,
+  "secret_recorded": false
+}

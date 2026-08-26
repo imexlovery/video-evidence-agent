@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "task_id": "P0B-R3",
+  "evidence_id": "P0B-R3-FINAL-REPORT-001",
+  "status": "P0B_PASSED_OWNER_ACCEPTED",
+  "generated_at": "2026-08-26T11:58:49.470301+00:00",
+  "owner_decision_at": "2026-08-26",
+  "owner_decision_evidence": "DEC-P0B-037",
+  "eval_revision": "p0b-r3",
+  "source_commit": "7cedce5475b928ded3d7c071f09132963cd0f9fa",
+  "manifest": {
+    "path": "eval/p0b/revisions/p0b-r3/eval-manifest.json",
+    "sha256": "45000b84fc5c0902993d5e7d81ed16e912e34b87a8c750b0018357375e535e1a"
+  },
+  "report": {
+    "markdown_path": "reports/p0b-r3-retrieval-eval.md",
+    "markdown_sha256": "66a08e69e9133bdda9bab043e62a32ffafff534c106b51a9df2a00f40ea10f38",
+    "json_path": "reports/p0b-r3-retrieval-eval.json",
+    "json_sha256": "451c389b83ed8d3d1a53950b36ee98e4ed9c7c3552dea3b8795b6c3536f3d66a",
+    "metrics_path": "artifacts/p0b/p0b-r3/metrics.json",
+    "metrics_sha256": "2f4b0d8847183c5df1cb5de5f5d97692562178cc904575079665b024fe7fac1d"
+  },
+  "execution": {
+    "preflight_calls": 1,
+    "formal_calls": 12,
+    "formal_successes": 12,
+    "formal_failures": 0,
+    "retries": 0,
+    "formal_calls_remaining": 0,
+    "mock_used": false,
+    "video_upload": false
+  },
+  "gate": {
+    "checks_passed": 6,
+    "checks_total": 6,
+    "question_hit_at_1": {"observed": "6/9", "threshold": ">=6/9", "passed": true},
+    "question_hit_at_5": {"observed": "9/9", "threshold": ">=8/9", "passed": true},
+    "multi_all_evidence_at_5": {"observed": "2/3", "threshold": ">=2/3", "passed": true},
+    "fully_supported_answer": {"observed": "9/9", "threshold": ">=7/9", "passed": true},
+    "correct_refusal": {"observed": "2/3", "threshold": ">=2/3", "passed": true},
+    "invalid_citation_provenance": {"observed": 0, "threshold": 0, "passed": true}
+  },
+  "diagnostics": {
+    "answer_status_accuracy": "11/12",
+    "schema_compliance": "12/12",
+    "citation_temporal_hit": "9/9",
+    "answer_point_recall_mean": 1.0,
+    "fully_correct_answer": "9/9",
+    "semantic_support": "9/9",
+    "mean_answer_latency_ms": 4799.583333333333,
+    "mean_retrieval_latency_ms": 34.583333333333336,
+    "total_tokens": 23858,
+    "monetary_cost": null,
+    "monetary_cost_note": "Provider responses expose token usage but not billed monetary cost; no pricing snapshot was introduced into the frozen evaluation."
+  },
+  "known_failure": {
+    "question_id": "p0b-r1-kling-u",
+    "category": "REFUSAL",
+    "detail": "The answer correctly says the parameter count was not disclosed and is citation-supported, but it did not emit the contract-required INSUFFICIENT_EVIDENCE status."
+  },
+  "limitations": [
+    "R2 and R3 use the same fixed 12-question regression set revised after R1 failures.",
+    "There is no unseen-video holdout, so cross-video generalization is not established.",
+    "The owner superseded the B0 direct-multimodal baseline; R3 is not a B0-versus-B1 architecture comparison.",
+    "Only Chinese transcript evidence retrieval is evaluated.",
+    "OCR, VLM, Agent, LangGraph, Web/API, concurrency, and production reliability are not evaluated.",
+    "Citation provenance does not automatically establish semantic support.",
+    "Passing this small G1 gate is not a production, commercial, or statistical-significance conclusion."
+  ],
+  "p0b_passed": true,
+  "owner_final_decision": "P0B_PASSED_OWNER_ACCEPTED",
+  "allowed_owner_decisions": [
+    "P0B_PASSED_OWNER_ACCEPTED",
+    "P0B_THRESHOLDS_NOT_MET",
+    "P0B_BLOCKED"
+  ],
+  "p1_started": false,
+  "p1_authorized": false,
+  "secret_recorded": false
+}

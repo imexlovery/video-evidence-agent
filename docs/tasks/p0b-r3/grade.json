@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "task_id": "P0B-R3",
+  "evidence_id": "P0B-R3-AUTO-GRADE-001",
+  "status": "OWNER_REVIEW_COMPLETE",
+  "graded_at": "2026-08-26T11:20:20.448344+00:00",
+  "final_graded_at": "2026-08-26T11:58:49.470301+00:00",
+  "manifest_path": "eval/p0b/revisions/p0b-r3/eval-manifest.json",
+  "metrics_path": "artifacts/p0b/p0b-r3/metrics.json",
+  "human_review_path": "artifacts/p0b/p0b-r3/human-review.json",
+  "automatic_metrics": {
+    "question_count": 12,
+    "answerable_count": 9,
+    "question_hit_at_1": "6/9",
+    "question_hit_at_5": "9/9",
+    "gold_evidence_unit_recall_at_5_mean": 0.9629629629629629,
+    "multi_all_evidence_at_5": "2/3",
+    "mrr_mean": 0.8055555555555556,
+    "answer_status_accuracy": "11/12",
+    "correct_refusal": "2/3",
+    "false_refusal": "0/9",
+    "citation_temporal_hit": "9/9",
+    "citation_provenance_invalid": "0/10",
+    "schema_compliance": "12/12",
+    "schema_failure": "0/12",
+    "mean_answer_latency_ms": 4799.583333333333,
+    "mean_retrieval_latency_ms": 34.583333333333336
+  },
+  "automatic_gate_comparison": {
+    "question_hit_at_1": {"observed": "6/9", "threshold": ">=6/9", "status": "MEETS"},
+    "question_hit_at_5": {"observed": "9/9", "threshold": ">=8/9", "status": "MEETS"},
+    "multi_all_evidence_at_5": {"observed": "2/3", "threshold": ">=2/3", "status": "MEETS"},
+    "correct_refusal": {"observed": "2/3", "threshold": ">=2/3", "status": "MEETS"},
+    "citation_provenance_invalid": {"observed": "0", "threshold": "0", "status": "MEETS"},
+    "fully_supported_answer": {"observed": "9/9", "threshold": ">=7/9", "status": "MEETS"}
+  },
+  "token_usage": {
+    "available": true,
+    "rows": 12,
+    "completion_tokens": 6041,
+    "prompt_tokens": 17817,
+    "total_tokens": 23858,
+    "prompt_cache_hit_tokens": 5120,
+    "prompt_cache_miss_tokens": 12697
+  },
+  "semantic_review": {
+    "status": "COMPLETED",
+    "authority": "CODEX_OWNER_AUTHORIZED",
+    "authorization_decision": "DEC-P0B-033",
+    "answer_point_recall": 1.0,
+    "fully_correct_answer": "9/9",
+    "fully_supported_answer": "9/9",
+    "semantic_support": "9/9",
+    "owner_labels_written": true
+  },
+  "recommendation": "READY_FOR_OWNER_P0B_DECISION",
+  "owner_final_decision": "P0B_PASSED_OWNER_ACCEPTED",
+  "p0b_passed": true,
+  "p1_started": false,
+  "p1_authorized": false,
+  "report_generated": true,
+  "report_paths": [
+    "reports/p0b-r3-retrieval-eval.md",
+    "reports/p0b-r3-retrieval-eval.json"
+  ],
+  "p1_started": false,
+  "secret_recorded": false
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "task_id": "P0B-R3",
+  "evidence_id": "P0B-R3-SEMANTIC-REVIEW-001",
+  "status": "COMPLETED",
+  "reviewed_at": "2026-08-26",
+  "reviewer": "CODEX_OWNER_AUTHORIZED",
+  "authorization_decision": "DEC-P0B-033",
+  "rubric_path": "eval/p0b/rubric.md",
+  "review_artifacts": {
+    "json": {
+      "path": "artifacts/p0b/p0b-r3/human-review.json",
+      "sha256": "4ee58983ca8c708300e1663fa5062df12d2825d6c5ed9585a9009957df08eefa"
+    },
+    "jsonl": {
+      "path": "artifacts/p0b/p0b-r3/human-review.jsonl",
+      "sha256": "f341240b5a7e595dc3089e0007cc8d830937714cc111e0adaba8b7725f46c27f"
+    }
+  },
+  "summary": {
+    "rows_reviewed": 12,
+    "answerable_rows": 9,
+    "answer_point_recall_mean": 1.0,
+    "fully_correct_answer": "9/9",
+    "fully_supported_answer": "9/9",
+    "semantic_support": "9/9",
+    "correct_refusal": "2/3"
+  },
+  "unanswerable_review": [
+    {
+      "question_id": "p0b-r1-kling-u",
+      "answer_status": "ANSWERED",
+      "fully_correct": false,
+      "fully_supported": false,
+      "semantic_support": true,
+      "reason": "The cited content supports that no parameter count was disclosed, but the frozen contract required INSUFFICIENT_EVIDENCE."
+    },
+    {
+      "question_id": "p0b-r1-rlinf-u",
+      "answer_status": "INSUFFICIENT_EVIDENCE",
+      "fully_correct": true,
+      "fully_supported": false,
+      "semantic_support": false,
+      "reason": "Correct evidence-constrained refusal; support fields are not applicable without an answer or citation."
+    },
+    {
+      "question_id": "p0b-r1-wuyi-u",
+      "answer_status": "INSUFFICIENT_EVIDENCE",
+      "fully_correct": true,
+      "fully_supported": false,
+      "semantic_support": false,
+      "reason": "Correct evidence-constrained refusal; support fields are not applicable without an answer or citation."
+    }
+  ],
+  "raw_results_modified": false,
+  "retrieval_artifacts_modified": false,
+  "gold_modified": false,
+  "secret_recorded": false
+}
