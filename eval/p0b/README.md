@@ -54,8 +54,8 @@ an evidence-insufficiency answer prompt, and revision-safe output paths. No
 video is uploaded and no Gemini, Dense, Hybrid, Reranker, Embedding, VLM, Agent,
 FastAPI, or database path is active.
 
-The r2 prompt is `prompts/transcript-retrieval-r2.md`. Its manifest is planned
-at `revisions/p0b-r2/eval-manifest.json`, with formal results under
+The r2 prompt is `prompts/transcript-retrieval-r2.md`. Its frozen manifest is at
+`revisions/p0b-r2/eval-manifest.json`, with formal results under
 `artifacts/p0b/p0b-r2/` and the report under
 `reports/p0b-r2-retrieval-eval.md` plus its JSON companion. The r1 manifest at
 `eval-manifest.json` and all r1 artifacts remain immutable.
@@ -74,8 +74,7 @@ The r2 safe order is:
 7. after the required review, generate `reports/p0b-r2-retrieval-eval.md`
 ```
 
-At the current construction stage the r2 manifest has not been frozen and no
-new DeepSeek calls have been made. Each future question will persist its own
+The r2 manifest is frozen and no new DeepSeek calls have been made. Each future question will persist its own
 Top-5 retrieval before its single answer call; failures remain visible and are
 not selectively rerun or overwritten. The fixed-set development retrieval
 check is not a formal P0-B result and cannot by itself establish a pass.

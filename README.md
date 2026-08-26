@@ -121,5 +121,5 @@ query-view/score aggregation, an evidence-insufficiency prompt, and revision
 isolation. It does not use Gemini, upload video, or add Dense/Hybrid/Reranker,
 VLM, Agent, or service components. Its planned manifest and results are
 `eval/p0b/revisions/p0b-r2/eval-manifest.json` and
-`artifacts/p0b/p0b-r2/`. The new 12-call DeepSeek run starts only after that
-manifest is frozen and separately authorized by the owner.
+`artifacts/p0b/p0b-r2/`. The r2 manifest is now frozen; its new 12-call DeepSeek
+run remains pending a separate explicit owner authorization.

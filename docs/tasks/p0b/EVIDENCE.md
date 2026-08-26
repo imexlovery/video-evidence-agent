@@ -128,8 +128,12 @@ showed `QuestionHit@1 = 6/9`, `QuestionHit@5 = 9/9`, `AllEvidence@5 = 2/3`, and
 result: they were run before freeze and before any new answer-model calls, and
 must not be presented as a P0-B pass.
 
-The current stage is `IMPLEMENTATION_IN_PROGRESS / PREFREEZE`. Offline tests and
-static checks have passed so far (`28 passed`; Ruff clean; `git diff --check`
-clean). The r2 manifest has not yet been frozen and no new DeepSeek calls have
-been made. After freeze, a separate explicit owner authorization is still
-required for the one-call-per-question 12-question formal run.
+The current stage is `FROZEN / AWAITING_OWNER_RUN_AUTHORIZATION`. Offline tests and
+static checks passed (`28 passed`; Ruff clean; `git diff --check` clean), and the
+formal input validation passed for 3 videos, 12 questions, 12 Gold rows, 127
+segments, all Gold mappings, and all media hashes/durations. The r2 manifest is
+at `eval/p0b/revisions/p0b-r2/eval-manifest.json`; it pins source commit
+`3e280afc5d11a7976575ca0c8c660d6c79d70aaa` and artifact root
+`artifacts/p0b/p0b-r2/`. No new DeepSeek calls have been made. A separate explicit
+owner authorization is required for the one-call-per-question 12-question formal
+run.

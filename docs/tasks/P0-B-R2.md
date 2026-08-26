@@ -186,10 +186,12 @@ r1 保护文件哈希校验
 - `P0B-R2-00`：已完成；r1 baseline commit 与保护哈希已记录在
   `docs/tasks/p0b-r2/r1-baseline.json`。
 - `P0B-R2-01`：已完成；失败分析见 `docs/tasks/p0b-r2/failure-analysis.md`。
-- `P0B-R2-02` 至 `P0B-R2-04`：实现中，当前改动为通用字符 2–4 gram TF-IDF
+- `P0B-R2-02` 至 `P0B-R2-04`：已完成，当前改动为通用字符 2–4 gram TF-IDF
   查询视图/固定分数聚合、r2 拒答 prompt 和 revision-safe 路径隔离。
-- 当前尚未冻结 `p0b-r2`，尚未执行新的 12 次 DeepSeek 调用；API 调用授权仍按
-  `P0B-R2-07` 在冻结后单独确认。
+- `P0B-R2-05` 至 `P0B-R2-06`：已完成；`p0b-r2` manifest 已冻结并通过冻结复核，
+  尚未执行新的 12 次 DeepSeek 调用。
+- 当前状态为 `FROZEN / AWAITING_OWNER_RUN_AUTHORIZATION`；API 调用授权仍按
+  `P0B-R2-07` 单独确认。
 
 ## 7. 验收与状态
 
@@ -220,8 +222,9 @@ r1 保护文件哈希校验
 
 ## 9. 本任务当前状态
 
-当前为 `IMPLEMENTATION_IN_PROGRESS / PREFREEZE`。owner 已授权开始施工；实现、
-测试、冻结前校验和 r2 manifest 创建可以继续。按照 `P0B-R2-07`，在 r2 manifest
-成功冻结后，必须再次取得对新的 12 次真实 DeepSeek 文本调用的明确授权；在此之前
-不得执行正式回答评测。正式运行、自动评分完成后，仍须在 owner 语义审核点暂停，
-不得提前声明 `P0B_R2_PASSED`。
+当前为 `FROZEN / AWAITING_OWNER_RUN_AUTHORIZATION`。r2 manifest 位于
+`eval/p0b/revisions/p0b-r2/eval-manifest.json`，结果根目录锁定为
+`artifacts/p0b/p0b-r2/`；冻结复核已通过。按照 `P0B-R2-07`，在执行新的 12 次
+真实 DeepSeek 文本调用前，必须取得 owner 的明确授权；在此之前不得执行正式回答
+评测。正式运行、自动评分完成后，仍须在 owner 语义审核点暂停，不得提前声明
+`P0B_R2_PASSED`。
