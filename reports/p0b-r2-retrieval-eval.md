@@ -22,6 +22,16 @@ Consequently, answer/refusal quality, schema compliance, citation validity,
 latency, and semantic support are not evaluable in this revision. The report is
 closed as `P0B_BLOCKED_EXECUTION_FAILURE`, not `P0B_R2_PASSED`.
 
+## Post-run connection diagnosis
+
+The provider failure was traced to the execution sandbox denying outbound
+network access (`PermissionError: [Errno 1] Operation not permitted`). From a
+network-enabled context, the configured endpoint returned HTTP 401 for an
+unauthenticated request, and an authenticated non-answer `models.list()` check
+using the project `.env` succeeded. The endpoint and credential are valid. The
+locked r2 result is not rerun; a future revision must execute in a
+network-enabled environment.
+
 ## Overall metrics
 
 | method | results | QuestionHit@1 | QuestionHit@5 | Gold evidence-unit recall@5 | AllEvidence@5 (multi) | MRR | answer/refusal accuracy | correct refusal | provenance invalid | schema failures | mean latency ms |

@@ -13,6 +13,7 @@
   "follow_up_fixed_inputs_revision": "p0b-r1",
   "follow_up_scope": "TRANSCRIPT_RETRIEVAL only: deterministic lexical query views and char 2-4 gram TF-IDF score aggregation, r2 refusal prompt, and revision-safe paths",
   "follow_up_call_boundary": "The owner authorized one r2 run; all 12 calls failed with provider/APIConnectionError and are immutable. Do not rerun this revision.",
+  "deepseek_connection_diagnosis": "Project .env endpoint and credential validated from a network-enabled context; the original APIConnectionError was caused by sandbox outbound-network denial.",
   "source_of_truth": [
     "docs/requirements/p0b/decision-evidence.jsonl",
     "eval/p0b/eval-manifest.json",

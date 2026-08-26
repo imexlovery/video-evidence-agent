@@ -68,6 +68,8 @@
     "formal_run": "2026-08-26: 12/12 retrieval files persisted before calls; 12/12 result slots recorded provider/APIConnectionError; no rerun or overwrite",
     "automatic_score": "2026-08-26: retrieval Hit@1 6/9, Hit@5 9/9, Gold evidence-unit recall mean 0.962963, AllEvidence@5 2/3, MRR 0.805556; answer/status and schema metrics not evaluable because all calls failed",
     "report": "2026-08-26: reports/p0b-r2-retrieval-eval.md and .json generated with P0B_BLOCKED_EXECUTION_FAILURE",
-    "human_review": "NOT_APPLICABLE_FOR_THIS_RUN; all model calls failed and review fields remain null"
+    "human_review": "NOT_APPLICABLE_FOR_THIS_RUN; all model calls failed and review fields remain null",
+    "connection_diagnosis": "2026-08-26: sandbox outbound network denied with PermissionError Errno 1; network-enabled no-auth endpoint check returned 401 and authenticated models.list returned 3 models; endpoint and credential are valid",
+    "connection_resolution": "Use a network-enabled execution context for any future formally authorized revision; do not rerun frozen p0b-r2"
   }
 }

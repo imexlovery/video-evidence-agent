@@ -80,3 +80,12 @@ report recommendation is `P0B_BLOCKED_EXECUTION_FAILURE`; failures remain
 visible and were not selectively rerun or overwritten. The fixed-set retrieval
 metrics are therefore not an end-to-end quality pass, and the revision is
 closed without `P0B_R2_PASSED`.
+
+### DeepSeek connectivity note
+
+The r2 `APIConnectionError` was caused by the execution sandbox denying
+outbound network access (`PermissionError: [Errno 1] Operation not permitted`).
+The project `.env` endpoint was reachable from a network-enabled context, and
+an authenticated non-answer `models.list()` check succeeded. Future formal
+revisions must run in a network-enabled environment. This diagnosis does not
+authorize rerunning the frozen r2 results.

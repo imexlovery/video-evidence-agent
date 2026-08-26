@@ -128,15 +128,14 @@ showed `QuestionHit@1 = 6/9`, `QuestionHit@5 = 9/9`, `AllEvidence@5 = 2/3`, and
 result: they were run before freeze and before any new answer-model calls, and
 must not be presented as a P0-B pass.
 
-The current stage is `FROZEN / AWAITING_OWNER_RUN_AUTHORIZATION`. Offline tests and
+The current stage is `CLOSED / BLOCKED_EXECUTION_FAILURE`. Offline tests and
 static checks passed (`28 passed`; Ruff clean; `git diff --check` clean), and the
 formal input validation passed for 3 videos, 12 questions, 12 Gold rows, 127
 segments, all Gold mappings, and all media hashes/durations. The r2 manifest is
 at `eval/p0b/revisions/p0b-r2/eval-manifest.json`; it pins source commit
 `3e280afc5d11a7976575ca0c8c660d6c79d70aaa` and artifact root
-`artifacts/p0b/p0b-r2/`. No new DeepSeek calls have been made. A separate explicit
-owner authorization is required for the one-call-per-question 12-question formal
-run.
+`artifacts/p0b/p0b-r2/`. The owner subsequently authorized the one-call-per-question
+12-question formal run; its failures are recorded below.
 
 ## P0-B R2 formal run and closeout — 2026-08-26
 
@@ -167,3 +166,20 @@ no model call succeeded. The automatically generated report is
 semantic review fields left null. There is no answer content for meaningful
 owner semantic adjudication, so this revision is closed blocked and is not
 `P0B_R2_PASSED`.
+
+## DeepSeek connection diagnosis — 2026-08-26
+
+The r2 provider failure was diagnosed after closeout without rerunning any
+formal question. In the sandbox, a no-auth request to the configured endpoint
+failed with `PermissionError: [Errno 1] Operation not permitted`, which the
+OpenAI-compatible client surfaced during the formal run as
+`APIConnectionError`. The project `.env` itself has a configured endpoint,
+model, and credential.
+
+In a network-enabled execution context, the same endpoint returned the expected
+HTTP 401 for a no-auth request, and one authenticated non-answer
+`models.list()` request using the project `.env` succeeded and returned three
+models. This confirms the root cause was the sandbox network restriction, not
+an invalid DeepSeek endpoint or credential. The operational fix is to run any
+future formal revision from a network-enabled environment. The frozen r2
+manifest and its 12 failed result slots remain immutable; r2 is not rerun.
