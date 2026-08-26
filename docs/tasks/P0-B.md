@@ -1,5 +1,11 @@
 # P0-B 施工任务单：中文技术视频 Retrieval Eval
 
+> 历史状态：本文件是最初的 P0-B 设计草案，其中直接视频/B0 方案已被
+> `DEC-P0B-016` 标记为 `SUPERSEDED`，不得再作为活动施工要求。已完成的正式
+> r1 范围与结果以 `eval/p0b/eval-manifest.json`、
+> `reports/p0b-retrieval-eval.md` 和 `docs/tasks/p0b/EVIDENCE.md` 为准；后续窄范围
+> 修订任务见 `docs/tasks/P0-B-R2.md`。
+
 | 字段 | 内容 |
 |---|---|
 | 任务编号 | `P0-B` |

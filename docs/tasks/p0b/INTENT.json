@@ -1,0 +1,22 @@
+{
+  "task_id": "P0B-IMPLEMENT-R1",
+  "intent": "Freeze and exercise the smallest runnable R1 TRANSCRIPT_RETRIEVAL harness while preserving the boundary between local ingest, one real DeepSeek text call per question, deterministic grading, and owner semantic review.",
+  "assumptions": [
+    "The current P0-A owner acceptance and anchor hashes are valid.",
+    "The owner has confirmed three local Chinese technical videos, twelve questions, and twelve Gold rows for local evaluation.",
+    "The existing FFmpeg/MLX Whisper ingest artifacts contain 127 timestamped VideoSegments and remain the source for retrieval.",
+    "The project-root .env supplies the real DeepSeek-compatible text configuration; the answer workflow has no video-provider configuration."
+  ],
+  "non_goals": [
+    "Agent orchestration",
+    "OCR or visual indexing",
+    "Dense/Hybrid/Reranker retrieval",
+    "Web/API productization",
+    "Automatic promotion of question or Gold drafts to frozen inputs"
+  ],
+  "verification": [
+    "uv run pytest -q",
+    "uv run ruff check .",
+    "jq -c . docs/requirements/p0b/decision-evidence.jsonl"
+  ]
+}

@@ -20,6 +20,19 @@ from video_evidence_agent.audio import extract_audio, probe_media_duration_ms
 from video_evidence_agent.chinese_lips import prepare_chinese_lips_mini
 from video_evidence_agent.evaluation import evaluate_asr, load_asr_segments, load_ground_truth
 from video_evidence_agent.evidence import GateDecision, gate_answer
+from video_evidence_agent.p0b_eval import (
+    _resolve_media,
+    freeze_p0b,
+    grade_p0b,
+    render_p0b_report,
+    run_p0b_transcript_retrieval,
+)
+from video_evidence_agent.p0b_schemas import (
+    CorpusRecord,
+    P0BQuestion,
+    load_jsonl,
+    validate_p0b_dataset,
+)
 from video_evidence_agent.retrieval import retrieve
 from video_evidence_agent.schemas import QuestionSpec, RetrievalHit, VideoSegment
 from video_evidence_agent.segments import build_video_segments, validate_video_segments
@@ -593,14 +606,10 @@ def _r1_question_asr_samples(
             continue
         interval = question.expected_interval
         matching_clips = [
-            clip
-            for clip in ground_truth
-            if (clip["start_ms"], clip["end_ms"]) == interval
+            clip for clip in ground_truth if (clip["start_ms"], clip["end_ms"]) == interval
         ]
         if len(matching_clips) != 1:
-            raise CliError(
-                f"question {question.question_id} does not map to one ground-truth clip"
-            )
+            raise CliError(f"question {question.question_id} does not map to one ground-truth clip")
         clip = matching_clips[0]
         overlapping = []
         for segment in asr_segments:
@@ -815,9 +824,7 @@ def _render_review_report(
         except (KeyError, TypeError, ValueError) as exc:
             raise CliError("ASR review segment has invalid boundaries") from exc
         sample_review = (
-            "USER_CONFIRMED"
-            if segment.get("question_id") in confirmed_question_ids
-            else "PENDING"
+            "USER_CONFIRMED" if segment.get("question_id") in confirmed_question_ids else "PENDING"
         )
         sample_rows.append(
             f"| {label} | {range_text} | {_markdown_cell(segment.get('text', ''))} | "
@@ -935,6 +942,95 @@ def _review(args: argparse.Namespace) -> int:
     return 0
 
 
+def _p0b_project_root(args: argparse.Namespace) -> Path:
+    return Path(args.project_root).expanduser().resolve()
+
+
+def _p0b_freeze(args: argparse.Namespace) -> int:
+    project_root = _p0b_project_root(args)
+    manifest = freeze_p0b(
+        project_root=project_root,
+        eval_revision=args.eval_revision,
+        corpus_path=(project_root / args.corpus).resolve(),
+        questions_path=(project_root / args.questions).resolve(),
+        gold_path=(project_root / args.gold).resolve(),
+        answer_prompt_path=(project_root / args.answer_prompt).resolve(),
+        media_root=(project_root / args.media_root).resolve(),
+    )
+    print(
+        f"froze {manifest['eval_revision']}: {manifest['corpus']['video_count']} videos, "
+        f"{manifest['questions']['count']} questions"
+    )
+    return 0
+
+
+def _p0b_ingest(args: argparse.Namespace) -> int:
+    project_root = _p0b_project_root(args)
+    corpus_path = (project_root / args.corpus).resolve()
+    corpus = load_jsonl(corpus_path, CorpusRecord)
+    questions_path = (project_root / args.questions).resolve() if args.questions else None
+    questions = load_jsonl(questions_path, P0BQuestion) if questions_path else []
+    if questions:
+        validate_p0b_dataset(corpus, questions)
+    for record in corpus:
+        video_path = _resolve_media(
+            (project_root / args.media_root).resolve(), record.local_path_alias
+        )
+        artifact_relpath = Path(record.ingest_artifact_relpath)
+        ingest_args = argparse.Namespace(
+            video_id=record.video_id,
+            video_path=str(video_path),
+            artifacts_dir=project_root / artifact_relpath.parent,
+            preview_seconds=args.preview_seconds,
+            asr_model=args.asr_model,
+            target_segment_ms=args.target_segment_ms,
+            max_segment_ms=args.max_segment_ms,
+            source_url=record.source_url,
+            source_license=record.license,
+            source_attribution=record.attribution,
+            source_use_note=record.use_basis,
+        )
+        _ingest(ingest_args)
+    print(f"ingested {len(corpus)} P0-B videos")
+    return 0
+
+
+def _p0b_run(args: argparse.Namespace) -> int:
+    project_root = _p0b_project_root(args)
+    manifest = _read_json((project_root / args.manifest).resolve())
+    result = run_p0b_transcript_retrieval(
+        project_root=project_root,
+        manifest=manifest,
+        media_root=(project_root / args.media_root).resolve(),
+    )
+    print(
+        f"recorded P0-B {result['evaluation_method']}: {result['result_count']} result slots; "
+        "inspect artifacts/p0b before grading"
+    )
+    return 0
+
+
+def _p0b_grade(args: argparse.Namespace) -> int:
+    project_root = _p0b_project_root(args)
+    manifest = _read_json((project_root / args.manifest).resolve())
+    metrics = grade_p0b(project_root=project_root, manifest=manifest)
+    print(
+        f"graded {metrics['result_count']} P0-B results: "
+        f"status={metrics['evaluation_status']} recommendation={metrics['recommendation']}"
+    )
+    return 0
+
+
+def _p0b_report(args: argparse.Namespace) -> int:
+    project_root = _p0b_project_root(args)
+    manifest = _read_json((project_root / args.manifest).resolve())
+    metrics = grade_p0b(project_root=project_root, manifest=manifest)
+    report_path = (project_root / args.report).resolve()
+    render_p0b_report(metrics=metrics, report_path=report_path)
+    print(f"wrote P0-B report: {report_path}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="video-evidence",
@@ -1019,6 +1115,61 @@ def build_parser() -> argparse.ArgumentParser:
     review.add_argument("--artifacts-dir", type=Path, default=Path("artifacts"))
     review.add_argument("--report", type=Path, default=Path("reports/p0a-smoke-report.md"))
     review.set_defaults(handler=_review)
+
+    p0b_freeze = subparsers.add_parser(
+        "p0b-freeze",
+        help="freeze the P0-B corpus, questions, Gold, prompts, and source hashes",
+    )
+    p0b_freeze.add_argument("--project-root", type=Path, default=Path("."))
+    p0b_freeze.add_argument("--eval-revision", default="p0b-r1")
+    p0b_freeze.add_argument("--corpus", type=Path, default=Path("eval/p0b/corpus.jsonl"))
+    p0b_freeze.add_argument("--questions", type=Path, default=Path("eval/p0b/questions.jsonl"))
+    p0b_freeze.add_argument("--gold", type=Path, default=Path("eval/p0b/gold.jsonl"))
+    p0b_freeze.add_argument(
+        "--answer-prompt", type=Path, default=Path("eval/p0b/prompts/transcript-retrieval-v1.md")
+    )
+    p0b_freeze.add_argument("--media-root", type=Path, default=Path("eval/p0b/media"))
+    p0b_freeze.set_defaults(handler=_p0b_freeze)
+
+    p0b_ingest = subparsers.add_parser(
+        "p0b-ingest",
+        help="run the existing FFmpeg/Chinese ASR ingest for every frozen corpus video",
+    )
+    p0b_ingest.add_argument("--project-root", type=Path, default=Path("."))
+    p0b_ingest.add_argument("--corpus", type=Path, default=Path("eval/p0b/corpus.jsonl"))
+    p0b_ingest.add_argument("--questions", type=Path)
+    p0b_ingest.add_argument("--media-root", type=Path, default=Path("eval/p0b/media"))
+    p0b_ingest.add_argument("--asr-model", default=os.getenv("VIDEO_EVIDENCE_ASR_MODEL", ""))
+    p0b_ingest.add_argument("--preview-seconds", type=int, default=300)
+    p0b_ingest.add_argument("--target-segment-ms", type=int, default=45_000)
+    p0b_ingest.add_argument("--max-segment-ms", type=int, default=60_000)
+    p0b_ingest.set_defaults(handler=_p0b_ingest)
+
+    p0b_run = subparsers.add_parser(
+        "p0b-run",
+        help="run one locked TRANSCRIPT_RETRIEVAL result per frozen question",
+    )
+    p0b_run.add_argument("--project-root", type=Path, default=Path("."))
+    p0b_run.add_argument("--manifest", type=Path, default=Path("eval/p0b/eval-manifest.json"))
+    p0b_run.add_argument("--media-root", type=Path, default=Path("eval/p0b/media"))
+    p0b_run.set_defaults(handler=_p0b_run)
+
+    p0b_grade = subparsers.add_parser(
+        "p0b-grade",
+        help="grade preserved P0-B results after the locked run",
+    )
+    p0b_grade.add_argument("--project-root", type=Path, default=Path("."))
+    p0b_grade.add_argument("--manifest", type=Path, default=Path("eval/p0b/eval-manifest.json"))
+    p0b_grade.set_defaults(handler=_p0b_grade)
+
+    p0b_report = subparsers.add_parser(
+        "p0b-report",
+        help="grade and render the P0-B report without changing result artifacts",
+    )
+    p0b_report.add_argument("--project-root", type=Path, default=Path("."))
+    p0b_report.add_argument("--manifest", type=Path, default=Path("eval/p0b/eval-manifest.json"))
+    p0b_report.add_argument("--report", type=Path, default=Path("reports/p0b-retrieval-eval.md"))
+    p0b_report.set_defaults(handler=_p0b_report)
     return parser
 
 

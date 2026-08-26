@@ -1,0 +1,44 @@
+{
+  "task_id": "P0B-IMPLEMENT-R1",
+  "task_type": "single_stage_agent_evaluation",
+  "objective": "Implement and execute the file-backed P0-B R1 TRANSCRIPT_RETRIEVAL evaluation without entering later retrieval or product stages.",
+  "allowed_paths": [
+    "src/video_evidence_agent/",
+    "tests/",
+    "eval/p0b/",
+    "docs/tasks/p0b/",
+    "docs/requirements/p0b/decision-evidence.jsonl",
+    "README.md",
+    ".env.example"
+  ],
+  "invariants": [
+    "P0-A frozen reports and artifacts are immutable.",
+    "TRANSCRIPT_RETRIEVAL remains character 2-4 gram TF-IDF with Top-K 5.",
+    "DeepSeek receives only the current question and its current Top-5; it never receives full transcript, Gold, or answer points.",
+    "The three videos are processed locally; the answer workflow never uploads video.",
+    "No Mock result can satisfy the P0-B evaluation.",
+    "The run stops at the P0-B report and owner decision."
+  ],
+  "acceptance": [
+    "Strict 3-video/12-question schema validation exists.",
+    "TRANSCRIPT_RETRIEVAL raw Top-K is persisted before answerer execution.",
+    "TRANSCRIPT_RETRIEVAL has one result slot per frozen question, including explicit failures.",
+    "Deterministic retrieval/provenance/temporal graders and owner semantic-review material exist.",
+    "Tests and Ruff pass."
+  ],
+  "status": "CLOSED_OWNER_REVIEWED_RETRIEVAL_THRESHOLDS_NOT_MET",
+  "implementation_evidence": "reports/p0b-implementation-report.md",
+  "verification": {
+    "pytest": "2026-08-26: 22 passed",
+    "ruff": "2026-08-26: All checks passed",
+    "jsonl": "2026-08-26: corpus/questions/gold/decision-evidence valid JSONL",
+    "p0b_ingest": "2026-08-26: 3/3 real videos SUCCEEDED; 127 non-empty timestamped VideoSegments; unfrozen",
+    "formal_input_validation": "2026-08-26: 3 corpus videos, 12 owner-confirmed questions, 12 owner-confirmed Gold rows, all 127 segments, all Gold-to-segment mappings, and all media hashes/durations passed",
+    "scope_revision": "2026-08-26: OWNER_CONFIRMED — former direct-video path superseded; only TRANSCRIPT_RETRIEVAL remains",
+    "formal_media_validation": "2026-08-26: passed — all three media hashes/durations, ingest snapshots, 127 segments, and Gold mappings verified",
+    "freeze": "2026-08-26: p0b-r1 FROZEN; corpus/questions/gold/prompt/source/media hashes recorded in eval/p0b/eval-manifest.json",
+    "run": "2026-08-26: 12/12 TRANSCRIPT_RETRIEVAL result slots recorded; 12 retrieval.json artifacts persisted before the 12 DeepSeek text calls; no video upload",
+    "automatic_score": "2026-08-26: 12/12 calls succeeded and schema-compliant; QuestionHit@1 2/9, QuestionHit@5 7/9, Gold evidence-unit recall@5 mean 0.648148, AllEvidence@5 1/3, MRR mean 0.435185, answer/refusal accuracy 10/12, correct refusal 2/3, invalid provenance 0/9, mean latency 3645.08ms",
+    "human_review": "2026-08-26: OWNER reviewed all 12 rows and explicitly authorized Codex to record the frozen-rubric semantic labels; answer-point coverage mean 0.685185, fully correct 5/9 answerable, fully supported 5/9 answerable, semantic support 8/9 answerable; evaluation closed without a P0B PASSED claim"
+  }
+}

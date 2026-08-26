@@ -77,3 +77,37 @@ Automated tests alone are not acceptance evidence.
 The ingest manifest records the source URL, license, attribution, local-use
 note, input hash and duration. Do not invent these fields: use the source
 publisher's actual attribution and license information.
+
+## P0-B locked Retrieval Eval
+
+P0-B is a separate G1 offline evaluation of one formal method,
+`TRANSCRIPT_RETRIEVAL`: three natural Chinese technical videos are processed by
+local FFmpeg and Chinese MLX Whisper ASR, yielding 127 timestamped
+`VideoSegment` objects; character 2–4 gram TF-IDF retrieves Top-5 evidence, and
+DeepSeek answers from the question plus that Top-5 only. It is not an Agent
+implementation and does not include Dense/Hybrid retrieval, OCR, VLM
+enrichment, or a Web service.
+
+The implementation is file-backed and fail-closed:
+
+- `p0b-ingest` reuses the P0-A FFmpeg/Chinese ASR/VideoSegment pipeline for each
+  corpus video;
+- `p0b-freeze` records media, questions, Gold, the answer prompt, dependency and source
+  hashes in an immutable `eval/p0b/eval-manifest.json`;
+- `p0b-run` persists the current question's Top-5 before its single DeepSeek
+  text call and writes one `TRANSCRIPT_RETRIEVAL` result or explicit failure
+  artifact for every question; it never uploads video;
+- `p0b-report` computes temporal retrieval/provenance metrics and keeps semantic
+  answer review separate in `artifacts/p0b/p0b-r1/human-review.json`.
+
+The frozen `p0b-r1` run is closed after owner review and owner-authorized
+per-question semantic labeling. Its final recommendation is
+`P0B_RETRIEVAL_THRESHOLDS_NOT_MET`, so it is not labeled `PASSED`.
+
+The formal inputs are already owner-confirmed in `eval/p0b/`: three videos,
+twelve questions, twelve Gold rows, and the real 127-segment ingest artifacts.
+`p0b-freeze` validates their hashes, durations, segment IDs, and P0-A anchor
+hashes before creating the manifest. The answer call uses the project-root
+`.env` values `OPENAI_API_KEY`, `OPENAI_BASE_URL`, and
+`VIDEO_EVIDENCE_MODEL`; no separate video-provider configuration exists and
+there is no Mock answer path.

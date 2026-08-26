@@ -1,0 +1,16 @@
+{
+  "task_id": "P0B-IMPLEMENT-R1",
+  "workspace": "/Users/tristana/Develop/video-evidence-agent",
+  "base_commit": "0de7f74",
+  "base_scope": "P0-A PASSED / OWNER_ACCEPTED",
+  "current_stage": "P0-B p0b-r1 TRANSCRIPT_RETRIEVAL frozen, auto-scored, semantically labeled under owner delegation, and closed; retrieval thresholds not met",
+  "evaluation_revision": "p0b-r1",
+  "source_of_truth": [
+    "docs/requirements/p0b/decision-evidence.jsonl",
+    "eval/p0b/eval-manifest.json",
+    "eval/p0b/README.md",
+    "eval/p0b/pre-freeze-review.md",
+    "docs/tasks/p0b/EVIDENCE.md"
+  ],
+  "freshness_rule": "The manifest is created only after implementation and frozen inputs are complete; any post-freeze input or source change requires a new revision."
+}

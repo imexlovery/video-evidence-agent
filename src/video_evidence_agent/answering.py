@@ -5,7 +5,9 @@ from __future__ import annotations
 import json
 import os
 from collections.abc import Iterable
+from dataclasses import dataclass
 from pathlib import Path
+from time import perf_counter
 from typing import Any
 
 from dotenv import load_dotenv
@@ -24,6 +26,19 @@ class AnsweringConfigurationError(RuntimeError):
 
 class AnsweringProviderError(RuntimeError):
     """Raised when the configured real provider cannot return an answer."""
+
+
+@dataclass(frozen=True)
+class AnswerTrace:
+    """P0-B observability around one transcript-retrieval answer call."""
+
+    proposal: AnswerProposal
+    provider: str
+    model: str
+    latency_ms: int
+    usage: dict[str, Any]
+    raw_response: dict[str, Any] | str | None
+    schema_valid: bool
 
 
 SYSTEM_INSTRUCTION = """
@@ -54,6 +69,10 @@ def _configured_client() -> tuple[OpenAI, str]:
     options: dict[str, Any] = {"api_key": api_key}
     if base_url:
         options["base_url"] = base_url
+    timeout_seconds = float(os.getenv("VIDEO_EVIDENCE_TIMEOUT_SECONDS", "120"))
+    if timeout_seconds <= 0:
+        raise AnsweringConfigurationError("VIDEO_EVIDENCE_TIMEOUT_SECONDS must be positive")
+    options["timeout"] = timeout_seconds
     return OpenAI(**options), model
 
 
@@ -81,8 +100,37 @@ def _invalid_model_output() -> AnswerProposal:
     )
 
 
-def request_answer(question: str, retrieval_hits: Iterable[RetrievalHit]) -> AnswerProposal:
-    """Call a configured real provider, never a local or mock answer fallback."""
+def _jsonable_response(response: Any) -> dict[str, Any] | str:
+    """Serialize provider output without emitting request credentials."""
+
+    try:
+        model_dump = response.model_dump(mode="json")
+    except (AttributeError, TypeError, ValueError):
+        try:
+            model_dump = json.loads(response.model_dump_json())
+        except (AttributeError, TypeError, ValueError, json.JSONDecodeError):
+            return type(response).__name__
+    return model_dump if isinstance(model_dump, dict) else str(model_dump)
+
+
+def _usage_payload(response: Any) -> dict[str, Any]:
+    usage = getattr(response, "usage", None)
+    if usage is None:
+        return {}
+    try:
+        payload = usage.model_dump(mode="json")
+    except (AttributeError, TypeError, ValueError):
+        payload = {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def request_answer_traced(
+    question: str,
+    retrieval_hits: Iterable[RetrievalHit],
+    *,
+    system_instruction: str | None = None,
+) -> AnswerTrace:
+    """Call a configured real provider and retain one immutable call trace."""
 
     hits = list(retrieval_hits)
     if not question.strip():
@@ -91,23 +139,63 @@ def request_answer(question: str, retrieval_hits: Iterable[RetrievalHit]) -> Ans
         raise AnsweringProviderError("answering requires at least one retrieval hit")
 
     client, model = _configured_client()
+    started_at = perf_counter()
+    instruction = SYSTEM_INSTRUCTION
+    if system_instruction and system_instruction.strip():
+        instruction = (
+            f"{SYSTEM_INSTRUCTION}\n\nFrozen P0-B instruction:\n{system_instruction.strip()}"
+        )
     try:
         response = client.chat.completions.create(
             model=model,
             temperature=0,
             response_format={"type": "json_object"},
             messages=[
-                {"role": "system", "content": SYSTEM_INSTRUCTION},
+                {"role": "system", "content": instruction},
                 {"role": "user", "content": _context(question, hits)},
             ],
         )
     except Exception as exc:
         raise AnsweringProviderError(f"real answer provider failed: {type(exc).__name__}") from exc
 
+    latency_ms = round((perf_counter() - started_at) * 1000)
+    raw_response = _jsonable_response(response)
+    usage = _usage_payload(response)
     if not response.choices or response.choices[0].message.content is None:
-        return _invalid_model_output()
+        return AnswerTrace(
+            proposal=_invalid_model_output(),
+            provider=os.getenv("OPENAI_BASE_URL", "openai-compatible") or "openai-compatible",
+            model=model,
+            latency_ms=latency_ms,
+            usage=usage,
+            raw_response=raw_response,
+            schema_valid=False,
+        )
     try:
         payload = json.loads(response.choices[0].message.content)
-        return AnswerProposal.model_validate(payload)
+        proposal = AnswerProposal.model_validate(payload)
     except (json.JSONDecodeError, ValueError, TypeError):
-        return _invalid_model_output()
+        return AnswerTrace(
+            proposal=_invalid_model_output(),
+            provider=os.getenv("OPENAI_BASE_URL", "openai-compatible") or "openai-compatible",
+            model=model,
+            latency_ms=latency_ms,
+            usage=usage,
+            raw_response=raw_response,
+            schema_valid=False,
+        )
+    return AnswerTrace(
+        proposal=proposal,
+        provider=os.getenv("OPENAI_BASE_URL", "openai-compatible") or "openai-compatible",
+        model=model,
+        latency_ms=latency_ms,
+        usage=usage,
+        raw_response=raw_response,
+        schema_valid=True,
+    )
+
+
+def request_answer(question: str, retrieval_hits: Iterable[RetrievalHit]) -> AnswerProposal:
+    """Compatibility wrapper for P0-A callers."""
+
+    return request_answer_traced(question, retrieval_hits).proposal

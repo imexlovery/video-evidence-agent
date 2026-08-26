@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "eval_revision": "p0b-r1",
+  "evaluation_method": "TRANSCRIPT_RETRIEVAL",
+  "status": "FROZEN",
+  "locked_at": "2026-08-26T08:50:20.059764+00:00",
+  "locked_by": "local-owner",
+  "chain": {
+    "media": "local-only input; no upload",
+    "audio": "local FFmpeg",
+    "asr": "local mlx-whisper Chinese transcription",
+    "segments": "timestamped VideoSegment",
+    "retrieval": "character 2-4 gram TF-IDF Top-5",
+    "answering": "DeepSeek text model receives question plus current Top-5 only",
+    "grading": "deterministic checks plus owner semantic review against Gold"
+  },
+  "corpus": {
+    "path": "eval/p0b/corpus.jsonl",
+    "sha256": "5a8e1beb0af1404ed6aed9df5959512315abd9915db6b6760c55b7db3368ce43",
+    "video_count": 3,
+    "videos": [
+      {
+        "video_id": "p0b-kling-2024",
+        "source_url": "https://www.bilibili.com/video/BV1HM4m1U7bM/?p=6",
+        "use_basis": "项目所有者于 2026-08-26 确认：此本地副本仅用于本地、非公开的 P0B 技术评测，不再分发原始媒体。",
+        "license": "未发现明确开放许可证；项目所有者确认仅按上述本地研究用途使用，不作传播或再分发。",
+        "attribution": "2024 北京智源大会；万鹏飞；《可灵(KLING) 视频生成大模型》；Bilibili BV1HM4m1U7bM p6。",
+        "local_path_alias": "2024北京智源大会-大模型产业技术 p06 可灵(KLING) 视频生成大模型：万鹏飞 [BV1HM4m1U7bM_p6].mp4",
+        "media_sha256": "e539a0b0e85e19596bf9666b33ad4c47c30ca15aeb482cc3c064f71275bb1e31",
+        "duration_ms": 2022421,
+        "language": "zh",
+        "content_type": "natural_continuous_chinese_technical_presentation",
+        "sensitivity": "公开技术演讲；项目所有者已确认无预期敏感个人数据。",
+        "ingest_artifact_relpath": "artifacts/p0b-ingest/p0b-kling-2024"
+      },
+      {
+        "video_id": "p0b-rlinf-2026",
+        "source_url": "https://www.bilibili.com/video/BV1KNjz6cEeR/?p=1",
+        "use_basis": "项目所有者于 2026-08-26 确认：此本地副本仅用于本地、非公开的 P0B 技术评测，不再分发原始媒体。",
+        "license": "未发现明确开放许可证；项目所有者确认仅按上述本地研究用途使用，不作传播或再分发。",
+        "attribution": "2026 北京智源大会；于超；《面向具身智能的高灵活大规模强化学习框架 RLinf》；Bilibili BV1KNjz6cEeR p1。",
+        "local_path_alias": "2026北京智源大会丨强化学习 p01 面向具身智能的高灵活大规模强化学习框架 RLinf：于超 [BV1KNjz6cEeR_p1].mp4",
+        "media_sha256": "f0d0dc489a1df2284154920af8fb70b2d54070332c70964af65aafe596b2f33d",
+        "duration_ms": 2093120,
+        "language": "zh",
+        "content_type": "natural_continuous_chinese_technical_presentation",
+        "sensitivity": "公开技术演讲；项目所有者已确认无预期敏感个人数据。",
+        "ingest_artifact_relpath": "artifacts/p0b-ingest/p0b-rlinf-2026"
+      },
+      {
+        "video_id": "p0b-wuyi-goals",
+        "source_url": "https://www.bilibili.com/video/BV1RxWnzbE7g",
+        "use_basis": "项目所有者于 2026-08-26 确认：此本地副本仅用于本地、非公开的 P0B 技术评测，不再分发原始媒体。",
+        "license": "未发现明确开放许可证；项目所有者确认仅按上述本地研究用途使用，不作传播或再分发。",
+        "attribution": "吴翼；《清华姚班、OpenAI研究员吴翼：我们在训练AI的时候，目标都是简单的、明确的，但是人类的真实目标总是含糊的、不确定的。》；Bilibili BV1RxWnzbE7g。",
+        "local_path_alias": "清华姚班、OpenAI研究员吴翼：我们在训练AI的时候，目标都是简单的、明确的，但是人类的真实目标总是含糊的，不确定的。 [BV1RxWnzbE7g].mp4",
+        "media_sha256": "04b383544d961241f9472010bd56086f591cd2f05b6c5b731f9f6b22a553221a",
+        "duration_ms": 1763207,
+        "language": "zh",
+        "content_type": "natural_continuous_chinese_technical_presentation",
+        "sensitivity": "公开技术演讲；项目所有者已确认无预期敏感个人数据。",
+        "ingest_artifact_relpath": "artifacts/p0b-ingest/p0b-wuyi-goals"
+      }
+    ]
+  },
+  "questions": {
+    "path": "eval/p0b/questions.jsonl",
+    "sha256": "c82990972d75776a2758373fd78afdd5ccb8651cfcb780041b5925e07dc485a0",
+    "count": 12
+  },
+  "gold": {
+    "path": "eval/p0b/gold.jsonl",
+    "sha256": "66be91ce13987e0da67ec9fd95ddabfe90a04ce159fc40921631ae38ea2a8381",
+    "count": 12
+  },
+  "prompt": {
+    "path": "eval/p0b/prompts/transcript-retrieval-v1.md",
+    "sha256": "d2e3f44a2130ab89161d78cbf08cef107b22949354d21adbae9b72c54b15ca98"
+  },
+  "answer_model": {
+    "provider": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash",
+    "credential_present": true,
+    "temperature": 0,
+    "timeout_seconds": 120.0,
+    "response_schema": "AnswerProposal: status, answer, citation_segment_ids"
+  },
+  "media_snapshots": [
+    {
+      "video_id": "p0b-kling-2024",
+      "path": "2024北京智源大会-大模型产业技术 p06 可灵(KLING) 视频生成大模型：万鹏飞 [BV1HM4m1U7bM_p6].mp4",
+      "sha256": "e539a0b0e85e19596bf9666b33ad4c47c30ca15aeb482cc3c064f71275bb1e31",
+      "duration_ms": 2022421,
+      "size_bytes": 400288197
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "path": "2026北京智源大会丨强化学习 p01 面向具身智能的高灵活大规模强化学习框架 RLinf：于超 [BV1KNjz6cEeR_p1].mp4",
+      "sha256": "f0d0dc489a1df2284154920af8fb70b2d54070332c70964af65aafe596b2f33d",
+      "duration_ms": 2093120,
+      "size_bytes": 178451915
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "path": "清华姚班、OpenAI研究员吴翼：我们在训练AI的时候，目标都是简单的、明确的，但是人类的真实目标总是含糊的，不确定的。 [BV1RxWnzbE7g].mp4",
+      "sha256": "04b383544d961241f9472010bd56086f591cd2f05b6c5b731f9f6b22a553221a",
+      "duration_ms": 1763207,
+      "size_bytes": 109315252
+    }
+  ],
+  "ingest_snapshots": [
+    {
+      "video_id": "p0b-kling-2024",
+      "artifact_relpath": "artifacts/p0b-ingest/p0b-kling-2024",
+      "manifest_sha256": "82487e503cb428f3987350c7cf3332e04b004ad332a3b05eec202dfbb4d6ed8a",
+      "segments_sha256": "c350e1c6a69ca13ae0349061dfa1436782704ef737a9a28092504b18eb75010b",
+      "segment_count": 43,
+      "asr_model": "mlx-community/whisper-small-mlx"
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "artifact_relpath": "artifacts/p0b-ingest/p0b-rlinf-2026",
+      "manifest_sha256": "9e75a3bb97b93aeb97c5324f0031a1c67060d6f23a5c3e241cea81edd06ebb4e",
+      "segments_sha256": "d284cb127b4cdd2c56d556cdf80c8c77754b6e2bdec7a51bb6565976de1ae9c0",
+      "segment_count": 46,
+      "asr_model": "mlx-community/whisper-small-mlx"
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "artifact_relpath": "artifacts/p0b-ingest/p0b-wuyi-goals",
+      "manifest_sha256": "1f58070ad91b67cf7c8dd080873aff35952956f17ccb2bf3569ba6003993475e",
+      "segments_sha256": "2abcaf3c8582c293d869bdd4af8284a641cc934275f00f40842abc560040d37f",
+      "segment_count": 38,
+      "asr_model": "mlx-community/whisper-small-mlx"
+    }
+  ],
+  "p0a_anchors": {
+    "reports/p0a-smoke-report.md": {
+      "expected_sha256": "a57a15207c95f1c8217590a270cc30ce811001810f3fa6e25923953aed64ea9a",
+      "actual_sha256": "a57a15207c95f1c8217590a270cc30ce811001810f3fa6e25923953aed64ea9a",
+      "verified": true
+    },
+    "artifacts/chinese-lips-mini-val-kj-001/smoke-run.json": {
+      "expected_sha256": "55563f08c99a709347e0715917e66028767f79b0066265ab5d5c866fbe11cf74",
+      "actual_sha256": "55563f08c99a709347e0715917e66028767f79b0066265ab5d5c866fbe11cf74",
+      "verified": true
+    },
+    "artifacts/chinese-lips-mini-val-kj-001/human-review.json": {
+      "expected_sha256": "04d817974af0b73aeb39ce650ee980fe0ef6c904226c30ae147cc8dd20e23ed4",
+      "actual_sha256": "04d817974af0b73aeb39ce650ee980fe0ef6c904226c30ae147cc8dd20e23ed4",
+      "verified": true
+    },
+    "pyproject.toml": {
+      "expected_sha256": "1b667d5de7cbc36a8c8cba0c8610c2d5acb0f36be98a7b248040b6fe4f6b6b7a",
+      "actual_sha256": "1b667d5de7cbc36a8c8cba0c8610c2d5acb0f36be98a7b248040b6fe4f6b6b7a",
+      "verified": true
+    },
+    "uv.lock": {
+      "expected_sha256": "d62819c00268e64ff00d958b2cc5ebff587ed1f576c0e67e219999edb52d4851",
+      "actual_sha256": "d62819c00268e64ff00d958b2cc5ebff587ed1f576c0e67e219999edb52d4851",
+      "verified": true
+    }
+  },
+  "source_revision": {
+    "git_commit": "0de7f74d32d3dd59407bc1016994bcc9ca0d2db3",
+    "files": {
+      "src/video_evidence_agent/__init__.py": "b814dc08edef88c2993374636e91e68932d2e1e1560e43f315cdc48e3ed0d8dd",
+      "src/video_evidence_agent/answering.py": "0cdcbbe6e32c95bb7d207d8628923e24da115c019b7dd4b04e1275028f8c2052",
+      "src/video_evidence_agent/asr.py": "efae7f624837971128da7775525d8116bc05c574687792c837f43919ceae1a55",
+      "src/video_evidence_agent/audio.py": "47ffe1b584e5b2df43ea7af54009c40d2f4bf055db4be66009be35c1883aeb05",
+      "src/video_evidence_agent/chinese_lips.py": "7f5ca822f5587fec06d5418edf386007be36a8ee3abbf682b18fa3c891aa46e4",
+      "src/video_evidence_agent/cli.py": "09e23d1329402860ed6f0dcbd387e1792860d51e6680572b2b0f26688163810e",
+      "src/video_evidence_agent/evaluation.py": "0241f386602500666bc3e47cf97b84753ece2345bbb8a0241b3e3a533c0a1402",
+      "src/video_evidence_agent/evidence.py": "c29b1958070d1ed8894ae18464ec4deec4bd1de82fd06d13bfd827bcc40a400a",
+      "src/video_evidence_agent/p0b_eval.py": "80ab2c8b45694136882d400d52ff9201349a663b28997ff7787c320a86b19896",
+      "src/video_evidence_agent/p0b_schemas.py": "363c8460f2d6ad1d604fa9fa988d2990ae288f8c60249d2ed875f6137eef3b5d",
+      "src/video_evidence_agent/retrieval.py": "2c12d2391ab14557f48eff2e160b6162f4bb8c632e4029f0dc30d9f04c0eb370",
+      "src/video_evidence_agent/schemas.py": "5e3c7b42256fc5bbde5cc15ddd60a7fe696ca11720604d7983494c14141fb418",
+      "src/video_evidence_agent/segments.py": "d5c84d60203004c26ae58dd70cf14328b000ca27a776b046e79c2bfa2339c3bc",
+      "tests/test_asr.py": "06e9ae517aba8f84bdb45d340f1589ef75ee3f9939c53d1cb2d7c66ba30df88f",
+      "tests/test_audio.py": "268364d7968660f08d81bce5c119e0fef19a97c81994110e87a62892ef586115",
+      "tests/test_chinese_lips.py": "4fe5ea725a808ce0d410e148ba96f3442cea05a0ce17c3215bd9d48671cf394f",
+      "tests/test_cli_failures.py": "e7f3d161a0a6ef291e79953421db5d1bf6a173d5cd057e6a57487bbda66db528",
+      "tests/test_evaluation.py": "da40ed968cc5d2aead7446793453b014a219c8f517d5de0511988388ca9863a0",
+      "tests/test_evidence.py": "bb20302488fd4b961ab58178e26704aa3a669fa9e9dc4ca6ada231977e293eea",
+      "tests/test_p0b.py": "f61999ae78b034fd4ce4de5bcce137b579be2ca0549f258afd219c3bec6628bd",
+      "tests/test_retrieval.py": "ca403d1880b0e8cc126ea7a066037a66ddda9d2bfba417b8e2c5e76f401fbbcf",
+      "tests/test_review.py": "05e7960d11d98670c67a29f393278e945dd1bcff08f929f693a5043f510d74db",
+      "tests/test_segments.py": "86199a9bf27d9f780c9a7c8c9f8de02d3ff140cad9ac1b80900c99480824deb4",
+      "pyproject.toml": "1b667d5de7cbc36a8c8cba0c8610c2d5acb0f36be98a7b248040b6fe4f6b6b7a",
+      "uv.lock": "d62819c00268e64ff00d958b2cc5ebff587ed1f576c0e67e219999edb52d4851"
+    }
+  },
+  "runtime": {
+    "python": "3.12.13 (main, Aug  7 2026, 02:15:23) [Clang 22.1.3 ]",
+    "platform": "arm64"
+  }
+}
