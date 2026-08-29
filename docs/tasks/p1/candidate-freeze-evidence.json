@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "evidence_id": "EVID-P1-010-FREEZE-001",
+  "task_id": "TASK-P1-010",
+  "gate": "TASK-P1-010 Candidate/Gold freeze",
+  "status": "PASSED",
+  "recorded_at": "2026-08-26T15:50:09.054575+00:00",
+  "artifact_type": "ART-P1-002 CandidateManifest",
+  "artifact_path": "eval/p1/revisions/p1-candidate-freeze-r2/candidate-manifest.json",
+  "artifact_sha256": "d523c22fdfbfb8d1ff55a2d5620d94bd6cdfac5368472995f1317b857f495cf2",
+  "owner_authorization": {
+    "decision_id": "DEC-P1-033",
+    "authorized_draft_path": "eval/p1/revisions/p1-candidate-draft-r2/candidate-draft.json",
+    "authorized_draft_sha256": "fce132bde0ca044a5aa6186512607d874c71bbfe4a6480b7430c3a0d2c989456"
+  },
+  "active_candidate_ids": [
+    "p1-c02-kling-signal-quality-001",
+    "p1-c03-rlinf-simulation-001"
+  ],
+  "rejected_history_ids": [
+    "p1-c01-kling-creative-001",
+    "p1-c04-rlinf-real-system-001"
+  ],
+  "rejected_history_excluded_from_headroom": true,
+  "r1_preserved": {
+    "path": "eval/p1/revisions/p1-candidate-draft-r1/candidate-draft.json",
+    "sha256": "e7dc08dc78881e0c35262635460e297c8f0347facaebaca7f919b355e8346567"
+  },
+  "baseline": {
+    "path": "eval/p1/revisions/p1-baseline-r1/baseline-manifest.json",
+    "sha256": "d2171330a5a60261189f8e46fe20e5fbdb234aa4a3c7853a4eae0742602e6958",
+    "history_protection_snapshot_sha256": "d068dad5cce78baaa29c6ec42ad26ca966213ef691f575c13a2d2692b7f6f3e3"
+  },
+  "checks": {
+    "r2_exact_hash": true,
+    "owner_decision": true,
+    "candidate_count": 2,
+    "source_and_gold_mapping": true,
+    "fixed_hard_case_preserved": true,
+    "requirements_readiness": "READY_FOR_ENGINEERING_HANDOFF"
+  },
+  "provider_calls": 0,
+  "video_upload": false,
+  "task_p1_020_started": false,
+  "b2_design": false,
+  "next_gate": "TASK-P1-020 B1 Headroom"
+}

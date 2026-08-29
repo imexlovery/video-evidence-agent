@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "evidence_id": "EVID-P1-000-BASELINE-001",
+  "task_id": "TASK-P1-000",
+  "gate": "GATE-P1-1 Baseline",
+  "status": "PASSED",
+  "recorded_at": "2026-08-26T14:52:06.960593+00:00",
+  "head": {
+    "branch": "main",
+    "git_commit": "fc9b29ce387f52d5da92be8fc68ce171727f872a",
+    "files": {
+      "src/video_evidence_agent/__init__.py": "b814dc08edef88c2993374636e91e68932d2e1e1560e43f315cdc48e3ed0d8dd",
+      "src/video_evidence_agent/answering.py": "0cdcbbe6e32c95bb7d207d8628923e24da115c019b7dd4b04e1275028f8c2052",
+      "src/video_evidence_agent/asr.py": "efae7f624837971128da7775525d8116bc05c574687792c837f43919ceae1a55",
+      "src/video_evidence_agent/audio.py": "47ffe1b584e5b2df43ea7af54009c40d2f4bf055db4be66009be35c1883aeb05",
+      "src/video_evidence_agent/chinese_lips.py": "7f5ca822f5587fec06d5418edf386007be36a8ee3abbf682b18fa3c891aa46e4",
+      "src/video_evidence_agent/cli.py": "99cf04a83c6a455c5214f87c7070126246d6bf094e40e40c5ddc0559d9546c5e",
+      "src/video_evidence_agent/evaluation.py": "0241f386602500666bc3e47cf97b84753ece2345bbb8a0241b3e3a533c0a1402",
+      "src/video_evidence_agent/evidence.py": "c29b1958070d1ed8894ae18464ec4deec4bd1de82fd06d13bfd827bcc40a400a",
+      "src/video_evidence_agent/p0b_eval.py": "d08222a500e82aaa7122105a018d5ffc19c81e9863775e5663d2b46a7cf73c93",
+      "src/video_evidence_agent/p0b_schemas.py": "363c8460f2d6ad1d604fa9fa988d2990ae288f8c60249d2ed875f6137eef3b5d",
+      "src/video_evidence_agent/retrieval.py": "ae7ba1eca908b740c924a0867f329807da1362f825efbce632b3fc44f2c41719",
+      "src/video_evidence_agent/schemas.py": "5e3c7b42256fc5bbde5cc15ddd60a7fe696ca11720604d7983494c14141fb418",
+      "src/video_evidence_agent/segments.py": "d5c84d60203004c26ae58dd70cf14328b000ca27a776b046e79c2bfa2339c3bc",
+      "tests/test_asr.py": "06e9ae517aba8f84bdb45d340f1589ef75ee3f9939c53d1cb2d7c66ba30df88f",
+      "tests/test_audio.py": "268364d7968660f08d81bce5c119e0fef19a97c81994110e87a62892ef586115",
+      "tests/test_chinese_lips.py": "4fe5ea725a808ce0d410e148ba96f3442cea05a0ce17c3215bd9d48671cf394f",
+      "tests/test_cli_failures.py": "e7f3d161a0a6ef291e79953421db5d1bf6a173d5cd057e6a57487bbda66db528",
+      "tests/test_evaluation.py": "da40ed968cc5d2aead7446793453b014a219c8f517d5de0511988388ca9863a0",
+      "tests/test_evidence.py": "bb20302488fd4b961ab58178e26704aa3a669fa9e9dc4ca6ada231977e293eea",
+      "tests/test_p0b.py": "d524ecc840724cb80724f00e329c61bb043bbb4a7751514f0712f78bb31a347a",
+      "tests/test_retrieval.py": "70c060066e3b263decbed988a1ac110302d201e8c6d42c1629b3f7eb05c95207",
+      "tests/test_review.py": "05e7960d11d98670c67a29f393278e945dd1bcff08f929f693a5043f510d74db",
+      "tests/test_segments.py": "86199a9bf27d9f780c9a7c8c9f8de02d3ff140cad9ac1b80900c99480824deb4",
+      "pyproject.toml": "1b667d5de7cbc36a8c8cba0c8610c2d5acb0f36be98a7b248040b6fe4f6b6b7a",
+      "uv.lock": "d62819c00268e64ff00d958b2cc5ebff587ed1f576c0e67e219999edb52d4851"
+    },
+    "pyproject_sha256": "1b667d5de7cbc36a8c8cba0c8610c2d5acb0f36be98a7b248040b6fe4f6b6b7a",
+    "uv_lock_sha256": "d62819c00268e64ff00d958b2cc5ebff587ed1f576c0e67e219999edb52d4851"
+  },
+  "baseline_manifest_path": "eval/p1/revisions/p1-baseline-r1/baseline-manifest.json",
+  "baseline_manifest_sha256": "d2171330a5a60261189f8e46fe20e5fbdb234aa4a3c7853a4eae0742602e6958",
+  "provider_calls": 0,
+  "video_upload": false,
+  "checks": {
+    "evidence_id": "EVID-P1-000-BASELINE-001",
+    "evidence_path": "docs/tasks/p1/baseline-evidence.json",
+    "pytest": {
+      "command": "uv run pytest",
+      "exit_code": 0,
+      "summary": "28 passed"
+    },
+    "ruff": {
+      "command": "uv run ruff check .",
+      "exit_code": 0,
+      "summary": "All checks passed"
+    },
+    "git_diff_check": {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    "jsonl_and_mapping_validation": {
+      "exit_code": 0,
+      "summary": "3 videos, 12 questions, 12 Gold rows, 127 segments, all Gold mappings"
+    },
+    "p0_r3_manifest_verification": {
+      "exit_code": 0,
+      "summary": "source/media/ingest/input pins and report hashes verified"
+    }
+  },
+  "asset_summary": {
+    "videos": 3,
+    "questions": 12,
+    "gold_rows": 12,
+    "segments": 127,
+    "p0_r3_files_hashed": 50,
+    "protected_history_files_hashed": 181,
+    "history_protection_snapshot_sha256": "d068dad5cce78baaa29c6ec42ad26ca966213ef691f575c13a2d2692b7f6f3e3"
+  }
+}

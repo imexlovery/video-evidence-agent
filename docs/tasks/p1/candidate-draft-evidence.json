@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "evidence_id": "EVID-P1-010-DRAFT-001",
+  "task_id": "TASK-P1-010",
+  "gate": "Candidate/Gold draft review",
+  "status": "PENDING_OWNER_CONFIRMATION",
+  "recorded_at": "2026-08-26T14:58:02.880688+00:00",
+  "draft_path": "eval/p1/revisions/p1-candidate-draft-r1/candidate-draft.json",
+  "draft_sha256": "e7dc08dc78881e0c35262635460e297c8f0347facaebaca7f919b355e8346567",
+  "candidate_ids": [
+    "p1-c01-kling-creative-001",
+    "p1-c02-kling-signal-quality-001",
+    "p1-c03-rlinf-simulation-001",
+    "p1-c04-rlinf-real-system-001"
+  ],
+  "candidate_count": 4,
+  "source_segment_snapshots": {
+    "artifacts/p0b-ingest/p0b-kling-2024/segments.jsonl": "c350e1c6a69ca13ae0349061dfa1436782704ef737a9a28092504b18eb75010b",
+    "artifacts/p0b-ingest/p0b-rlinf-2026/segments.jsonl": "d284cb127b4cdd2c56d556cdf80c8c77754b6e2bdec7a51bb6565976de1ae9c0"
+  },
+  "failure_taxonomy_sha256": "c3fd2982c1118c659015e52a595b7040f9c640fe129c895dd83ffb73d5fff750",
+  "frozen_question_set_sha256": "c82990972d75776a2758373fd78afdd5ccb8651cfcb780041b5925e07dc485a0",
+  "existing_hard_case": {
+    "question_id": "p0b-r1-rlinf-m",
+    "role": "existing_fixed_hard_case",
+    "must_not_be_copied_or_double_counted": true,
+    "evidence_source": "reports/p0b-r3-retrieval-eval.json and docs/tasks/p0b-r2/failure-analysis.md"
+  },
+  "provider_calls": 0,
+  "b1_headroom_run": false,
+  "b2_design": false,
+  "validation_summary": "All candidate IDs are new, answerable, single-video, source-mapped, Gold-mapped, and free of embedded transcript text; semantic duplicate risk remains for Owner review."
+}

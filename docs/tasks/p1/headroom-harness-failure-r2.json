@@ -1,0 +1,50 @@
+{
+  "artifact_type": "EVID-P1-020 HarnessFailure",
+  "schema_version": 1,
+  "evidence_id": "EVID-P1-020-HARNESS-FAIL-001",
+  "task_id": "TASK-P1-020",
+  "headroom_revision": "p1-headroom-r2",
+  "status": "FAILED_PARTIAL_HARNESS",
+  "created_at": "2026-08-26T00:00:00+08:00",
+  "failure": {
+    "class": "KeyError",
+    "missing_key": "top_k",
+    "message": "markdown_report referenced report['workload']['top_k']; the report stores Top-K under report['workload']['retrieval_parameters']['top_k'].",
+    "command": "uv run python /private/tmp/p1_headroom_r2.py",
+    "exit_code": 1,
+    "stage": "markdown rendering after case artifacts and partial JSON report were written"
+  },
+  "preserved_outputs": {
+    "partial_report": {
+      "path": "reports/p1-headroom-r2.json",
+      "sha256": "c415ee5c5b8ef1fa0ea863e2777cdda626d8b8e86b352ae163d08eb0e91ebdd7"
+    },
+    "case_artifacts": [
+      {
+        "path": "eval/p1/revisions/p1-headroom-r2/cases/p0b-r1-rlinf-m.json",
+        "sha256": "df68b88f649bef3aa69bd55a7f6729595c941587bb3cec75ea434c498c8825c1"
+      },
+      {
+        "path": "eval/p1/revisions/p1-headroom-r2/cases/p1-c02-kling-signal-quality-001.json",
+        "sha256": "d2b5889b91a161b46911bfcb46a197520cba1e8af39072d9433e60a17c6ba486"
+      },
+      {
+        "path": "eval/p1/revisions/p1-headroom-r2/cases/p1-c03-rlinf-simulation-001.json",
+        "sha256": "3aad2e276c407abdbb99e2fd416d86ac41cc51c731da70e46541601f310f910"
+      }
+    ],
+    "markdown_report_written": false,
+    "headroom_evidence_written": false
+  },
+  "execution_facts": {
+    "b1_retrieval_calls_completed": 3,
+    "b1_retrieval_calls_per_case": 1,
+    "provider_calls": 0,
+    "video_upload": false,
+    "b2_design_or_execution": false,
+    "p0_history_mutation": false,
+    "task_p1_030_started": false
+  },
+  "recovery_policy": "Do not rerun B1 or selectively rerun a case. Assemble final reporting materials in a new retry revision from the preserved case artifacts and partial report.",
+  "preserved": true
+}

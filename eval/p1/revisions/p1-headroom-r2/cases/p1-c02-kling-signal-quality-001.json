@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "artifact_type": "P1 B1 Headroom Case Result",
+  "headroom_revision": "p1-headroom-r2",
+  "task_id": "TASK-P1-020",
+  "case_id": "p1-c02-kling-signal-quality-001",
+  "video_id": "p0b-kling-2024",
+  "question": "可灵处理视频信号时，怎样在降低计算负担的同时保持生成画质？",
+  "answerable": true,
+  "answer_points": [
+    "在原始像素空间处理视频的计算代价很高，因此采用 3D VAE 在隐空间高效压缩视频信号。",
+    "压缩结构既要减少信息和计算损耗，又要保持足够的信息、生成能力与画质。"
+  ],
+  "gold_evidence_units": [
+    {
+      "unit_id": "p1-c02-kling-signal-quality-001-u1",
+      "start_ms": 1237400,
+      "end_ms": 1282920,
+      "gold_segment_ids": [
+        "p0b-kling-2024-seg-026"
+      ]
+    },
+    {
+      "unit_id": "p1-c02-kling-signal-quality-001-u2",
+      "start_ms": 1282920,
+      "end_ms": 1330200,
+      "gold_segment_ids": [
+        "p0b-kling-2024-seg-027"
+      ]
+    }
+  ],
+  "fixed_hard_case": false,
+  "pre_frozen": true,
+  "b1": {
+    "retrieval_profile": "char_tfidf_2_4_query_views_v1",
+    "query_views": {
+      "base": "可灵处理视频信号时怎样在降低计算负担的同时保持生成画质",
+      "focus": "可灵处理信号怎样在降低计算负担同保持生成画质",
+      "aliases": "可灵处理视频信号时怎样在降低计算负担的同时保持生成画质"
+    },
+    "top_k_requested": 5,
+    "retrieval_call_count": 1,
+    "retrieval_latency_ms": 13,
+    "source_segments_path": "artifacts/p0b-ingest/p0b-kling-2024/segments.jsonl",
+    "source_segments_sha256": "c350e1c6a69ca13ae0349061dfa1436782704ef737a9a28092504b18eb75010b",
+    "hits": [
+      {
+        "rank": 1,
+        "score": 0.05996495182397634,
+        "segment_id": "p0b-kling-2024-seg-027",
+        "video_id": "p0b-kling-2024",
+        "ordinal": 27,
+        "start_ms": 1282920,
+        "end_ms": 1330200
+      },
+      {
+        "rank": 2,
+        "score": 0.05544290525932389,
+        "segment_id": "p0b-kling-2024-seg-026",
+        "video_id": "p0b-kling-2024",
+        "ordinal": 26,
+        "start_ms": 1237400,
+        "end_ms": 1282920
+      },
+      {
+        "rank": 3,
+        "score": 0.03769407278071571,
+        "segment_id": "p0b-kling-2024-seg-004",
+        "video_id": "p0b-kling-2024",
+        "ordinal": 4,
+        "start_ms": 186900,
+        "end_ms": 234800
+      },
+      {
+        "rank": 4,
+        "score": 0.03268242564722136,
+        "segment_id": "p0b-kling-2024-seg-031",
+        "video_id": "p0b-kling-2024",
+        "ordinal": 31,
+        "start_ms": 1471400,
+        "end_ms": 1516720
+      },
+      {
+        "rank": 5,
+        "score": 0.03212952938378714,
+        "segment_id": "p0b-kling-2024-seg-002",
+        "video_id": "p0b-kling-2024",
+        "ordinal": 2,
+        "start_ms": 94000,
+        "end_ms": 140700
+      }
+    ],
+    "gold_units_hit_at_5": [
+      "p1-c02-kling-signal-quality-001-u1",
+      "p1-c02-kling-signal-quality-001-u2"
+    ],
+    "missing_gold_unit_ids": [],
+    "hit_units_at_5": 2,
+    "unit_count": 2,
+    "evidence_unit_recall_at_5": 1.0,
+    "all_necessary_evidence_at_5": true,
+    "primary_failure": false
+  },
+  "deterministic_oracle": {
+    "action_family": "inspect_segments",
+    "allowed_radii": [
+      1,
+      2
+    ],
+    "candidate_action_count": 0,
+    "actions": [],
+    "best_recovery_action": null,
+    "adds_at_least_one_missing_gold_unit": false,
+    "runtime_reads_gold": false,
+    "cross_video": false,
+    "provider_calls": 0
+  },
+  "headroom": {
+    "dynamic_recoverable": false,
+    "qualifying": false,
+    "qualifying_conditions": {
+      "pre_frozen": true,
+      "answerable": true,
+      "b1_primary_failure": false,
+      "oracle_adds_missing_gold_unit": false,
+      "runtime_gold_context": false,
+      "cross_video": false
+    }
+  },
+  "provider_calls": 0,
+  "b2_design_or_execution": false
+}

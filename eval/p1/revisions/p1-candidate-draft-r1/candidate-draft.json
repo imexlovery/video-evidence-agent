@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "artifact_type": "P1 Candidate/Gold Draft",
+  "candidate_set_id": "p1-candidate-draft-r1",
+  "status": "DRAFT_PENDING_OWNER_CONFIRMATION",
+  "created_for_task": "TASK-P1-010",
+  "authoring_boundary": "Question wording is based on the recorded P0 failure taxonomy and historical failure descriptions. Source segments are cited for post-draft Gold annotation only; no Gold, full transcript, or historical answer is a runtime input.",
+  "existing_hard_case": {
+    "question_id": "p0b-r1-rlinf-m",
+    "role": "existing_fixed_hard_case",
+    "must_not_be_copied_or_double_counted": true,
+    "evidence_source": "reports/p0b-r3-retrieval-eval.json and docs/tasks/p0b-r2/failure-analysis.md"
+  },
+  "owner_review": {
+    "status": "PENDING",
+    "required_decisions": [
+      "accept or reject each candidate ID",
+      "accept or correct each Gold evidence unit and answer point mapping",
+      "confirm no accepted candidate duplicates the 12-question regression set",
+      "confirm the accepted set and Gold timestamps before any B1 Headroom run"
+    ],
+    "b1_headroom_run_allowed": false,
+    "b2_design_allowed": false
+  },
+  "candidates": [
+    {
+      "candidate_id": "p1-c01-kling-creative-001",
+      "video_id": "p0b-kling-2024",
+      "question_type": "SINGLE_PARAPHRASE",
+      "question": "如果不受现实拍摄条件限制，视频生成可以为内容创作带来怎样的空间？",
+      "answerable": true,
+      "failure_taxonomy": {
+        "category": "RETRIEVAL + ANSWERING",
+        "historical_case": "p0b-r1-kling-p",
+        "reference": "docs/tasks/p0b-r2/failure-analysis.md#2-逐题证据分析",
+        "mechanism": "R1 query wording did not retrieve the segment containing the content-freedom point; this candidate tests a new blind paraphrase."
+      },
+      "non_duplicate_note": "New wording and a single scoped target; Owner must reject it if its semantic scope is still too close to p0b-r1-kling-p.",
+      "source_segments_path": "artifacts/p0b-ingest/p0b-kling-2024/segments.jsonl",
+      "source_segment_ids": [
+        "p0b-kling-2024-seg-007"
+      ],
+      "gold_evidence_units": [
+        {
+          "unit_id": "p1-c01-kling-creative-001-u1",
+          "start_ms": 328500,
+          "end_ms": 373500,
+          "gold_segment_ids": [
+            "p0b-kling-2024-seg-007"
+          ]
+        }
+      ],
+      "answer_points": [
+        "视频生成的内容自由度高，可以呈现现实世界中不存在的概念组合或想象场景。"
+      ],
+      "source_segments_sha256": "c350e1c6a69ca13ae0349061dfa1436782704ef737a9a28092504b18eb75010b",
+      "draft_content_sha256": "2989fff6b3d567f86a1527e9744ee177f7ec873b4e43dc3836084376f4d93c38"
+    },
+    {
+      "candidate_id": "p1-c02-kling-signal-quality-001",
+      "video_id": "p0b-kling-2024",
+      "question_type": "SINGLE_PARAPHRASE",
+      "question": "可灵处理视频信号时，怎样在降低计算负担的同时保持生成画质？",
+      "answerable": true,
+      "failure_taxonomy": {
+        "category": "RETRIEVAL + MULTI-CLAUSE BALANCE",
+        "historical_case": "p0b-r1-kling-m",
+        "reference": "docs/tasks/p0b-r2/failure-analysis.md#3-允许的最小改进假设",
+        "mechanism": "R1 multi-evidence retrieval compressed multiple technical subparts into a single theme; this candidate isolates the signal-compression subproblem."
+      },
+      "non_duplicate_note": "Scoped to signal compression and quality rather than the existing model-design/data-platform question; Owner must confirm distinctness.",
+      "source_segments_path": "artifacts/p0b-ingest/p0b-kling-2024/segments.jsonl",
+      "source_segment_ids": [
+        "p0b-kling-2024-seg-026",
+        "p0b-kling-2024-seg-027"
+      ],
+      "gold_evidence_units": [
+        {
+          "unit_id": "p1-c02-kling-signal-quality-001-u1",
+          "start_ms": 1237400,
+          "end_ms": 1330200,
+          "gold_segment_ids": [
+            "p0b-kling-2024-seg-026",
+            "p0b-kling-2024-seg-027"
+          ]
+        }
+      ],
+      "answer_points": [
+        "在原始像素空间处理视频的计算代价很高，因此采用 3D VAE 在隐空间高效压缩视频信号。",
+        "压缩结构既要减少信息和计算损耗，又要保持足够的信息、生成能力与画质。"
+      ],
+      "source_segments_sha256": "c350e1c6a69ca13ae0349061dfa1436782704ef737a9a28092504b18eb75010b",
+      "draft_content_sha256": "c6c60350781693fd7d894097c72516bf0f7da37afc291835238740712ded035f"
+    },
+    {
+      "candidate_id": "p1-c03-rlinf-simulation-001",
+      "video_id": "p0b-rlinf-2026",
+      "question_type": "SINGLE_PARAPHRASE",
+      "question": "在具身智能的仿真强化学习中，仿真器需要满足哪些视觉和计算方面的要求？",
+      "answerable": true,
+      "failure_taxonomy": {
+        "category": "RETRIEVAL + MULTI-CLAUSE BALANCE",
+        "historical_case": "p0b-r1-rlinf-m",
+        "reference": "docs/tasks/p0b-r2/failure-analysis.md#2-逐题证据分析",
+        "mechanism": "R1 multi-evidence retrieval concentrated on part of the simulation/real-machine question; this candidate isolates the simulation-side evidence."
+      },
+      "non_duplicate_note": "A new simulation-only scope, not the existing question comparing simulation and real-machine constraints.",
+      "source_segments_path": "artifacts/p0b-ingest/p0b-rlinf-2026/segments.jsonl",
+      "source_segment_ids": [
+        "p0b-rlinf-2026-seg-009"
+      ],
+      "gold_evidence_units": [
+        {
+          "unit_id": "p1-c03-rlinf-simulation-001-u1",
+          "start_ms": 420800,
+          "end_ms": 466500,
+          "gold_segment_ids": [
+            "p0b-rlinf-2026-seg-009"
+          ]
+        }
+      ],
+      "answer_points": [
+        "仿真器需要高保真的图像渲染能力，以保证视觉层面的仿真质量。",
+        "仿真器需要较高速的科学计算能力来模拟碰撞等过程，并通常使用 GPU 并行计算。"
+      ],
+      "source_segments_sha256": "d284cb127b4cdd2c56d556cdf80c8c77754b6e2bdec7a51bb6565976de1ae9c0",
+      "draft_content_sha256": "fe1aa02097609c7d8b6236b6400588fef2528881aa8d05ec6a00c2a3f31ea482"
+    },
+    {
+      "candidate_id": "p1-c04-rlinf-real-system-001",
+      "video_id": "p0b-rlinf-2026",
+      "question_type": "MULTI_EVIDENCE",
+      "question": "真机强化学习中的端云系统和人在环分别要解决什么问题？",
+      "answerable": true,
+      "failure_taxonomy": {
+        "category": "RETRIEVAL + MULTI-CLAUSE BALANCE",
+        "historical_case": "p0b-r1-rlinf-m",
+        "reference": "docs/tasks/p0b-r2/failure-analysis.md#2-逐题证据分析",
+        "mechanism": "R1 omitted one necessary subpart of a multi-evidence system-constraint question; this candidate isolates the two real-machine controls for a recovery test."
+      },
+      "non_duplicate_note": "Correlated with the existing RLinf hard case; it must not be counted as that hard case and requires explicit Owner approval as a distinct candidate.",
+      "source_segments_path": "artifacts/p0b-ingest/p0b-rlinf-2026/segments.jsonl",
+      "source_segment_ids": [
+        "p0b-rlinf-2026-seg-010",
+        "p0b-rlinf-2026-seg-011"
+      ],
+      "gold_evidence_units": [
+        {
+          "unit_id": "p1-c04-rlinf-real-system-001-u1",
+          "start_ms": 466600,
+          "end_ms": 512800,
+          "gold_segment_ids": [
+            "p0b-rlinf-2026-seg-010"
+          ]
+        },
+        {
+          "unit_id": "p1-c04-rlinf-real-system-001-u2",
+          "start_ms": 512800,
+          "end_ms": 558200,
+          "gold_segment_ids": [
+            "p0b-rlinf-2026-seg-011"
+          ]
+        }
+      ],
+      "answer_points": [
+        "端侧负责推理、云侧负责训练，需要解决端云通信、权重同步和资源协调。",
+        "真实机器昂贵且探索有风险，因此需要人在环来保护机器并提高探索效率。"
+      ],
+      "source_segments_sha256": "d284cb127b4cdd2c56d556cdf80c8c77754b6e2bdec7a51bb6565976de1ae9c0",
+      "draft_content_sha256": "3074b79fd1f1f5f51ee5a2d00eb9293d19349f6accb388f40ff9b173de8c256a"
+    }
+  ],
+  "authoring_sources": {
+    "failure_taxonomy": "docs/tasks/p0b-r2/failure-analysis.md",
+    "failure_taxonomy_sha256": "c3fd2982c1118c659015e52a595b7040f9c640fe129c895dd83ffb73d5fff750",
+    "frozen_question_set": "eval/p0b/questions.jsonl",
+    "frozen_question_set_sha256": "c82990972d75776a2758373fd78afdd5ccb8651cfcb780041b5925e07dc485a0"
+  },
+  "source_segment_snapshots": {
+    "artifacts/p0b-ingest/p0b-kling-2024/segments.jsonl": "c350e1c6a69ca13ae0349061dfa1436782704ef737a9a28092504b18eb75010b",
+    "artifacts/p0b-ingest/p0b-rlinf-2026/segments.jsonl": "d284cb127b4cdd2c56d556cdf80c8c77754b6e2bdec7a51bb6565976de1ae9c0"
+  },
+  "validated_at": "2026-08-26T14:58:02.880688+00:00",
+  "validation": {
+    "status": "DRAFT_VALIDATED_PENDING_OWNER_CONFIRMATION",
+    "candidate_count": 4,
+    "candidate_ids": [
+      "p1-c01-kling-creative-001",
+      "p1-c02-kling-signal-quality-001",
+      "p1-c03-rlinf-simulation-001",
+      "p1-c04-rlinf-real-system-001"
+    ],
+    "existing_p0_question_count": 12,
+    "provider_calls": 0,
+    "b1_headroom_run": false,
+    "b2_design": false
+  }
+}

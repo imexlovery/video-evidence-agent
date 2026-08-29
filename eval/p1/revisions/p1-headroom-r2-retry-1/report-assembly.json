@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "artifact_type": "P1 Headroom Report Assembly",
+  "revision": "p1-headroom-r2-retry-1",
+  "task_id": "TASK-P1-020",
+  "created_at": "2026-08-26T16:03:31.832317+00:00",
+  "assembly_only": true,
+  "b1_rerun": false,
+  "source_attempt": {
+    "revision": "p1-headroom-r2",
+    "partial_report": {
+      "path": "reports/p1-headroom-r2.json",
+      "sha256": "c415ee5c5b8ef1fa0ea863e2777cdda626d8b8e86b352ae163d08eb0e91ebdd7"
+    },
+    "harness_failure": {
+      "path": "docs/tasks/p1/headroom-harness-failure-r2.json",
+      "sha256": "e6d039fd23e153653a6b20275c6eb824bc7f4a8927dea9b64e5181b1dc64f3e0"
+    },
+    "case_artifacts": [
+      {
+        "path": "eval/p1/revisions/p1-headroom-r2/cases/p0b-r1-rlinf-m.json",
+        "sha256": "df68b88f649bef3aa69bd55a7f6729595c941587bb3cec75ea434c498c8825c1"
+      },
+      {
+        "path": "eval/p1/revisions/p1-headroom-r2/cases/p1-c02-kling-signal-quality-001.json",
+        "sha256": "d2b5889b91a161b46911bfcb46a197520cba1e8af39072d9433e60a17c6ba486"
+      },
+      {
+        "path": "eval/p1/revisions/p1-headroom-r2/cases/p1-c03-rlinf-simulation-001.json",
+        "sha256": "3aad2e276c407abdbba99e2fd416d86ac41cc51c731da70e46541601f310f910"
+      }
+    ]
+  },
+  "outputs": {
+    "report_json": {
+      "path": "reports/p1-headroom-r2-retry-1.json",
+      "sha256": "f5d542fba755034f9ec7ecb63367af5a7108907c555ff2e67a7beaf6a2326d88"
+    },
+    "report_markdown": {
+      "path": "reports/p1-headroom-r2-retry-1.md",
+      "sha256": "c0e2a15e19ca244a6c6ea961b8202f6b88316aebf8efb5b6c8b89714cb78529d"
+    },
+    "evidence_json": {
+      "path": "docs/tasks/p1/headroom-evidence-r2-retry-1.json",
+      "sha256": "4efabab83ca3197c14d09db352d068fb1929f24d773326f74e1d0be6c6a52b7f"
+    }
+  },
+  "execution_facts": {
+    "preserved_b1_calls": 3,
+    "provider_calls": 0,
+    "b2_design_or_execution": false,
+    "p0_history_mutation": false,
+    "protected_p0_snapshot_verified": "d068dad5cce78baaa29c6ec42ad26ca966213ef691f575c13a2d2692b7f6f3e3",
+    "qualifying_count": 1,
+    "gate": "NO_GO_INSUFFICIENT_HEADROOM"
+  }
+}

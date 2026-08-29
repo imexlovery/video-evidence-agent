@@ -1,0 +1,1062 @@
+{
+  "schema_version": 1,
+  "artifact_type": "OUT-P1-003 HeadroomReport",
+  "headroom_revision": "p1-headroom-r2",
+  "task_id": "TASK-P1-020",
+  "status": "NO_GO_INSUFFICIENT_HEADROOM",
+  "created_at": "2026-08-26T15:55:54.619692+00:00",
+  "manifest": {
+    "path": "eval/p1/revisions/p1-candidate-freeze-r2/candidate-manifest.json",
+    "sha256": "d523c22fdfbfb8d1ff55a2d5620d94bd6cdfac5368472995f1317b857f495cf2",
+    "draft_path": "eval/p1/revisions/p1-candidate-draft-r2/candidate-draft.json",
+    "draft_sha256": "fce132bde0ca044a5aa6186512607d874c71bbfe4a6480b7430c3a0d2c989456"
+  },
+  "workload": {
+    "case_count": 3,
+    "case_ids": [
+      "p0b-r1-rlinf-m",
+      "p1-c02-kling-signal-quality-001",
+      "p1-c03-rlinf-simulation-001"
+    ],
+    "retrieval_profile": "char_tfidf_2_4_query_views_v1",
+    "retrieval_parameters": {
+      "top_k": 5,
+      "analyzer": "char",
+      "ngram_range": [
+        2,
+        4
+      ],
+      "sublinear_tf": true,
+      "query_view_weights": {
+        "base": 0.1,
+        "focus": 0.36,
+        "aliases": 0.54
+      }
+    },
+    "b1_retrieval_runs_per_case": 1,
+    "b1_retrieval_run_count": 3,
+    "oracle": "deterministic scorer-only inspect_segments radius 1/2 simulation",
+    "provider_calls": 0,
+    "video_upload": false,
+    "b2_design_or_execution": false
+  },
+  "rejected_history": [
+    {
+      "candidate_id": "p1-c01-kling-creative-001",
+      "decision": "REJECTED",
+      "reason": "duplicate with p0b-r1-kling-p semantic target, Gold segment, and core answer",
+      "active_set": false,
+      "headroom_denominator": false,
+      "headroom_numerator": false,
+      "throughput_count": false,
+      "source_draft_path": "eval/p1/revisions/p1-candidate-draft-r1/candidate-draft.json"
+    },
+    {
+      "candidate_id": "p1-c04-rlinf-real-system-001",
+      "decision": "REJECTED",
+      "reason": "highly correlated with fixed hard case p0b-r1-rlinf-m; no double counting",
+      "active_set": false,
+      "headroom_denominator": false,
+      "headroom_numerator": false,
+      "throughput_count": false,
+      "source_draft_path": "eval/p1/revisions/p1-candidate-draft-r1/candidate-draft.json"
+    }
+  ],
+  "case_results": [
+    {
+      "case_id": "p0b-r1-rlinf-m",
+      "artifact_path": "eval/p1/revisions/p1-headroom-r2/cases/p0b-r1-rlinf-m.json",
+      "answerable": true,
+      "fixed_hard_case": true,
+      "b1": {
+        "retrieval_profile": "char_tfidf_2_4_query_views_v1",
+        "query_views": {
+          "base": "面向具身智能的强化学习系统为何需要同时处理仿真训练和真机训练的不同资源通信或人工参与问题请概括两类场景的关键约束",
+          "focus": "面向具身智能强化学习需要同处理仿真训练真机训练不同资源通信或人工参两类场景关键约束资源通信同步人在环真机真实环境仿真",
+          "aliases": "资源通信同步人在环真机真实环境仿真"
+        },
+        "top_k_requested": 5,
+        "retrieval_call_count": 1,
+        "retrieval_latency_ms": 20,
+        "source_segments_path": "artifacts/p0b-ingest/p0b-rlinf-2026/segments.jsonl",
+        "source_segments_sha256": "d284cb127b4cdd2c56d556cdf80c8c77754b6e2bdec7a51bb6565976de1ae9c0",
+        "hits": [
+          {
+            "rank": 1,
+            "score": 0.0855067460646253,
+            "segment_id": "p0b-rlinf-2026-seg-010",
+            "video_id": "p0b-rlinf-2026",
+            "ordinal": 10,
+            "start_ms": 466600,
+            "end_ms": 512800
+          },
+          {
+            "rank": 2,
+            "score": 0.08359113727403547,
+            "segment_id": "p0b-rlinf-2026-seg-011",
+            "video_id": "p0b-rlinf-2026",
+            "ordinal": 11,
+            "start_ms": 512800,
+            "end_ms": 558200
+          },
+          {
+            "rank": 3,
+            "score": 0.034175141222227284,
+            "segment_id": "p0b-rlinf-2026-seg-032",
+            "video_id": "p0b-rlinf-2026",
+            "ordinal": 32,
+            "start_ms": 1487000,
+            "end_ms": 1534400
+          },
+          {
+            "rank": 4,
+            "score": 0.027861932640742985,
+            "segment_id": "p0b-rlinf-2026-seg-026",
+            "video_id": "p0b-rlinf-2026",
+            "ordinal": 26,
+            "start_ms": 1208500,
+            "end_ms": 1255300
+          },
+          {
+            "rank": 5,
+            "score": 0.02625856754634591,
+            "segment_id": "p0b-rlinf-2026-seg-022",
+            "video_id": "p0b-rlinf-2026",
+            "ordinal": 22,
+            "start_ms": 1018200,
+            "end_ms": 1066500
+          }
+        ],
+        "gold_units_hit_at_5": [
+          "p0b-r1-rlinf-m-u2",
+          "p0b-r1-rlinf-m-u3"
+        ],
+        "missing_gold_unit_ids": [
+          "p0b-r1-rlinf-m-u1"
+        ],
+        "hit_units_at_5": 2,
+        "unit_count": 3,
+        "evidence_unit_recall_at_5": 0.6666666666666666,
+        "all_necessary_evidence_at_5": false,
+        "primary_failure": true
+      },
+      "deterministic_oracle": {
+        "action_family": "inspect_segments",
+        "allowed_radii": [
+          1,
+          2
+        ],
+        "candidate_action_count": 10,
+        "actions": [
+          {
+            "action_type": "inspect_segments",
+            "anchor_segment_id": "p0b-rlinf-2026-seg-010",
+            "anchor_ordinal": 10,
+            "anchor_observed_in_b1": true,
+            "radius": 1,
+            "returned_segments": [
+              {
+                "segment_id": "p0b-rlinf-2026-seg-009",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 9,
+                "start_ms": 420800,
+                "end_ms": 466500,
+                "relation_to_anchor": -1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-010",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 10,
+                "start_ms": 466600,
+                "end_ms": 512800,
+                "relation_to_anchor": 0
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-011",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 11,
+                "start_ms": 512800,
+                "end_ms": 558200,
+                "relation_to_anchor": 1
+              }
+            ],
+            "new_segment_ids": [
+              "p0b-rlinf-2026-seg-009"
+            ],
+            "gold_units_before": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "gold_units_after": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "new_gold_unit_ids": [],
+            "adds_missing_gold_unit": false,
+            "scorer_only": true,
+            "runtime_reads_gold": false,
+            "cross_video": false
+          },
+          {
+            "action_type": "inspect_segments",
+            "anchor_segment_id": "p0b-rlinf-2026-seg-010",
+            "anchor_ordinal": 10,
+            "anchor_observed_in_b1": true,
+            "radius": 2,
+            "returned_segments": [
+              {
+                "segment_id": "p0b-rlinf-2026-seg-008",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 8,
+                "start_ms": 375500,
+                "end_ms": 420800,
+                "relation_to_anchor": -2
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-009",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 9,
+                "start_ms": 420800,
+                "end_ms": 466500,
+                "relation_to_anchor": -1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-010",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 10,
+                "start_ms": 466600,
+                "end_ms": 512800,
+                "relation_to_anchor": 0
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-011",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 11,
+                "start_ms": 512800,
+                "end_ms": 558200,
+                "relation_to_anchor": 1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-012",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 12,
+                "start_ms": 558400,
+                "end_ms": 603500,
+                "relation_to_anchor": 2
+              }
+            ],
+            "new_segment_ids": [
+              "p0b-rlinf-2026-seg-008",
+              "p0b-rlinf-2026-seg-009",
+              "p0b-rlinf-2026-seg-012"
+            ],
+            "gold_units_before": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "gold_units_after": [
+              "p0b-r1-rlinf-m-u1",
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "new_gold_unit_ids": [
+              "p0b-r1-rlinf-m-u1"
+            ],
+            "adds_missing_gold_unit": true,
+            "scorer_only": true,
+            "runtime_reads_gold": false,
+            "cross_video": false
+          },
+          {
+            "action_type": "inspect_segments",
+            "anchor_segment_id": "p0b-rlinf-2026-seg-011",
+            "anchor_ordinal": 11,
+            "anchor_observed_in_b1": true,
+            "radius": 1,
+            "returned_segments": [
+              {
+                "segment_id": "p0b-rlinf-2026-seg-010",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 10,
+                "start_ms": 466600,
+                "end_ms": 512800,
+                "relation_to_anchor": -1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-011",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 11,
+                "start_ms": 512800,
+                "end_ms": 558200,
+                "relation_to_anchor": 0
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-012",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 12,
+                "start_ms": 558400,
+                "end_ms": 603500,
+                "relation_to_anchor": 1
+              }
+            ],
+            "new_segment_ids": [
+              "p0b-rlinf-2026-seg-012"
+            ],
+            "gold_units_before": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "gold_units_after": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "new_gold_unit_ids": [],
+            "adds_missing_gold_unit": false,
+            "scorer_only": true,
+            "runtime_reads_gold": false,
+            "cross_video": false
+          },
+          {
+            "action_type": "inspect_segments",
+            "anchor_segment_id": "p0b-rlinf-2026-seg-011",
+            "anchor_ordinal": 11,
+            "anchor_observed_in_b1": true,
+            "radius": 2,
+            "returned_segments": [
+              {
+                "segment_id": "p0b-rlinf-2026-seg-009",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 9,
+                "start_ms": 420800,
+                "end_ms": 466500,
+                "relation_to_anchor": -2
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-010",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 10,
+                "start_ms": 466600,
+                "end_ms": 512800,
+                "relation_to_anchor": -1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-011",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 11,
+                "start_ms": 512800,
+                "end_ms": 558200,
+                "relation_to_anchor": 0
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-012",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 12,
+                "start_ms": 558400,
+                "end_ms": 603500,
+                "relation_to_anchor": 1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-013",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 13,
+                "start_ms": 603500,
+                "end_ms": 649300,
+                "relation_to_anchor": 2
+              }
+            ],
+            "new_segment_ids": [
+              "p0b-rlinf-2026-seg-009",
+              "p0b-rlinf-2026-seg-012",
+              "p0b-rlinf-2026-seg-013"
+            ],
+            "gold_units_before": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "gold_units_after": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "new_gold_unit_ids": [],
+            "adds_missing_gold_unit": false,
+            "scorer_only": true,
+            "runtime_reads_gold": false,
+            "cross_video": false
+          },
+          {
+            "action_type": "inspect_segments",
+            "anchor_segment_id": "p0b-rlinf-2026-seg-032",
+            "anchor_ordinal": 32,
+            "anchor_observed_in_b1": true,
+            "radius": 1,
+            "returned_segments": [
+              {
+                "segment_id": "p0b-rlinf-2026-seg-031",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 31,
+                "start_ms": 1441800,
+                "end_ms": 1486900,
+                "relation_to_anchor": -1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-032",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 32,
+                "start_ms": 1487000,
+                "end_ms": 1534400,
+                "relation_to_anchor": 0
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-033",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 33,
+                "start_ms": 1534600,
+                "end_ms": 1579800,
+                "relation_to_anchor": 1
+              }
+            ],
+            "new_segment_ids": [
+              "p0b-rlinf-2026-seg-031",
+              "p0b-rlinf-2026-seg-033"
+            ],
+            "gold_units_before": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "gold_units_after": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "new_gold_unit_ids": [],
+            "adds_missing_gold_unit": false,
+            "scorer_only": true,
+            "runtime_reads_gold": false,
+            "cross_video": false
+          },
+          {
+            "action_type": "inspect_segments",
+            "anchor_segment_id": "p0b-rlinf-2026-seg-032",
+            "anchor_ordinal": 32,
+            "anchor_observed_in_b1": true,
+            "radius": 2,
+            "returned_segments": [
+              {
+                "segment_id": "p0b-rlinf-2026-seg-030",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 30,
+                "start_ms": 1394800,
+                "end_ms": 1441500,
+                "relation_to_anchor": -2
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-031",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 31,
+                "start_ms": 1441800,
+                "end_ms": 1486900,
+                "relation_to_anchor": -1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-032",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 32,
+                "start_ms": 1487000,
+                "end_ms": 1534400,
+                "relation_to_anchor": 0
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-033",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 33,
+                "start_ms": 1534600,
+                "end_ms": 1579800,
+                "relation_to_anchor": 1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-034",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 34,
+                "start_ms": 1580100,
+                "end_ms": 1626000,
+                "relation_to_anchor": 2
+              }
+            ],
+            "new_segment_ids": [
+              "p0b-rlinf-2026-seg-030",
+              "p0b-rlinf-2026-seg-031",
+              "p0b-rlinf-2026-seg-033",
+              "p0b-rlinf-2026-seg-034"
+            ],
+            "gold_units_before": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "gold_units_after": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "new_gold_unit_ids": [],
+            "adds_missing_gold_unit": false,
+            "scorer_only": true,
+            "runtime_reads_gold": false,
+            "cross_video": false
+          },
+          {
+            "action_type": "inspect_segments",
+            "anchor_segment_id": "p0b-rlinf-2026-seg-026",
+            "anchor_ordinal": 26,
+            "anchor_observed_in_b1": true,
+            "radius": 1,
+            "returned_segments": [
+              {
+                "segment_id": "p0b-rlinf-2026-seg-025",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 25,
+                "start_ms": 1161300,
+                "end_ms": 1208500,
+                "relation_to_anchor": -1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-026",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 26,
+                "start_ms": 1208500,
+                "end_ms": 1255300,
+                "relation_to_anchor": 0
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-027",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 27,
+                "start_ms": 1255400,
+                "end_ms": 1301800,
+                "relation_to_anchor": 1
+              }
+            ],
+            "new_segment_ids": [
+              "p0b-rlinf-2026-seg-025",
+              "p0b-rlinf-2026-seg-027"
+            ],
+            "gold_units_before": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "gold_units_after": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "new_gold_unit_ids": [],
+            "adds_missing_gold_unit": false,
+            "scorer_only": true,
+            "runtime_reads_gold": false,
+            "cross_video": false
+          },
+          {
+            "action_type": "inspect_segments",
+            "anchor_segment_id": "p0b-rlinf-2026-seg-026",
+            "anchor_ordinal": 26,
+            "anchor_observed_in_b1": true,
+            "radius": 2,
+            "returned_segments": [
+              {
+                "segment_id": "p0b-rlinf-2026-seg-024",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 24,
+                "start_ms": 1112600,
+                "end_ms": 1161200,
+                "relation_to_anchor": -2
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-025",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 25,
+                "start_ms": 1161300,
+                "end_ms": 1208500,
+                "relation_to_anchor": -1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-026",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 26,
+                "start_ms": 1208500,
+                "end_ms": 1255300,
+                "relation_to_anchor": 0
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-027",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 27,
+                "start_ms": 1255400,
+                "end_ms": 1301800,
+                "relation_to_anchor": 1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-028",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 28,
+                "start_ms": 1301900,
+                "end_ms": 1348800,
+                "relation_to_anchor": 2
+              }
+            ],
+            "new_segment_ids": [
+              "p0b-rlinf-2026-seg-024",
+              "p0b-rlinf-2026-seg-025",
+              "p0b-rlinf-2026-seg-027",
+              "p0b-rlinf-2026-seg-028"
+            ],
+            "gold_units_before": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "gold_units_after": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "new_gold_unit_ids": [],
+            "adds_missing_gold_unit": false,
+            "scorer_only": true,
+            "runtime_reads_gold": false,
+            "cross_video": false
+          },
+          {
+            "action_type": "inspect_segments",
+            "anchor_segment_id": "p0b-rlinf-2026-seg-022",
+            "anchor_ordinal": 22,
+            "anchor_observed_in_b1": true,
+            "radius": 1,
+            "returned_segments": [
+              {
+                "segment_id": "p0b-rlinf-2026-seg-021",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 21,
+                "start_ms": 971200,
+                "end_ms": 1018100,
+                "relation_to_anchor": -1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-022",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 22,
+                "start_ms": 1018200,
+                "end_ms": 1066500,
+                "relation_to_anchor": 0
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-023",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 23,
+                "start_ms": 1066700,
+                "end_ms": 1112600,
+                "relation_to_anchor": 1
+              }
+            ],
+            "new_segment_ids": [
+              "p0b-rlinf-2026-seg-021",
+              "p0b-rlinf-2026-seg-023"
+            ],
+            "gold_units_before": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "gold_units_after": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "new_gold_unit_ids": [],
+            "adds_missing_gold_unit": false,
+            "scorer_only": true,
+            "runtime_reads_gold": false,
+            "cross_video": false
+          },
+          {
+            "action_type": "inspect_segments",
+            "anchor_segment_id": "p0b-rlinf-2026-seg-022",
+            "anchor_ordinal": 22,
+            "anchor_observed_in_b1": true,
+            "radius": 2,
+            "returned_segments": [
+              {
+                "segment_id": "p0b-rlinf-2026-seg-020",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 20,
+                "start_ms": 924200,
+                "end_ms": 971100,
+                "relation_to_anchor": -2
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-021",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 21,
+                "start_ms": 971200,
+                "end_ms": 1018100,
+                "relation_to_anchor": -1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-022",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 22,
+                "start_ms": 1018200,
+                "end_ms": 1066500,
+                "relation_to_anchor": 0
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-023",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 23,
+                "start_ms": 1066700,
+                "end_ms": 1112600,
+                "relation_to_anchor": 1
+              },
+              {
+                "segment_id": "p0b-rlinf-2026-seg-024",
+                "video_id": "p0b-rlinf-2026",
+                "ordinal": 24,
+                "start_ms": 1112600,
+                "end_ms": 1161200,
+                "relation_to_anchor": 2
+              }
+            ],
+            "new_segment_ids": [
+              "p0b-rlinf-2026-seg-020",
+              "p0b-rlinf-2026-seg-021",
+              "p0b-rlinf-2026-seg-023",
+              "p0b-rlinf-2026-seg-024"
+            ],
+            "gold_units_before": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "gold_units_after": [
+              "p0b-r1-rlinf-m-u2",
+              "p0b-r1-rlinf-m-u3"
+            ],
+            "new_gold_unit_ids": [],
+            "adds_missing_gold_unit": false,
+            "scorer_only": true,
+            "runtime_reads_gold": false,
+            "cross_video": false
+          }
+        ],
+        "best_recovery_action": {
+          "action_type": "inspect_segments",
+          "anchor_segment_id": "p0b-rlinf-2026-seg-010",
+          "anchor_ordinal": 10,
+          "anchor_observed_in_b1": true,
+          "radius": 2,
+          "returned_segments": [
+            {
+              "segment_id": "p0b-rlinf-2026-seg-008",
+              "video_id": "p0b-rlinf-2026",
+              "ordinal": 8,
+              "start_ms": 375500,
+              "end_ms": 420800,
+              "relation_to_anchor": -2
+            },
+            {
+              "segment_id": "p0b-rlinf-2026-seg-009",
+              "video_id": "p0b-rlinf-2026",
+              "ordinal": 9,
+              "start_ms": 420800,
+              "end_ms": 466500,
+              "relation_to_anchor": -1
+            },
+            {
+              "segment_id": "p0b-rlinf-2026-seg-010",
+              "video_id": "p0b-rlinf-2026",
+              "ordinal": 10,
+              "start_ms": 466600,
+              "end_ms": 512800,
+              "relation_to_anchor": 0
+            },
+            {
+              "segment_id": "p0b-rlinf-2026-seg-011",
+              "video_id": "p0b-rlinf-2026",
+              "ordinal": 11,
+              "start_ms": 512800,
+              "end_ms": 558200,
+              "relation_to_anchor": 1
+            },
+            {
+              "segment_id": "p0b-rlinf-2026-seg-012",
+              "video_id": "p0b-rlinf-2026",
+              "ordinal": 12,
+              "start_ms": 558400,
+              "end_ms": 603500,
+              "relation_to_anchor": 2
+            }
+          ],
+          "new_segment_ids": [
+            "p0b-rlinf-2026-seg-008",
+            "p0b-rlinf-2026-seg-009",
+            "p0b-rlinf-2026-seg-012"
+          ],
+          "gold_units_before": [
+            "p0b-r1-rlinf-m-u2",
+            "p0b-r1-rlinf-m-u3"
+          ],
+          "gold_units_after": [
+            "p0b-r1-rlinf-m-u1",
+            "p0b-r1-rlinf-m-u2",
+            "p0b-r1-rlinf-m-u3"
+          ],
+          "new_gold_unit_ids": [
+            "p0b-r1-rlinf-m-u1"
+          ],
+          "adds_missing_gold_unit": true,
+          "scorer_only": true,
+          "runtime_reads_gold": false,
+          "cross_video": false
+        },
+        "adds_at_least_one_missing_gold_unit": true,
+        "runtime_reads_gold": false,
+        "cross_video": false,
+        "provider_calls": 0
+      },
+      "headroom": {
+        "dynamic_recoverable": true,
+        "qualifying": true,
+        "qualifying_conditions": {
+          "pre_frozen": true,
+          "answerable": true,
+          "b1_primary_failure": true,
+          "oracle_adds_missing_gold_unit": true,
+          "runtime_gold_context": false,
+          "cross_video": false
+        }
+      }
+    },
+    {
+      "case_id": "p1-c02-kling-signal-quality-001",
+      "artifact_path": "eval/p1/revisions/p1-headroom-r2/cases/p1-c02-kling-signal-quality-001.json",
+      "answerable": true,
+      "fixed_hard_case": false,
+      "b1": {
+        "retrieval_profile": "char_tfidf_2_4_query_views_v1",
+        "query_views": {
+          "base": "可灵处理视频信号时怎样在降低计算负担的同时保持生成画质",
+          "focus": "可灵处理信号怎样在降低计算负担同保持生成画质",
+          "aliases": "可灵处理视频信号时怎样在降低计算负担的同时保持生成画质"
+        },
+        "top_k_requested": 5,
+        "retrieval_call_count": 1,
+        "retrieval_latency_ms": 13,
+        "source_segments_path": "artifacts/p0b-ingest/p0b-kling-2024/segments.jsonl",
+        "source_segments_sha256": "c350e1c6a69ca13ae0349061dfa1436782704ef737a9a28092504b18eb75010b",
+        "hits": [
+          {
+            "rank": 1,
+            "score": 0.05996495182397634,
+            "segment_id": "p0b-kling-2024-seg-027",
+            "video_id": "p0b-kling-2024",
+            "ordinal": 27,
+            "start_ms": 1282920,
+            "end_ms": 1330200
+          },
+          {
+            "rank": 2,
+            "score": 0.05544290525932389,
+            "segment_id": "p0b-kling-2024-seg-026",
+            "video_id": "p0b-kling-2024",
+            "ordinal": 26,
+            "start_ms": 1237400,
+            "end_ms": 1282920
+          },
+          {
+            "rank": 3,
+            "score": 0.03769407278071571,
+            "segment_id": "p0b-kling-2024-seg-004",
+            "video_id": "p0b-kling-2024",
+            "ordinal": 4,
+            "start_ms": 186900,
+            "end_ms": 234800
+          },
+          {
+            "rank": 4,
+            "score": 0.03268242564722136,
+            "segment_id": "p0b-kling-2024-seg-031",
+            "video_id": "p0b-kling-2024",
+            "ordinal": 31,
+            "start_ms": 1471400,
+            "end_ms": 1516720
+          },
+          {
+            "rank": 5,
+            "score": 0.03212952938378714,
+            "segment_id": "p0b-kling-2024-seg-002",
+            "video_id": "p0b-kling-2024",
+            "ordinal": 2,
+            "start_ms": 94000,
+            "end_ms": 140700
+          }
+        ],
+        "gold_units_hit_at_5": [
+          "p1-c02-kling-signal-quality-001-u1",
+          "p1-c02-kling-signal-quality-001-u2"
+        ],
+        "missing_gold_unit_ids": [],
+        "hit_units_at_5": 2,
+        "unit_count": 2,
+        "evidence_unit_recall_at_5": 1.0,
+        "all_necessary_evidence_at_5": true,
+        "primary_failure": false
+      },
+      "deterministic_oracle": {
+        "action_family": "inspect_segments",
+        "allowed_radii": [
+          1,
+          2
+        ],
+        "candidate_action_count": 0,
+        "actions": [],
+        "best_recovery_action": null,
+        "adds_at_least_one_missing_gold_unit": false,
+        "runtime_reads_gold": false,
+        "cross_video": false,
+        "provider_calls": 0
+      },
+      "headroom": {
+        "dynamic_recoverable": false,
+        "qualifying": false,
+        "qualifying_conditions": {
+          "pre_frozen": true,
+          "answerable": true,
+          "b1_primary_failure": false,
+          "oracle_adds_missing_gold_unit": false,
+          "runtime_gold_context": false,
+          "cross_video": false
+        }
+      }
+    },
+    {
+      "case_id": "p1-c03-rlinf-simulation-001",
+      "artifact_path": "eval/p1/revisions/p1-headroom-r2/cases/p1-c03-rlinf-simulation-001.json",
+      "answerable": true,
+      "fixed_hard_case": false,
+      "b1": {
+        "retrieval_profile": "char_tfidf_2_4_query_views_v1",
+        "query_views": {
+          "base": "在具身智能的仿真强化学习中仿真器需要满足哪些视觉和计算方面的要求",
+          "focus": "在具身智能仿真强化学习仿真器需要满足视觉计算方面要求",
+          "aliases": "在具身智能的仿真强化学习中仿真器需要满足哪些视觉和计算方面的要求"
+        },
+        "top_k_requested": 5,
+        "retrieval_call_count": 1,
+        "retrieval_latency_ms": 16,
+        "source_segments_path": "artifacts/p0b-ingest/p0b-rlinf-2026/segments.jsonl",
+        "source_segments_sha256": "d284cb127b4cdd2c56d556cdf80c8c77754b6e2bdec7a51bb6565976de1ae9c0",
+        "hits": [
+          {
+            "rank": 1,
+            "score": 0.2017283563140097,
+            "segment_id": "p0b-rlinf-2026-seg-009",
+            "video_id": "p0b-rlinf-2026",
+            "ordinal": 9,
+            "start_ms": 420800,
+            "end_ms": 466500
+          },
+          {
+            "rank": 2,
+            "score": 0.0905912445881536,
+            "segment_id": "p0b-rlinf-2026-seg-022",
+            "video_id": "p0b-rlinf-2026",
+            "ordinal": 22,
+            "start_ms": 1018200,
+            "end_ms": 1066500
+          },
+          {
+            "rank": 3,
+            "score": 0.04879350504034671,
+            "segment_id": "p0b-rlinf-2026-seg-000",
+            "video_id": "p0b-rlinf-2026",
+            "ordinal": 0,
+            "start_ms": 0,
+            "end_ms": 46400
+          },
+          {
+            "rank": 4,
+            "score": 0.04626625326526533,
+            "segment_id": "p0b-rlinf-2026-seg-024",
+            "video_id": "p0b-rlinf-2026",
+            "ordinal": 24,
+            "start_ms": 1112600,
+            "end_ms": 1161200
+          },
+          {
+            "rank": 5,
+            "score": 0.043024676479501485,
+            "segment_id": "p0b-rlinf-2026-seg-003",
+            "video_id": "p0b-rlinf-2026",
+            "ordinal": 3,
+            "start_ms": 142300,
+            "end_ms": 188600
+          }
+        ],
+        "gold_units_hit_at_5": [
+          "p1-c03-rlinf-simulation-001-u1"
+        ],
+        "missing_gold_unit_ids": [],
+        "hit_units_at_5": 1,
+        "unit_count": 1,
+        "evidence_unit_recall_at_5": 1.0,
+        "all_necessary_evidence_at_5": true,
+        "primary_failure": false
+      },
+      "deterministic_oracle": {
+        "action_family": "inspect_segments",
+        "allowed_radii": [
+          1,
+          2
+        ],
+        "candidate_action_count": 0,
+        "actions": [],
+        "best_recovery_action": null,
+        "adds_at_least_one_missing_gold_unit": false,
+        "runtime_reads_gold": false,
+        "cross_video": false,
+        "provider_calls": 0
+      },
+      "headroom": {
+        "dynamic_recoverable": false,
+        "qualifying": false,
+        "qualifying_conditions": {
+          "pre_frozen": true,
+          "answerable": true,
+          "b1_primary_failure": false,
+          "oracle_adds_missing_gold_unit": false,
+          "runtime_gold_context": false,
+          "cross_video": false
+        }
+      }
+    }
+  ],
+  "gate": {
+    "case_count": 3,
+    "qualifying_count": 1,
+    "minimum_required": 2,
+    "result": "NO_GO_INSUFFICIENT_HEADROOM",
+    "reason": "Fewer than two qualifying pre-frozen answerable current B1 primary failures have an auditable allowed-action recovery path.",
+    "all_case_results_retained": true,
+    "p0_history_mutation": false
+  },
+  "boundary": {
+    "b2_started": false,
+    "task_p1_030_started": false,
+    "next_action": "STOP_AFTER_HEADROOM_OWNER_CHECKPOINT",
+    "b0": "NOT_AVAILABLE/NOT_RUN"
+  },
+  "case_artifacts": [
+    {
+      "path": "eval/p1/revisions/p1-headroom-r2/cases/p0b-r1-rlinf-m.json",
+      "sha256": "df68b88f649bef3aa69bd55a7f6729595c941587bb3cec75ea434c498c8825c1"
+    },
+    {
+      "path": "eval/p1/revisions/p1-headroom-r2/cases/p1-c02-kling-signal-quality-001.json",
+      "sha256": "d2b5889b91a161b46911bfcb46a197520cba1e8af39072d9433e60a17c6ba486"
+    },
+    {
+      "path": "eval/p1/revisions/p1-headroom-r2/cases/p1-c03-rlinf-simulation-001.json",
+      "sha256": "3aad2e276c407abdbba99e2fd416d86ac41cc51c731da70e46541601f310f910"
+    }
+  ]
+}

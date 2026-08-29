@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "task_id": "P1-DYNAMIC-EVIDENCE-SEEKING-R1",
+  "current_task_id": "TASK-P1-010",
+  "intent": "Freeze a reproducible P1 baseline and then test, in declared order, whether bounded dynamic evidence acquisition has real Headroom over the current B1 retrieval path.",
+  "execution_mode": "OFFLINE_FIRST_CANDIDATE_REVIEW",
+  "provider_authorization": "PROHIBITED_UNTIL_TASK_P1_070",
+  "assumptions": [
+    "The P1 requirements package remains READY_FOR_ENGINEERING_HANDOFF and its hashes are recorded by the validator.",
+    "P0-B R3 is closed as P0B_PASSED_OWNER_ACCEPTED and its frozen assets remain readable.",
+    "The current Python 3.12 uv environment and existing P0 retrieval/answer contracts are the implementation base."
+  ],
+  "non_goals": [
+    "B0 Direct Multimodal, VLM, OCR, keyframes, dense/hybrid/reranker retrieval",
+    "LangGraph, Hypha, MCP server, multi-agent, database, queue, worker, API, Web/UI, or long-term memory",
+    "P0 history repair, selective reruns, formal provider evaluation before explicit authorization, P2/G2 work"
+  ],
+  "verification_commands": [
+    "uv run pytest",
+    "uv run ruff check .",
+    "git diff --check",
+    "jq -c . docs/requirements/p1/decision-evidence.jsonl",
+    "jq -e . docs/requirements/p1/coverage.json",
+    "python3 /Users/tristana/.codex/skills/agent-native-requirements/scripts/validate_readiness.py docs/requirements/p1 --output docs/requirements/p1/requirements-readiness.json"
+  ],
+  "stop_rules": [
+    "Any TASK-P1-000 verification failure stops without changing P0 history.",
+    "Owner candidate/Gold freeze is required before TASK-P1-020 and before any B2 prompt/tool design.",
+    "Headroom count below two stops as NO_GO_INSUFFICIENT_HEADROOM.",
+    "FormalManifest freeze stops as WAITING_OWNER_PROVIDER_AUTHORIZATION until exact Owner authorization.",
+    "No automatic entry into P2/G2 or any unlisted adjacent gate.",
+    "Candidate/Gold draft material is not frozen until Owner confirms the exact accepted set and Gold mapping."
+  ]
+}

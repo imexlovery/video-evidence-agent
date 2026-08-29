@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "task_id": "P1-DYNAMIC-EVIDENCE-SEEKING-R1",
+  "workspace": "/Users/tristana/Develop/video-evidence-agent",
+  "base_branch": "main",
+  "base_commit_at_takeover": "fc9b29ce387f52d5da92be8fc68ce171727f872a",
+  "current_stage": "TASK-P1-020 NO_GO_INSUFFICIENT_HEADROOM",
+  "requirements_status": "READY_FOR_ENGINEERING_HANDOFF",
+  "requirements_readiness_sha256": "ade9c3b8e807ab5230c8bef37cdd28e3b95cd52c68831dc2d6ce39e49b82cdef",
+  "project_to_act": "ABSENT_BY_PROJECT_CONTRACT; docs/tasks and docs/requirements remain the canonical ledger",
+  "preexisting_dirty_paths": [
+    "docs/requirements/p1/",
+    "docs/tasks/P1.md"
+  ],
+  "protected_history": {
+    "p0b_r3_revision": "p0b-r3",
+    "p0b_r3_source_commit": "7cedce5475b928ded3d7c071f09132963cd0f9fa",
+    "p0b_r3_manifest": "eval/p0b/revisions/p0b-r3/eval-manifest.json",
+    "p0b_r3_final_report": "docs/tasks/p0b-r3/final-report.json",
+    "p0b_r3_retrieval_report": "reports/p0b-r3-retrieval-eval.md"
+  },
+  "source_of_truth": [
+    "docs/tasks/P1.md",
+    "docs/requirements/p1/00-handoff.md",
+    "docs/requirements/p1/01-product-requirements.md through docs/requirements/p1/12-engineering-context.md",
+    "docs/requirements/p1/decision-evidence.jsonl",
+    "docs/requirements/p1/coverage.json",
+    "docs/requirements/p1/requirements-readiness.json",
+    "docs/requirements/p1/P1-DESIGN.md",
+    "docs/tasks/p0b/TASK.json",
+    "docs/tasks/p0b/INTENT.json",
+    "docs/tasks/p0b/CONTEXT.json",
+    "docs/tasks/p0b/EVIDENCE.md",
+    "docs/tasks/p0b-r3/final-report.json",
+    "eval/p0b/revisions/p0b-r3/eval-manifest.json",
+    "reports/p0b-r3-retrieval-eval.md",
+    "reports/p0b-r3-retrieval-eval.json"
+  ],
+  "runtime": {
+    "python_requirement": ">=3.12,<3.13",
+    "package_manager": "uv",
+    "environment": ".venv",
+    "provider_calls_so_far": 0,
+    "video_upload": false
+  },
+  "p1_baseline": {
+    "manifest": "eval/p1/revisions/p1-baseline-r1/baseline-manifest.json",
+    "manifest_sha256": "d2171330a5a60261189f8e46fe20e5fbdb234aa4a3c7853a4eae0742602e6958",
+    "evidence": "docs/tasks/p1/baseline-evidence.json",
+    "evidence_id": "EVID-P1-000-BASELINE-001",
+    "history_protection_snapshot_sha256": "d068dad5cce78baaa29c6ec42ad26ca966213ef691f575c13a2d2692b7f6f3e3"
+  },
+  "candidate_review": {
+    "state": "FROZEN_ART_P1_002",
+    "draft": "eval/p1/revisions/p1-candidate-draft-r2/candidate-draft.json",
+    "draft_sha256": "fce132bde0ca044a5aa6186512607d874c71bbfe4a6480b7430c3a0d2c989456",
+    "evidence": "docs/tasks/p1/candidate-draft-r2-evidence.json",
+    "review_material": "docs/tasks/p1/candidate-gold-review-r2.md",
+    "evidence_id": "EVID-P1-010-R2-DRAFT-001",
+    "candidate_count": 2,
+    "candidate_ids": [
+      "p1-c02-kling-signal-quality-001",
+      "p1-c03-rlinf-simulation-001"
+    ],
+    "rejected_candidate_ids": [
+      "p1-c01-kling-creative-001",
+      "p1-c04-rlinf-real-system-001"
+    ],
+    "superseded_draft": "eval/p1/revisions/p1-candidate-draft-r1/candidate-draft.json",
+    "superseded_draft_sha256": "e7dc08dc78881e0c35262635460e297c8f0347facaebaca7f919b355e8346567",
+    "owner_decision_status": "R2_CONFIRMED_AND_FROZEN",
+    "owner_confirmation_required": true,
+    "art_p1_002_frozen": true,
+    "task_p1_020_run": true,
+    "b1_headroom_run": true,
+    "b2_design": false
+  },
+  "candidate_freeze": {
+    "artifact": "eval/p1/revisions/p1-candidate-freeze-r2/candidate-manifest.json",
+    "artifact_sha256": "d523c22fdfbfb8d1ff55a2d5620d94bd6cdfac5368472995f1317b857f495cf2",
+    "evidence": "docs/tasks/p1/candidate-freeze-evidence.json",
+    "evidence_id": "EVID-P1-010-FREEZE-001",
+    "owner_authorization": "DEC-P1-033",
+    "active_candidate_count": 2,
+    "rejected_history_excluded": true
+  },
+  "headroom": {
+    "task_id": "TASK-P1-020",
+    "state": "STOPPED_NO_GO_INSUFFICIENT_HEADROOM",
+    "cases": [
+      "p0b-r1-rlinf-m",
+      "p1-c02-kling-signal-quality-001",
+      "p1-c03-rlinf-simulation-001"
+    ],
+    "provider_calls": 0,
+    "b2_design": false,
+    "stop_after_gate": true,
+    "b1_retrieval_runs": 3,
+    "b1_rerun_during_assembly": false,
+    "qualifying_count": 1,
+    "minimum_required": 2,
+    "gate": "NO_GO_INSUFFICIENT_HEADROOM",
+    "report": "reports/p1-headroom-r2-retry-1.json",
+    "report_sha256": "f5d542fba755034f9ec7ecb63367af5a7108907c555ff2e67a7beaf6a2326d88",
+    "report_markdown": "reports/p1-headroom-r2-retry-1.md",
+    "report_markdown_sha256": "c0e2a15e19ca244a6c6ea961b8202f6b88316aebf8efb5b6c8b89714cb78529d",
+    "evidence": "docs/tasks/p1/headroom-evidence-r2-retry-1.json",
+    "evidence_id": "EVID-P1-020-HEADROOM-002",
+    "evidence_sha256": "4efabab83ca3197c14d09db352d068fb1929f24d773326f74e1d0be6c6a52b7f",
+    "assembly": "eval/p1/revisions/p1-headroom-r2-retry-1/report-assembly.json",
+    "assembly_sha256": "7c0c7d6d6c95c3b5900de0f40f76574570a9f9812ca421225e78923a37b9ad5d",
+    "harness_failure": "docs/tasks/p1/headroom-harness-failure-r2.json",
+    "harness_failure_sha256": "e6d039fd23e153653a6b20275c6eb824bc7f4a8927dea9b64e5181b1dc64f3e0",
+    "task_p1_030_started": false,
+    "b0": "NOT_AVAILABLE/NOT_RUN",
+    "p0_history_mutation": false
+  }
+}

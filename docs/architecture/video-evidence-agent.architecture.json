@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Video Evidence Agent：中文视频证据检索架构",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "viewBox": [1390, 840],
+    "views": [
+      {
+        "id": "p0-pipeline",
+        "label": "P0 主链路",
+        "focus": ["source-video", "cli", "media", "asr", "segments", "artifacts", "retrieval"],
+        "note": "从本地中文 MP4 到可追溯的 Top-K 时间戳证据。"
+      },
+      {
+        "id": "answer-boundary",
+        "label": "回答与证据边界",
+        "focus": ["retrieval", "provider", "gate", "artifacts"],
+        "note": "回答模型只接收当前问题与当前 Top-K transcript segments。"
+      },
+      {
+        "id": "evaluation-boundary",
+        "label": "评估与停止边界",
+        "focus": ["cli", "artifacts", "evaluation", "owner-review", "excluded"],
+        "note": "P0-B 的评估结果与人工语义审核分开记录，P1 No-Go 保持为边界。"
+      }
+    ]
+  },
+  "layout": {
+    "mode": "grid",
+    "origin": [40, 80],
+    "cols": 10,
+    "gapX": 24,
+    "gapY": 34,
+    "cellW": 130,
+    "cellH": 72
+  },
+  "components": [
+    {
+      "id": "source-video",
+      "type": "external",
+      "label": "中文技术 MP4",
+      "sublabel": "合法本地文件",
+      "tag": "INPUT",
+      "pos": [24, 330],
+      "size": [120, 78]
+    },
+    {
+      "id": "cli",
+      "type": "backend",
+      "label": "CLI 编排",
+      "sublabel": "ingest / ask / p0b-*",
+      "tag": "LOCAL",
+      "pos": [168, 330],
+      "size": [120, 78]
+    },
+    {
+      "id": "media",
+      "type": "backend",
+      "label": "媒体准备",
+      "sublabel": "FFmpeg / ffprobe",
+      "tag": "LOCAL",
+      "pos": [312, 330],
+      "size": [120, 78]
+    },
+    {
+      "id": "asr",
+      "type": "backend",
+      "label": "中文 ASR",
+      "sublabel": "MLX Whisper · zh",
+      "tag": "LOCAL",
+      "pos": [456, 330],
+      "size": [120, 78]
+    },
+    {
+      "id": "segments",
+      "type": "backend",
+      "label": "VideoSegment",
+      "sublabel": "连续、无重叠、可追溯",
+      "tag": "CONTRACT",
+      "pos": [600, 330],
+      "size": [120, 78]
+    },
+    {
+      "id": "artifacts",
+      "type": "database",
+      "label": "文件工件",
+      "sublabel": "JSONL + manifests",
+      "tag": "IMMUTABLE ROOTS",
+      "pos": [744, 330],
+      "size": [120, 78]
+    },
+    {
+      "id": "retrieval",
+      "type": "backend",
+      "label": "证据检索",
+      "sublabel": "TF-IDF · 2–4g",
+      "tag": "R2 · K=5",
+      "pos": [888, 330],
+      "size": [120, 78]
+    },
+    {
+      "id": "provider",
+      "type": "external",
+      "label": "OpenAI-compatible Provider",
+      "sublabel": "只收问题 + 当前 Top-K",
+      "tag": "ONE TEXT CALL",
+      "pos": [1032, 330],
+      "size": [180, 78]
+    },
+    {
+      "id": "gate",
+      "type": "security",
+      "label": "Evidence Gate",
+      "sublabel": "引用来自当前 Top-K",
+      "tag": "FAIL CLOSED",
+      "pos": [1236, 330],
+      "size": [120, 78]
+    },
+    {
+      "id": "evaluation",
+      "type": "backend",
+      "label": "P0-B 评估与报告",
+      "sublabel": "grade / report / audit trail",
+      "tag": "12 QUESTIONS",
+      "pos": [820, 530],
+      "size": [160, 78]
+    },
+    {
+      "id": "owner-review",
+      "type": "external",
+      "label": "Owner Review",
+      "sublabel": "语义支持与停止决策",
+      "tag": "HUMAN BOUNDARY",
+      "pos": [1070, 530],
+      "size": [150, 78]
+    },
+    {
+      "id": "excluded",
+      "type": "security",
+      "label": "明确排除",
+      "sublabel": "OCR / VLM / Agent / Web / P1",
+      "tag": "NOT IMPLEMENTED",
+      "pos": [700, 680],
+      "size": [170, 70]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "本地可验证执行边界",
+      "wraps": ["cli", "media", "asr", "segments", "artifacts", "retrieval", "gate", "evaluation"],
+      "pad": 28
+    }
+  ],
+  "connections": [
+    { "id": "video-to-cli", "from": "source-video", "to": "cli", "label": "ingest", "variant": "emphasis", "labelDy": -90 },
+    { "id": "cli-to-media", "from": "cli", "to": "media", "label": "extract audio", "labelDy": -52 },
+    { "id": "media-to-asr", "from": "media", "to": "asr", "label": "WAV + duration", "labelDy": -52 },
+    { "id": "asr-to-segments", "from": "asr", "to": "segments", "label": "timestamped text", "labelDy": -52 },
+    { "id": "segments-to-artifacts", "from": "segments", "to": "artifacts", "label": "persist JSONL", "fromSide": "right", "toSide": "left", "labelDy": -52 },
+    { "id": "artifacts-to-retrieval", "from": "artifacts", "to": "retrieval", "label": "load same-video segments", "labelDy": -52 },
+    { "id": "retrieval-to-provider", "from": "retrieval", "to": "provider", "label": "question + Top-K", "variant": "emphasis", "labelDy": -52 },
+    { "id": "provider-to-gate", "from": "provider", "to": "gate", "label": "AnswerProposal", "labelDy": -52 },
+    { "id": "gate-to-evaluation", "from": "gate", "to": "evaluation", "label": "accepted / refusal", "fromSide": "bottom", "toSide": "top", "labelAt": [1110, 470] },
+    { "id": "artifacts-to-evaluation", "from": "artifacts", "to": "evaluation", "label": "metrics inputs", "fromSide": "bottom", "toSide": "top", "via": [[804, 420], [900, 420]], "labelAt": [830, 422] },
+    { "id": "evaluation-to-owner", "from": "evaluation", "to": "owner-review", "label": "review material", "variant": "dashed", "labelDy": -60 },
+    { "id": "owner-to-evaluation", "from": "owner-review", "to": "evaluation", "label": "semantic labels", "variant": "dashed", "labelDy": 60 },
+    { "id": "scope-boundary", "from": "evaluation", "to": "excluded", "label": "stop at P0-B boundary", "variant": "security", "fromSide": "bottom", "toSide": "top", "labelAt": [840, 622] }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Evidence boundary",
+      "items": ["Provider never receives video or full transcript", "Citation, quote, and timestamp are checked against the current Top-K"]
+    },
+    {
+      "dot": "amber",
+      "title": "Evaluation boundary",
+      "items": ["P0-B evaluates transcript retrieval only", "Owner semantic review stays separate from deterministic provenance checks"]
+    },
+    {
+      "dot": "rose",
+      "title": "Current stop",
+      "items": ["OCR, VLM, Agent, LangGraph, Web/API, database, and P1 are not implemented or authorized by this scope"]
+    }
+  ]
+}
