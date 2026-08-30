@@ -35,17 +35,22 @@ The report is an editorial document, not an application dashboard.
 - **Hero:** source/category eyebrow, display title, one-sentence thesis, duration/
   speaker/source context. It must establish the argument rather than show generic
   KPIs.
-- **Argument spine:** one vertical visual rail connecting section markers and
-  timestamps. It encodes the actual video progression and is the signature
-  element.
-- **Sections:** 3–5 modules in a deliberate narrative order. Section Header is
-  structural; content blocks create varied rhythm rather than a uniform card grid.
-- **Evidence frames:** 16:9 presentation content, useful alt text, timestamp chip,
-  concise caption, no decorative blur or arbitrary crop.
+- **Editorial density:** use a compact Chinese visual-article rhythm inspired by
+  the reference's hierarchy and density, without copying its artwork. Remove
+  reading instructions, decorative English labels, oversized poster spacing,
+  and any side rail that competes with the summary itself.
+- **Sections:** 3–5 numbered modules in a deliberate narrative order. Each
+  section timestamp marks a verified semantic topic boundary, never a uniform
+  interval or candidate-frame sampling time.
+- **Components:** colored boxes are reserved for meaningful contrast, process,
+  bullets, metrics, or takeaways; they use restrained small corner radii. Bullet
+  groups use small round dots, not outlined squares.
+- **Evidence frames:** 16:9 presentation content, useful alt text, one
+  bottom-right timestamp chip from the asset timestamp, no visible caption/source
+  trace below the image, no decorative blur, and no arbitrary crop.
 - **Footer:** attribution, local prototype/use notice, and report/video metadata.
 - **Responsive:** at about 390 px, one column; comparisons stack; process becomes
-  vertical; metric groups wrap; the argument spine simplifies without hiding
-  timestamps; no horizontal overflow.
+  vertical; metric groups wrap; no horizontal overflow.
 - **Accessibility:** semantic headings in order, readable contrast, images have
   `alt`, decorative SVG is hidden from assistive technology, meaningful SVG has
   a label/title, focus styles exist for any link, and reduced-motion preferences

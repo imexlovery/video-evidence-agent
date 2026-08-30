@@ -96,7 +96,7 @@ have `asset_id`; `image_caption` must have one.
 | `metric_row` | 2–4 items of `value`, `label`, optional `context` | Verified numbers or concise milestones only |
 | `comparison_card` | `headline`, left/right labels and 1–4 items per side | Meaningful contrast, stacked on mobile |
 | `process_flow` | `headline`, 3–6 ordered steps with title/body | Renderer-owned SVG/vertical mobile flow |
-| `image_caption` | `headline`, optional `body`, required `asset_id` | Evidence frame with timestamp and caption |
+| `image_caption` | `headline`, optional `body`, required `asset_id` | Self-explanatory evidence frame; V0 keeps authored caption metadata but visibly renders only the image and its asset timestamp |
 | `takeaway_box` | `headline`, 2–5 takeaways | Final synthesis and memorable conclusions |
 
 `key_insight`, `process`, `comparison`, `metric`, and similar semantic labels are
@@ -125,7 +125,8 @@ represented by these fixed discriminants; aliases are not accepted in V0.
 | `RULE-VR0-002` | Authored text includes `<`, `&`, quotes, or script markup | Escape as text in every component | Safe visible text | Escaping tests |
 | `RULE-VR0-003` | Valid asset ref | Resolve within assets manifest directory and verify readable | Local image URL in HTML | Path tests |
 | `RULE-VR0-004` | Missing/unknown data | Fail closed at validation | Non-zero and useful error | Failure tests |
-| `RULE-VR0-005` | Factual block | Render human-readable timestamp from earliest source ref and retain all refs in semantic markup/data attributes | Visible time/source metadata | Component tests |
+| `RULE-VR0-005` | Factual block | Text blocks render compact human-readable source times and retain all refs in semantic markup/data attributes; image blocks retain refs in data attributes but visibly show only the asset's own timestamp | Unambiguous visible time/source metadata | Component tests |
+| `RULE-VR0-010` | Ordered section | Use a manually verified semantic topic boundary for `timestamp_ms`; candidate-frame sampling times do not define sections | Non-uniform semantic chapter starts | Real-plan/source review |
 | `RULE-VR0-006` | Process flow | Renderer computes placement and mobile fallback | SVG desktop, vertical flow mobile | Screenshot/component test |
 | `RULE-VR0-007` | Final report | Render attribution and local prototype notice | Footer/source module | Integration test |
 | `RULE-VR0-008` | Ambiguous numeric content | Author omits number or labels uncertainty explicitly; renderer never invents | No unsupported metric | Content review |

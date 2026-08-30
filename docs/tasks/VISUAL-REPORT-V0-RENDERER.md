@@ -264,6 +264,57 @@ The owner decides acceptance after viewing the artifact. Acceptance requires:
 
 Status: `READY_FOR_OWNER_VISUAL_REVIEW`
 
+### 2026-08-30 — Owner visual revision 1 completed
+
+- Result: revised the generic deterministic renderer and the RLinf plan; the
+  canonical report now contains 4 semantic sections, 13 typed blocks, and the
+  same 4 manually selected keyframes.
+- Information architecture: section starts now follow transcript topic turns at
+  `00:00`, `03:54`, `19:21`, and `27:06`, independent of the candidate-frame
+  times. Added one compact supporting block explaining why existing frameworks
+  fail to absorb changing algorithms and system boundaries.
+- Visual system: replaced the oversized field-notebook/poster composition with
+  a compact Chinese editorial article; removed the reading note, argument spine,
+  section kickers, decorative block labels, and dark image-caption panels;
+  tightened typography/spacing; added restrained small radii; and changed bullet
+  groups to small round dots.
+- Keyframes: every figure visibly contains only its source image and one
+  bottom-right asset timestamp (`01:00`, `10:00`, `20:00`, or `30:00`). Authored
+  source refs remain machine-readable in `data-source-refs`; no visible
+  `figcaption` or competing source timestamp remains.
+- Commands and results:
+  - focused Ruff: passed.
+  - focused pytest: `10 passed`.
+  - full Ruff: passed.
+  - full pytest: `38 passed in 1.06s`.
+  - real render: `4 sections, 13 blocks, 4 used assets`.
+  - structural/offline check: 27,163-byte HTML, 4 images, no scripts, no remote
+    asset markup, no decorative labels/reading note/argument spine, and exactly
+    one visible timestamp inside every figure.
+  - requirements readiness validator: `READY_FOR_ENGINEERING_HANDOFF` after
+    recording `DEC-VR0-053` and refreshing coverage/fingerprints.
+  - `git diff --check`: passed.
+- Visual-review boundary: the in-app browser refused automated refresh of the
+  local `file://` page under its URL safety policy. No alternate browser channel
+  was used. Per the owner's instruction, the two prior PNGs were not regenerated
+  and remain historical evidence for the rejected first candidate. The revised
+  `report.html` therefore awaits direct Owner inspection; acceptance remains
+  `PENDING`, and V1 remains unauthorized.
+
+### 2026-08-30 — Owner visual revision 1 requested
+
+- The first candidate was not accepted. The owner requested a renderer-level
+  revision rather than a hand edit of `report.html`.
+- Required changes: remove the reading-note strip and decorative English/index
+  labels; replace the argument-spine/poster composition with a denser Chinese
+  editorial flow; give colored components small corner radii; use round bullet
+  dots; show each keyframe as the self-explanatory image plus its own bottom-right
+  timestamp only; and set section timestamps from semantic topic boundaries
+  rather than the four sampled frame times.
+- The existing desktop/mobile PNGs remain historical evidence for the rejected
+  first candidate and are not regenerated in this bounded iteration. Owner
+  acceptance remains `PENDING`; V1 remains unauthorized.
+
 ### 2026-08-30 — VR-V0-RENDERER-001 implementation
 
 - Result: completed the renderer-first V0 for `p0b-rlinf-2026`. The canonical

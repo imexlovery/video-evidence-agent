@@ -33,9 +33,9 @@ after V0 acceptance.
 | `ACC-VR0-004` | Valid reused optional asset and required image asset | Render runs | Assets resolve by ID and can be reused; image block requires one | `REQ-VR0-003` |
 | `ACC-VR0-005` | Unknown/duplicate asset or escaping/remote path | Render runs | Non-zero error names the problem and no false success occurs | `REQ-VR0-003`, `008`, `011` |
 | `ACC-VR0-006` | Authored text contains script/HTML syntax | HTML renders | Syntax is visible inert text; no script executes | `REQ-VR0-008` |
-| `ACC-VR0-007` | Factual blocks in the real plan | Plan validates/renders | 100% contain in-range timestamped source refs visible as times | `REQ-VR0-007` |
+| `ACC-VR0-007` | Factual blocks in the real plan | Plan validates/renders | 100% contain in-range timestamped source refs; text blocks show compact source times, while image blocks show only their asset timestamp and retain refs in data attributes | `REQ-VR0-007` |
 | `ACC-VR0-008` | Final RLinf inputs | HTML renders | Hero, 3–5 modules, relationship/process, 2–4 useful frames, and takeaways are present | `REQ-VR0-006` |
-| `ACC-VR0-009` | Final report at 1080 px | Owner/implementer inspects | Clear type hierarchy, rhythm, evidence frames, argument spine; no overflow/clipping | `REQ-VR0-009`, `010`, `013` |
+| `ACC-VR0-009` | Final report at 1080 px | Owner/implementer inspects | Dense, readable Chinese editorial hierarchy; semantic numbered sections; compact small-radius components; self-explanatory evidence frames; no overflow/clipping | `REQ-VR0-009`, `010`, `013` |
 | `ACC-VR0-010` | Same final report at about 390 px | Browser inspects | Single-column adaptation, stacked comparisons/vertical process, no horizontal overflow | `REQ-VR0-010`, `013` |
 | `ACC-VR0-011` | Final page loads with browser network inspection | Page opens | Zero automatic external requests; local images load | `REQ-VR0-005`, `011` |
 | `ACC-VR0-012` | RLinf source use basis | Final report inspected | Required attribution/local notice is visible; no publish/deploy path added | `REQ-VR0-011` |

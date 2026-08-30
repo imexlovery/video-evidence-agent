@@ -44,7 +44,7 @@ is no external system boundary or network dependency.
 | `plan_models` | Versioned report, section, block, and source-ref contracts | `REQ-VR0-001`, `002`, `007`, `008` | Untrusted JSON → validated objects |
 | `asset_models/resolver` | Validate asset metadata, containment, readability, timestamps | `REQ-VR0-003`, `008`, `011` | Untrusted manifest/path → bounded local file |
 | `components` | Render structural and seven typed content components | `REQ-VR0-002`, `004`, `006`, `009`, `010` | Validated content only |
-| `document_renderer` | Compose semantic HTML, design tokens, argument spine, footer, responsive CSS | `REQ-VR0-004`, `005`, `009`, `010` | Pure/deterministic composition |
+| `document_renderer` | Compose semantic HTML, dense editorial design tokens, footer, responsive CSS | `REQ-VR0-004`, `005`, `009`, `010` | Pure/deterministic composition |
 | `svg` | Renderer-owned process and spine geometry | `REQ-VR0-004`, `006` | No plan coordinates or SVG paths |
 | `cli/__main__` | Parse paths, orchestrate validate/render/write, report errors | `REQ-VR0-001`, `005`, `008` | Local command boundary |
 | Browser review | Inspect desktop/mobile output and capture screenshots | `REQ-VR0-013`, `014` | Human visual gate |
@@ -109,7 +109,7 @@ status. Artifact existence never implies owner acceptance.
 - Assets separate from content; blocks reference IDs only.
 - Renderer decides all visual geometry and style.
 - Hero and Section Header are structural, derived from top-level/section data.
-- Only process flow and argument spine require programmatic inline SVG.
+- Only process flow requires programmatic inline SVG.
 - Semantic HTML and CSS are preferred over drawing text into a canvas.
 - No generated timestamp or random ID that makes identical input nondeterministic.
 - Escape content at the rendering boundary.

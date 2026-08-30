@@ -210,6 +210,16 @@ def test_real_components_render_and_escape_authored_text(tmp_path: Path) -> None
     assert 'href="https://' not in rendered
     assert "data-source-refs=" in rendered
     assert "00:00" in rendered
+    assert 'class="image-time"' in rendered
+    assert "<figcaption>" not in rendered
+    assert "第一张证据帧" not in rendered
+    assert "说明文字" not in rendered
+    assert "第一张测试帧说明。" not in rendered
+    assert "reading-note" not in rendered
+    assert "argument-spine" not in rendered
+    assert "THE FIRST TURN" not in rendered
+    assert "FRAME /" not in rendered
+    assert "A /" not in rendered
 
 
 def test_repeat_render_is_deterministic(tmp_path: Path) -> None:
