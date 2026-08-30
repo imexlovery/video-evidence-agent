@@ -21,7 +21,8 @@
 | `ASSET-VR1A-MANIFESTS / AVAILABLE` | Matching `manifest.json` plus `eval/p0b/corpus.jsonl` | P0-B corpus | JSON/JSONL metadata, attribution, use basis | Authority for title/duration/rights; read-only | Reuse; conflict blocks run |
 | `ASSET-VR1A-V0-PLAN / AVAILABLE` | `artifacts/visual-report/v0-rlinf/report-plan.json` | V0 Owner | 4 sections, 13 blocks | Local development reference; not automatic Gold | Human comparison only |
 | `ASSET-VR1A-RENDERER / AVAILABLE` | `src/video_evidence_agent/visual_report/` | Repository | Current V0 Pydantic/HTML contract | Preserve behavior | Reuse unchanged |
-| `ASSET-VR1A-REVIEW-CARDS / MISSING` | Proposed `eval/visual-report-v1a/review-cards/` | Implementer drafts; Owner reviews | Three small JSON cards | Derived locally from authorized transcripts | Create before measured runs; version control permitted because text excerpts are minimized |
+| `ASSET-VR1A-REVIEW-CARDS / AVAILABLE` | `eval/visual-report-v1a/review-cards/` | Implementer created; Owner reviews | Three versioned small JSON cards; current human rubrics remain pending | Derived locally from authorized transcripts | Validate and snapshot unchanged into any new formal revision |
+| `ASSET-VR1A-HISTORICAL-RUNS / AVAILABLE_IMMUTABLE` | `artifacts/visual-report/v1a/` plus `eval/visual-report-v1a/` manifests | V1-A recorder/evaluator | Three historical formal revisions, 22 recovery candidate manifests, 20 failed recovery canaries | Local restricted evidence; no public redistribution | Preserve every identity/aggregate/rubric; create only new unique strategy/canary/formal identities |
 | `STORE-VR1A-DATABASE / NOT_APPLICABLE` | None | None | None | No G1 need | Must not add |
 | Brand/creative assets | Not applicable | None | None | V1-A creates no visual identity | Existing renderer retained |
 

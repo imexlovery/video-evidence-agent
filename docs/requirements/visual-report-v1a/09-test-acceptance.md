@@ -68,7 +68,7 @@ avoids turning the evaluation into template matching.
 7. If a prompt/model/policy changes, create a new measurement revision and rerun
    all six identities; never replace or selectively rerun the earlier revision.
 
-## Authorized Goal recovery protocol
+## Historical exhausted Goal recovery protocol
 
 After `vr1a-dev-10f4334c8026` produced one provider failure and five first-stage
 schema failures, the Owner authorized `VR-V1A-GOAL-RECOVERY-003` as one
@@ -101,6 +101,56 @@ The latest formal revision is execution-valid only when all six declared runs
 reach `RENDERED`, observed calls equal `12/12`, both first responses validate in
 every run, compilation/render/source refs pass, and six report paths plus six
 pending Owner rubrics exist. Human quality acceptance remains Owner-only.
+
+`VR-V1A-GOAL-RECOVERY-003` ended at
+`READY_FOR_OWNER_V1A_REVIEW — GOAL_RECOVERY_EXHAUSTED`: 22 candidate manifests,
+20 failed Kling canaries, `36/36` calls, no rendered canary, and no new formal
+revision. The loop and its two-formal/36-call authority are closed.
+
+## Authorized canonical provider-conformance protocol
+
+`VR-V1A-PROVIDER-CONFORMANCE-004` replaces the exhausted recovery authority
+without changing the canonical product or quality contract.
+
+1. Preserve the frozen failed-experiment commit and all historical identities.
+2. Restore the 4–12-topic/0–5-subtopic Mapper and 3–5-section/8–14-block,
+   content-affordance Planner. Provider-free tests must reject exact-count,
+   fixed-assignment, fixed-sequence, or fixture-specific prompt/payload logic.
+3. Predeclare and freeze at most two materially distinct provider/model/API
+   strategies before the first transcript call. Each must use official
+   provider-native schema-constrained output; JSON-object/instruction-only
+   output does not qualify.
+4. Freeze one prompt bundle per strategy (one Mapper prompt plus one Planner
+   prompt). Strategy B is frozen before Strategy A runs and may not incorporate
+   Strategy A observations.
+5. For each eligible strategy, execute the complete three-video canary set once:
+   Kling, RLinf, then Wu Yi. Continue the set even after an earlier failure.
+   Each run allows one Mapper call and, only after valid mapping, one Planner
+   call; SDK retry is zero.
+6. A strategy passes only when all three runs reach `RENDERED` from the first
+   two responses, report `2/2` calls, pass all deterministic gates, and the
+   three normalized structure signatures are not all identical.
+7. Stop strategy comparison after the first pass. Freeze one wholly new
+   six-run formal revision under that exact winning tuple, execute every run
+   once regardless of failures, and invoke the evaluator exactly once.
+8. Do not repair or rerun a strategy after its first transcript call and do not
+   create a second formal revision. The maximum is 24 new transcript-bearing
+   provider calls and 24 model calls.
+
+Terminal conclusions are mutually exclusive:
+
+| Condition | Required state |
+|---|---|
+| First passing strategy yields a complete execution-valid six-run revision | `READY_FOR_OWNER_V1A_REVIEW — PENDING_OWNER_REVIEW` |
+| A strategy passes canary but the single formal revision is incomplete/invalid | `READY_FOR_OWNER_V1A_REVIEW — FORMAL_MEASUREMENT_FAILED` |
+| Both predeclared candidates fail capability admission or complete canary conformance | `READY_FOR_OWNER_V1A_REVIEW — V1A_PROVIDER_CONFORMANCE_NO_GO` |
+| Remaining eligible strategy cannot execute because of credential/billing/quota/access/network/source authorization | `READY_FOR_OWNER_V1A_REVIEW — EXTERNAL_BLOCKED` |
+| Continuing requires a V1-A contract/threshold/two-call change or excluded scope | `READY_FOR_OWNER_V1A_REVIEW — CONTRACT_CHANGE_REQUIRED` |
+
+A capability no-go contains no transcript call. An external block is never
+relabelled as conformance evidence. Canary reports are not inserted into the
+formal six-run denominator, and no human rubric score is inferred from canary
+or automated results.
 
 ## Owner-confirmed quality rubric
 
@@ -153,6 +203,12 @@ and still overstate it.
 | `TEST-VR1A-014` | Frozen six-run measurement | Evaluator runs | Every declared run appears in denominator and rubric | `REQ-VR1A-014` |
 | `TEST-VR1A-015` | Final diff/test run | Regression checks run | V0 renderer command and P0-B frozen artifacts remain unchanged | `REQ-VR1A-015` |
 | `TEST-VR1A-016` | All implementation/evaluation checks complete | Session concludes | Status stops for Owner review; no V1-B/C work | `REQ-VR1A-016` |
+| `TEST-VR1A-017` | Canonical prompts/payloads/examples | Static and contract tests run | No exact-four topic, empty-subtopic, exact 3/8, fixed assignment/sequence, or fixture-specific steering remains | `REQ-VR1A-003`, `005`, `014` |
+| `TEST-VR1A-018` | Candidate provider/model/API tuple | Capability admission runs | Official native schema-constrained support and exact frozen hashes exist; JSON-object-only mode is rejected | `REQ-VR1A-002`, `009`, `012` |
+| `TEST-VR1A-019` | One eligible frozen strategy | Canary manifest executes | All three videos execute once and remain retained; no per-video change or early-set abort | `REQ-VR1A-009`, `013`, `014` |
+| `TEST-VR1A-020` | Strategy A fails | Strategy B is considered | Only the already-frozen materially distinct tuple may run; no prompt learning/micro-version | `REQ-VR1A-009`, `014` |
+| `TEST-VR1A-021` | First strategy passes 3/3 | Formal manifest freezes and executes | Six fresh runs execute once, evaluator runs once, and calls remain within the 24-call ceiling | `REQ-VR1A-012`–`016` |
+| `TEST-VR1A-022` | No strategy passes or formal fails | Goal closes | Exact honest terminal is recorded without fake report, score, retry, or acceptance | `REQ-VR1A-009`, `013`, `014`, `016` |
 
 ## Invalid, partial, stale, and adversarial cases
 

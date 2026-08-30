@@ -6,6 +6,25 @@ The Owner confirmed the final model/measurement checkpoint on 2026-08-30.
 Authoritative readiness is still assigned only by the validator-generated
 `requirements-readiness.json`; this document does not assign its own READY state.
 
+## Current continuation handoff
+
+The original V1-A implementation and two recovery attempts now exist as
+historical evidence. The latest exhausted snapshot is frozen at
+`4ba28bf1b3288a6fb77bcc27378a45a69cd2b895` and is classified
+`FAILED_EXPERIMENT / DO_NOT_PROMOTE`: it retained 22 candidate manifests,
+20 failed Kling canaries, and `36/36` provider/model calls, but no passing
+cross-video gate or new formal measurement.
+
+The Owner has authorized
+`VR-V1A-PROVIDER-CONFORMANCE-004` as the next single-Goal continuation. Before
+any new transcript-bearing call it must restore the canonical 4–12 Topic Mapper
+range, 0–5 subtopics, 3–5 Planner sections, 8–14 blocks, content-affordance
+selection, and anti-template behavior. It may evaluate at most two predeclared,
+materially distinct provider/model/API strategies that use native
+schema-constrained output. JSON-object mode plus prompt instructions no longer
+qualifies for this bounded continuation. Details and terminal states are fixed
+in [the provider-conformance task](../../tasks/VISUAL-REPORT-V1A-PROVIDER-CONFORMANCE.md).
+
 ## Product definition
 
 V1-A is a local G1 prototype that turns one already-ingested Chinese technical
@@ -171,6 +190,7 @@ free layout, public publishing, prompt self-improvement, fine-tuning, and V1-B/C
 | Internal module/function split | implementation-delegated | Later implementer | Small project-owned code under approved paths | New framework/service | Code review |
 | Exact provider model | implementation-delegated, Owner-confirmed envelope | Owner/implementer | Explicit configured text model with sufficient context and JSON output | Implicit model or hidden fallback | `DEC-VR1A-048`; run manifest |
 | Quality thresholds/repeat plan | fixed constraint, Owner-confirmed | Owner | Values in `09-test-acceptance.md` | Self-acceptance or selective rerun by implementer | `DEC-VR1A-049`; frozen measurement |
+| Provider-conformance continuation | fixed experiment boundary with delegated implementation details | Owner/implementer | Restore canonical content contract; predeclare at most two native schema-constrained strategies; one three-video canary set each; first passing strategy runs one six-run measurement | JSON-object-only transport, prompt micro-versions, per-video tuning, same-strategy rerun, more than 24 new calls | `DEC-VR1A-053/054`; strategy/canary/formal manifests |
 | V1-B/C start | prohibited | Owner | Separate later authorization | Automatic continuation | New Owner instruction |
 
 ## Readiness gate

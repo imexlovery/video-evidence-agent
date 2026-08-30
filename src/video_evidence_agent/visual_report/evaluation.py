@@ -34,17 +34,37 @@ from .planning import (
     TOPIC_MAP_SCHEMA_VERSION,
     TOPIC_PROPOSAL_SCHEMA_VERSION,
     PlanningError,
+    ReportPlanProposal,
     ReviewCard,
     TopicMap,
+    TopicMapProposal,
     stable_json,
 )
-from .planning_runtime import SourceSnapshot, load_source
+from .planning_runtime import (
+    API_SURFACE,
+    REASONING_EFFORT,
+    RESPONSE_MODE,
+    SCHEMA_MECHANISM,
+    SourceSnapshot,
+    load_source,
+)
 
 MEASUREMENT_SCHEMA_VERSION = "visual-report-measurement-freeze.v1a-prototype"
 EVALUATION_SCHEMA_VERSION = "visual-report-evaluation.v1a-prototype"
 RUN_EVALUATION_SCHEMA_VERSION = "visual-report-run-evaluation.v1a-prototype"
 RUBRIC_SCHEMA_VERSION = "visual-report-human-rubric.v1a-prototype"
 EVALUATOR_VERSION = "visual-report-v1a-evaluator.v1"
+PROVIDER_CONFORMANCE_SCHEMA_VERSION = "visual-report-provider-conformance.v1a"
+PROVIDER_CONFORMANCE_RESULT_SCHEMA_VERSION = "visual-report-provider-conformance-result.v1a"
+PROVIDER_CONFORMANCE_ADAPTER_ID = "openai.responses.text.json_schema.v1a"
+DEEPSEEK_RESPONSES_DOC = "https://api-docs.deepseek.com/api/create-response/"
+DEEPSEEK_MODELS_DOC = (
+    "https://api-docs.deepseek.com/quick_start/pricing/?article_id=article_1779470751466_8"
+)
+SUPPORTED_DEEPSEEK_MODELS: tuple[str, ...] = (
+    "deepseek-v4-flash-vision-exp",
+    "deepseek-v4-flash",
+)
 
 FIXED_SOURCES: tuple[tuple[str, str, str], ...] = (
     (
@@ -251,9 +271,12 @@ def environment_snapshot(repository_root: Path) -> dict[str, object]:
         "model": model or "unavailable",
         "credential_present": api_key_present,
         "timeout_seconds": timeout_seconds if timeout_seconds is not None else "invalid",
-        "response_mode": "json_object",
+        "api_surface": API_SURFACE,
+        "response_mode": RESPONSE_MODE,
+        "schema_mechanism": SCHEMA_MECHANISM,
         "temperature": 0,
         "thinking_mode": THINKING_MODE,
+        "reasoning_effort": REASONING_EFFORT,
         "output_token_limit": MAX_OUTPUT_TOKENS,
         "sdk_max_retries": 0,
         "sdk_version": sdk_version,
@@ -261,9 +284,7 @@ def environment_snapshot(repository_root: Path) -> dict[str, object]:
 
 
 def _card_paths(card_root: Path) -> dict[str, Path]:
-    return {
-        video_id: card_root / f"{video_id}.v1.json" for video_id, _, _ in FIXED_SOURCES
-    }
+    return {video_id: card_root / f"{video_id}.v1.json" for video_id, _, _ in FIXED_SOURCES}
 
 
 def _card_payload(path: Path) -> ReviewCard:
@@ -274,6 +295,398 @@ def _card_payload(path: Path) -> ReviewCard:
         return ReviewCard.model_validate(payload)
     except ValidationError as exc:
         raise EvaluationError("REVIEW_CARD_SCHEMA_ERROR", str(exc)) from exc
+
+
+def _fixed_source_rows(repository_root: Path) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for video_id, manifest_rel, segments_rel in FIXED_SOURCES:
+        manifest_path = repository_root / manifest_rel
+        segments_path = repository_root / segments_rel
+        source = load_source(manifest_path, segments_path)
+        if source.video_id != video_id:
+            raise EvaluationError(
+                "SOURCE_SNAPSHOT_MISMATCH", f"unexpected source video_id: {video_id}"
+            )
+        rows.append(
+            {
+                "video_id": video_id,
+                "manifest_path": str(manifest_path),
+                "segments_path": str(segments_path),
+                "manifest_sha256": source.manifest_sha256,
+                "segments_sha256": source.segments_sha256,
+                "segment_count": len(source.segments),
+                "duration_ms": source.duration_ms,
+            }
+        )
+    return rows
+
+
+def _review_card_rows(
+    card_root: Path, source_rows: list[dict[str, object]]
+) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    card_paths = _card_paths(card_root)
+    for video_id, _, _ in FIXED_SOURCES:
+        path = card_paths[video_id]
+        card = _card_payload(path)
+        source_row = next(row for row in source_rows if row["video_id"] == video_id)
+        source = load_source(
+            Path(str(source_row["manifest_path"])), Path(str(source_row["segments_path"]))
+        )
+        validate_review_card(card, source)
+        rows.append(
+            {
+                "video_id": video_id,
+                "path": str(path),
+                "sha256": _sha256_file(path),
+                "schema_version": REVIEW_CARD_SCHEMA_VERSION,
+            }
+        )
+    return rows
+
+
+def _schema_fingerprint(
+    name: str, schema_version: str, schema: dict[str, object]
+) -> dict[str, object]:
+    return {
+        "name": name,
+        "schema_version": schema_version,
+        "sha256": _sha256_bytes(stable_json(schema).encode("utf-8")),
+    }
+
+
+def _provider_contract_snapshot() -> dict[str, object]:
+    return {
+        "prompts": {
+            "mapper": {
+                "version": MAPPER_PROMPT_VERSION,
+                "sha256": _sha256_bytes(MAPPER_SYSTEM_INSTRUCTION.encode("utf-8")),
+            },
+            "planner": {
+                "version": PLANNER_PROMPT_VERSION,
+                "sha256": _sha256_bytes(PLANNER_SYSTEM_INSTRUCTION.encode("utf-8")),
+            },
+        },
+        "schemas": {
+            "topic_mapper": _schema_fingerprint(
+                "v1a_topic_map_proposal",
+                TOPIC_PROPOSAL_SCHEMA_VERSION,
+                TopicMapProposal.model_json_schema(),
+            ),
+            "report_planner": _schema_fingerprint(
+                "v1a_report_plan_proposal",
+                PLAN_PROPOSAL_SCHEMA_VERSION,
+                ReportPlanProposal.model_json_schema(),
+            ),
+        },
+        "compiler_version": COMPILER_VERSION,
+        "call_schema_version": CALL_SCHEMA_VERSION,
+        "adapter_id": PROVIDER_CONFORMANCE_ADAPTER_ID,
+    }
+
+
+def _provider_adapter_snapshot() -> dict[str, object]:
+    path = Path(__file__).with_name("planning_runtime.py").resolve()
+    return {
+        "adapter_id": PROVIDER_CONFORMANCE_ADAPTER_ID,
+        "module": str(path),
+        "sha256": _sha256_file(path),
+        "api_surface": API_SURFACE,
+        "schema_mechanism": SCHEMA_MECHANISM,
+    }
+
+
+def _canary_declarations(model_suffix: str) -> list[dict[str, object]]:
+    return [
+        {
+            "run_id": f"{video_id}-v1a-{model_suffix}-canary",
+            "video_id": video_id,
+            "planned_provider_calls": 2,
+            "planned_model_calls": 2,
+        }
+        for video_id, _, _ in FIXED_SOURCES
+    ]
+
+
+def _validate_provider_conformance_manifest(payload: object) -> dict[str, object]:
+    if not isinstance(payload, dict):
+        raise EvaluationError(
+            "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "conformance manifest must be an object"
+        )
+    if payload.get("schema_version") != PROVIDER_CONFORMANCE_SCHEMA_VERSION:
+        raise EvaluationError(
+            "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "unsupported conformance manifest version"
+        )
+    if payload.get("status") not in {"FROZEN", "EXTERNAL_BLOCKED"}:
+        raise EvaluationError("PROVIDER_CONFORMANCE_SCHEMA_ERROR", "invalid conformance status")
+    strategies = payload.get("strategies")
+    if not isinstance(strategies, list) or not 1 <= len(strategies) <= 2:
+        raise EvaluationError(
+            "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "one or two strategies must be frozen"
+        )
+    contract = _provider_contract_snapshot()
+    adapter = _provider_adapter_snapshot()
+    ids: set[str] = set()
+    canary_ids: set[str] = set()
+    for index, strategy in enumerate(strategies, start=1):
+        if not isinstance(strategy, dict):
+            raise EvaluationError("PROVIDER_CONFORMANCE_SCHEMA_ERROR", "strategy must be an object")
+        strategy_id = strategy.get("strategy_id")
+        if not isinstance(strategy_id, str) or not strategy_id or strategy_id in ids:
+            raise EvaluationError(
+                "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "strategy IDs must be unique"
+            )
+        ids.add(strategy_id)
+        if strategy.get("order") != index:
+            raise EvaluationError("PROVIDER_CONFORMANCE_SCHEMA_ERROR", "strategy order is invalid")
+        if strategy.get("api_surface") != API_SURFACE:
+            raise EvaluationError(
+                "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "strategy is not Responses API"
+            )
+        if strategy.get("response_mode") != RESPONSE_MODE:
+            raise EvaluationError(
+                "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "strategy is not native JSON Schema"
+            )
+        if strategy.get("schema_mechanism") != SCHEMA_MECHANISM:
+            raise EvaluationError(
+                "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "strategy schema mechanism is invalid"
+            )
+        if strategy.get("adapter") != adapter:
+            raise EvaluationError(
+                "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "adapter changed after freeze"
+            )
+        if strategy.get("contract") != contract:
+            raise EvaluationError(
+                "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "prompt or schema contract changed"
+            )
+        config = strategy.get("config")
+        if not isinstance(config, dict):
+            raise EvaluationError("PROVIDER_CONFORMANCE_SCHEMA_ERROR", "strategy config is missing")
+        for key, expected in {
+            "api_surface": API_SURFACE,
+            "response_mode": RESPONSE_MODE,
+            "schema_mechanism": SCHEMA_MECHANISM,
+            "temperature": 0,
+            "thinking_mode": THINKING_MODE,
+            "reasoning_effort": REASONING_EFFORT,
+            "output_token_limit": MAX_OUTPUT_TOKENS,
+            "sdk_max_retries": 0,
+        }.items():
+            if config.get(key) != expected:
+                raise EvaluationError(
+                    "PROVIDER_CONFORMANCE_SCHEMA_ERROR", f"invalid strategy config: {key}"
+                )
+        canary_runs = strategy.get("canary_runs")
+        if not isinstance(canary_runs, list) or len(canary_runs) != 3:
+            raise EvaluationError(
+                "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "each strategy needs three canary runs"
+            )
+        video_ids: set[str] = set()
+        for declaration in canary_runs:
+            if not isinstance(declaration, dict):
+                raise EvaluationError(
+                    "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "canary declaration is invalid"
+                )
+            video_id = declaration.get("video_id")
+            run_id = declaration.get("run_id")
+            if video_id not in {item[0] for item in FIXED_SOURCES} or video_id in video_ids:
+                raise EvaluationError(
+                    "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "canary videos must be unique"
+                )
+            if not isinstance(run_id, str) or run_id in canary_ids:
+                raise EvaluationError(
+                    "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "canary run IDs must be unique"
+                )
+            if (
+                declaration.get("planned_provider_calls") != 2
+                or declaration.get("planned_model_calls") != 2
+            ):
+                raise EvaluationError(
+                    "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "canary call budget must be two"
+                )
+            video_ids.add(str(video_id))
+            canary_ids.add(run_id)
+    shared = payload.get("shared_contract")
+    if shared != contract:
+        raise EvaluationError(
+            "PROVIDER_CONFORMANCE_SCHEMA_ERROR", "shared contract is not canonical"
+        )
+    return payload
+
+
+def freeze_provider_conformance(
+    *,
+    repository_root: Path,
+    artifact_root: Path,
+    card_root: Path,
+    output_path: Path,
+) -> dict[str, object]:
+    """Freeze all provider strategies and canary identities before transcript egress."""
+    repository_root = repository_root.resolve()
+    artifact_root = artifact_root.resolve()
+    card_root = card_root.resolve()
+    source_rows = _fixed_source_rows(repository_root)
+    card_rows = _review_card_rows(card_root, source_rows)
+    environment = environment_snapshot(repository_root)
+    contract = _provider_contract_snapshot()
+    adapter = _provider_adapter_snapshot()
+    current_model = str(environment.get("model", ""))
+    first_model = (
+        current_model
+        if current_model in SUPPORTED_DEEPSEEK_MODELS
+        else SUPPORTED_DEEPSEEK_MODELS[0]
+    )
+    second_model = next(model for model in SUPPORTED_DEEPSEEK_MODELS if model != first_model)
+    base_eligible = bool(
+        environment.get("admission") == "READY"
+        and environment.get("provider") == "https://api.deepseek.com"
+        and environment.get("credential_present") is True
+        and environment.get("timeout_seconds") == 120.0
+        and environment.get("sdk_version") not in {None, "unavailable"}
+    )
+    endpoint = os.getenv("OPENAI_BASE_URL", "").strip() or "https://api.openai.com/v1"
+    strategies: list[dict[str, object]] = []
+    for order, model in enumerate((first_model, second_model), start=1):
+        suffix = "a" if order == 1 else "b"
+        strategy_id = f"{model}-responses-json-schema-{suffix}"
+        eligible = base_eligible
+        blockers = [] if eligible else list(environment.get("blockers", []))
+        if environment.get("provider") != "https://api.deepseek.com":
+            blockers.append("DeepSeek endpoint is not configured")
+        if environment.get("timeout_seconds") != 120.0:
+            blockers.append("timeout must be 120 seconds for this frozen strategy")
+        strategies.append(
+            {
+                "strategy_id": strategy_id,
+                "order": order,
+                "provider": "DeepSeek",
+                "provider_label": environment.get("provider"),
+                "endpoint": endpoint,
+                "model": model,
+                "model_version": model,
+                "api_surface": API_SURFACE,
+                "response_mode": RESPONSE_MODE,
+                "schema_mechanism": SCHEMA_MECHANISM,
+                "adapter": adapter,
+                "contract": contract,
+                "config": {
+                    "provider": environment.get("provider"),
+                    "model": model,
+                    "model_version": model,
+                    "timeout_seconds": 120.0,
+                    "credential_present": bool(environment.get("credential_present")),
+                    "api_surface": API_SURFACE,
+                    "response_mode": RESPONSE_MODE,
+                    "schema_mechanism": SCHEMA_MECHANISM,
+                    "temperature": 0,
+                    "thinking_mode": THINKING_MODE,
+                    "reasoning_effort": REASONING_EFFORT,
+                    "output_token_limit": MAX_OUTPUT_TOKENS,
+                    "sdk_max_retries": 0,
+                    "sdk_version": environment.get("sdk_version"),
+                },
+                "prompt_bundle": contract["prompts"],
+                "schemas": contract["schemas"],
+                "capability_evidence": [
+                    {
+                        "source": "DeepSeek Responses API reference",
+                        "url": DEEPSEEK_RESPONSES_DOC,
+                        "claim": (
+                            "Responses text.format supports provider-native json_schema "
+                            "with name and schema."
+                        ),
+                    },
+                    {
+                        "source": "DeepSeek model and API availability",
+                        "url": DEEPSEEK_MODELS_DOC,
+                        "claim": (
+                            f"{model} is a declared DeepSeek model available to the Responses API."
+                        ),
+                    },
+                ],
+                "eligibility": "ELIGIBLE" if eligible else "INELIGIBLE",
+                "eligibility_blockers": blockers,
+                "canary_runs": _canary_declarations(f"candidate-{suffix}"),
+            }
+        )
+    stable_payload = {
+        "schema_version": PROVIDER_CONFORMANCE_SCHEMA_VERSION,
+        "repository_root": str(repository_root),
+        "artifact_root": str(artifact_root),
+        "sources": source_rows,
+        "review_cards": card_rows,
+        "environment": environment,
+        "shared_contract": contract,
+        "strategies": strategies,
+        "call_ledger": {
+            "max_new_transcript_bearing_provider_model_calls": 24,
+            "canary_max_calls": 12,
+            "formal_max_calls": 12,
+            "per_run_max_calls": 2,
+            "sdk_max_retries": 0,
+            "comparison_stop": (
+                "stop after first strategy with three rendered canaries and "
+                "non-identical signatures"
+            ),
+        },
+        "source_policy": (
+            "full transcript for every mapper and planner call; no chunking or fallback"
+        ),
+    }
+    revision_id = f"vr1a-provider-{_sha256_bytes(stable_json(stable_payload).encode('utf-8'))[:12]}"
+    payload = {
+        **stable_payload,
+        "revision_id": revision_id,
+        "status": "FROZEN" if base_eligible else "EXTERNAL_BLOCKED",
+        "frozen_at": _now(),
+    }
+    _validate_provider_conformance_manifest(payload)
+    _write_new_json(output_path, payload)
+    return payload
+
+
+def load_provider_conformance_manifest(path: Path) -> dict[str, object]:
+    payload = _read_json(path)
+    return _validate_provider_conformance_manifest(payload)
+
+
+def load_provider_conformance_strategy(
+    path: Path, strategy_id: str | None = None
+) -> dict[str, object]:
+    payload = load_provider_conformance_manifest(path)
+    strategies = payload["strategies"]
+    assert isinstance(strategies, list)
+    eligible = [
+        item
+        for item in strategies
+        if isinstance(item, dict) and item.get("eligibility") == "ELIGIBLE"
+    ]
+    if strategy_id is None:
+        if len(eligible) != 1:
+            raise EvaluationError(
+                "PROVIDER_CONFORMANCE_SELECTION_ERROR",
+                "strategy_id is required when more than one eligible strategy is frozen",
+            )
+        selected = eligible[0]
+    else:
+        selected = next(
+            (
+                item
+                for item in strategies
+                if isinstance(item, dict) and item.get("strategy_id") == strategy_id
+            ),
+            None,
+        )
+        if selected is None:
+            raise EvaluationError("PROVIDER_CONFORMANCE_SELECTION_ERROR", "unknown strategy_id")
+        if selected.get("eligibility") != "ELIGIBLE":
+            raise EvaluationError(
+                "PROVIDER_CONFORMANCE_SELECTION_ERROR", "selected strategy is ineligible"
+            )
+    result = dict(selected)
+    result["strategy_manifest_sha256"] = _sha256_file(path.resolve())
+    result["manifest_revision_id"] = payload.get("revision_id")
+    return result
 
 
 def validate_review_card(card: ReviewCard, source: SourceSnapshot) -> None:
@@ -340,6 +753,8 @@ def freeze_measurement(
     artifact_root: Path,
     card_root: Path,
     output_path: Path,
+    strategy_manifest_path: Path | None = None,
+    strategy_id: str | None = None,
 ) -> MeasurementFreeze:
     """Validate and write one immutable six-run measurement declaration."""
     repository_root = repository_root.resolve()
@@ -385,6 +800,38 @@ def freeze_measurement(
         )
 
     provider = environment_snapshot(repository_root)
+    if strategy_manifest_path is not None:
+        strategy = load_provider_conformance_strategy(strategy_manifest_path, strategy_id)
+        strategy_config = strategy.get("config")
+        if not isinstance(strategy_config, dict):
+            raise EvaluationError("PROVIDER_CONFORMANCE_SCHEMA_ERROR", "strategy config is missing")
+        provider = {
+            **provider,
+            **{
+                key: strategy_config.get(key)
+                for key in (
+                    "provider",
+                    "model",
+                    "model_version",
+                    "timeout_seconds",
+                    "credential_present",
+                    "api_surface",
+                    "response_mode",
+                    "schema_mechanism",
+                    "temperature",
+                    "thinking_mode",
+                    "reasoning_effort",
+                    "output_token_limit",
+                    "sdk_max_retries",
+                    "sdk_version",
+                )
+                if key in strategy_config
+            },
+            "strategy_id": strategy.get("strategy_id"),
+            "strategy_manifest_sha256": strategy.get("strategy_manifest_sha256"),
+            "strategy_manifest_path": str(strategy_manifest_path.resolve()),
+            "strategy_revision_id": strategy.get("manifest_revision_id"),
+        }
     evaluator_sha256 = _sha256_file(Path(__file__).resolve())
     seed_payload = _stable_revision_payload(
         repository_root=repository_root,
@@ -407,6 +854,14 @@ def freeze_measurement(
         for video_id, _, _ in FIXED_SOURCES
         for repeat in (1, 2)
     ]
+    collisions = [
+        str(run["run_id"]) for run in runs if (artifact_root / str(run["run_id"])).exists()
+    ]
+    if collisions:
+        raise EvaluationError(
+            "EVALUATION_OUTPUT_EXISTS",
+            f"measurement run directories already exist: {', '.join(collisions)}",
+        )
     stable_payload = _stable_revision_payload(
         repository_root=repository_root,
         artifact_root=artifact_root,
@@ -588,18 +1043,27 @@ def _score_run(
         and source_snapshot.get("manifest_sha256") == source_row.get("manifest_sha256")
         and source_snapshot.get("segments_sha256") == source_row.get("segments_sha256")
         and isinstance(config_snapshot, dict)
-            and all(config_snapshot.get(key) == expected_config.get(key) for key in (
-            "provider",
-            "model",
-            "timeout_seconds",
-            "credential_present",
-            "response_mode",
-            "temperature",
-            "thinking_mode",
-            "output_token_limit",
-            "sdk_max_retries",
-            "sdk_version",
-        ))
+        and all(
+            config_snapshot.get(key) == expected_config.get(key)
+            for key in (
+                "provider",
+                "model",
+                "model_version",
+                "timeout_seconds",
+                "credential_present",
+                "api_surface",
+                "response_mode",
+                "schema_mechanism",
+                "temperature",
+                "thinking_mode",
+                "reasoning_effort",
+                "output_token_limit",
+                "sdk_max_retries",
+                "sdk_version",
+                "strategy_id",
+                "strategy_manifest_sha256",
+            )
+        )
     )
     deterministic["revision_snapshot_match"] = snapshot_match
     if not snapshot_match:
@@ -607,6 +1071,7 @@ def _score_run(
 
     calls_path = run_dir / "model-calls.jsonl"
     calls = _read_jsonl(calls_path) if calls_path.is_file() else []
+    expected_call_config = freeze.provider
     call_valid = (
         len(calls) == 2
         and [call.get("stage") for call in calls] == ["topic_mapper", "report_planner"]
@@ -614,6 +1079,18 @@ def _score_run(
             call.get("schema_version") == CALL_SCHEMA_VERSION
             and call.get("schema_valid") is True
             and call.get("error_category") is None
+            and call.get("api_surface") == expected_call_config.get("api_surface")
+            and call.get("response_mode") == expected_call_config.get("response_mode")
+            and call.get("schema_mechanism") == expected_call_config.get("schema_mechanism")
+            and call.get("reasoning_effort") == expected_call_config.get("reasoning_effort")
+            and call.get("strategy_id") == expected_call_config.get("strategy_id")
+            and call.get("strategy_manifest_sha256")
+            == expected_call_config.get("strategy_manifest_sha256")
+            and call.get("schema_name")
+            == {
+                "topic_mapper": "v1a_topic_map_proposal",
+                "report_planner": "v1a_report_plan_proposal",
+            }.get(str(call.get("stage")))
             for call in calls
         )
     )
@@ -731,9 +1208,7 @@ def _human_summary(rows: list[dict[str, object]]) -> dict[str, object]:
     return {"status": "PENDING_OWNER_REVIEW" if pending else "SCORED", "by_video": by_video}
 
 
-def evaluate_measurement(
-    *, measurement_path: Path, output_root: Path
-) -> dict[str, object]:
+def evaluate_measurement(*, measurement_path: Path, output_root: Path) -> dict[str, object]:
     """Evaluate all six declared identities without rescore or repair."""
     freeze = load_measurement(measurement_path)
     repository_root = Path(freeze.repository_root)
@@ -820,8 +1295,7 @@ def evaluate_measurement(
                 bool(row["deterministic"]["execution_valid"]) for row in video_rows
             ),
             "first_pass_success_count": sum(
-                bool(row["deterministic"]["first_pass_schema_compile_render"])
-                for row in video_rows
+                bool(row["deterministic"]["first_pass_schema_compile_render"]) for row in video_rows
             ),
             "structure_signatures": [
                 row["deterministic"]["structure_signature"] for row in video_rows
@@ -880,6 +1354,213 @@ def evaluate_measurement(
     }
     _write_new_json(revision_root / "aggregate.json", aggregate)
     return aggregate
+
+
+def _conformance_run_outcome(
+    declaration: dict[str, object], strategy: dict[str, object], artifact_root: Path
+) -> dict[str, object]:
+    run_id = str(declaration.get("run_id"))
+    run_dir = artifact_root / run_id
+    run_payload = _read_run_json(run_dir)
+    calls_path = run_dir / "model-calls.jsonl"
+    calls = _read_jsonl(calls_path) if calls_path.is_file() else []
+    errors: list[str] = []
+    signature: str | None = None
+    state = "MISSING"
+    observed_provider_calls = 0
+    observed_model_calls = 0
+    if run_payload is None:
+        errors.append("run.json is missing")
+    else:
+        state = str(run_payload.get("state", "UNKNOWN"))
+        observed_provider_calls = int(run_payload.get("provider_calls", 0))
+        observed_model_calls = int(run_payload.get("model_calls", 0))
+        config = run_payload.get("config")
+        expected_config = strategy.get("config")
+        if not isinstance(config, dict) or not isinstance(expected_config, dict):
+            errors.append("strategy config snapshot is missing")
+        else:
+            for key in (
+                "provider",
+                "model",
+                "model_version",
+                "timeout_seconds",
+                "credential_present",
+                "api_surface",
+                "response_mode",
+                "schema_mechanism",
+                "temperature",
+                "thinking_mode",
+                "reasoning_effort",
+                "output_token_limit",
+                "sdk_max_retries",
+                "sdk_version",
+            ):
+                if config.get(key) != expected_config.get(key):
+                    errors.append(f"config snapshot mismatch: {key}")
+        if run_payload.get("strategy_id") != strategy.get("strategy_id"):
+            errors.append("run strategy_id mismatch")
+        expected_manifest_sha = strategy.get("strategy_manifest_sha256")
+        if (
+            expected_manifest_sha is not None
+            and run_payload.get("strategy_manifest_sha256") != expected_manifest_sha
+        ):
+            errors.append("run strategy manifest hash mismatch")
+    if len(calls) != 2:
+        errors.append("model call trace is not exactly two calls")
+    else:
+        expected_model = strategy.get("model")
+        expected_config = strategy.get("config")
+        for index, (call, stage) in enumerate(zip(calls, ("topic_mapper", "report_planner"))):
+            if call.get("stage") != stage:
+                errors.append(f"call {index + 1} stage mismatch")
+            if call.get("schema_valid") is not True or call.get("error_category") is not None:
+                errors.append(f"call {index + 1} was not a successful first-pass call")
+            if call.get("model") != expected_model:
+                errors.append(f"call {index + 1} model mismatch")
+            if isinstance(expected_config, dict):
+                for key in ("api_surface", "response_mode", "schema_mechanism", "reasoning_effort"):
+                    if call.get(key) != expected_config.get(key):
+                        errors.append(f"call {index + 1} {key} mismatch")
+    plan_path = run_dir / "report-plan.json"
+    if plan_path.is_file():
+        try:
+            from .models import ReportPlan
+
+            signature = _structure_signature(ReportPlan.model_validate(_read_json(plan_path)))
+        except ValidationError:
+            errors.append("report plan is invalid")
+    else:
+        errors.append("report plan is missing")
+    success = (
+        not errors
+        and state == "RENDERED"
+        and observed_provider_calls == 2
+        and observed_model_calls == 2
+        and (run_dir / "report.html").is_file()
+        and signature is not None
+    )
+    return {
+        "run_id": run_id,
+        "video_id": declaration.get("video_id"),
+        "state": state,
+        "provider_calls": observed_provider_calls,
+        "model_calls": observed_model_calls,
+        "rendered": success,
+        "structure_signature": signature,
+        "errors": errors,
+    }
+
+
+def finalize_provider_conformance(
+    *,
+    manifest_path: Path,
+    artifact_root: Path,
+    output_path: Path,
+) -> dict[str, object]:
+    """Record canary outcomes without changing the frozen candidate manifest."""
+    manifest = load_provider_conformance_manifest(manifest_path)
+    strategies = manifest["strategies"]
+    assert isinstance(strategies, list)
+    strategy_rows: list[dict[str, object]] = []
+    selected_strategy_id: str | None = None
+    stop_reached = False
+    total_calls = 0
+    for strategy in strategies:
+        assert isinstance(strategy, dict)
+        if strategy.get("eligibility") != "ELIGIBLE":
+            strategy_rows.append(
+                {
+                    "strategy_id": strategy.get("strategy_id"),
+                    "eligibility": strategy.get("eligibility"),
+                    "status": "INELIGIBLE",
+                    "runs": [],
+                    "observed_provider_calls": 0,
+                    "observed_model_calls": 0,
+                }
+            )
+            continue
+        if stop_reached:
+            strategy_rows.append(
+                {
+                    "strategy_id": strategy.get("strategy_id"),
+                    "eligibility": "ELIGIBLE",
+                    "status": "NOT_RUN_AFTER_COMPARISON_STOP",
+                    "runs": [],
+                    "observed_provider_calls": 0,
+                    "observed_model_calls": 0,
+                }
+            )
+            continue
+        declarations = strategy.get("canary_runs")
+        assert isinstance(declarations, list)
+        strategy_for_run = dict(strategy)
+        strategy_for_run["strategy_manifest_sha256"] = _sha256_file(manifest_path.resolve())
+        outcomes = [
+            _conformance_run_outcome(declaration, strategy_for_run, artifact_root)
+            for declaration in declarations
+            if isinstance(declaration, dict)
+        ]
+        calls = sum(int(outcome["provider_calls"]) for outcome in outcomes)
+        model_calls = sum(int(outcome["model_calls"]) for outcome in outcomes)
+        total_calls += calls
+        rendered = [outcome for outcome in outcomes if outcome["rendered"] is True]
+        signatures = [outcome["structure_signature"] for outcome in rendered]
+        all_runs_terminal = len(outcomes) == 3 and all(
+            outcome["state"] in {"RENDERED", "FAILED", "CANCELLED"} for outcome in outcomes
+        )
+        complete_pass = all_runs_terminal and len(rendered) == 3 and len(set(signatures)) > 1
+        status = "PASS" if complete_pass else ("FAIL" if all_runs_terminal else "INCOMPLETE")
+        row = {
+            "strategy_id": strategy.get("strategy_id"),
+            "eligibility": "ELIGIBLE",
+            "status": status,
+            "runs": outcomes,
+            "observed_provider_calls": calls,
+            "observed_model_calls": model_calls,
+            "rendered_count": len(rendered),
+            "unique_rendered_signatures": len(set(signatures)),
+        }
+        strategy_rows.append(row)
+        if complete_pass:
+            selected_strategy_id = str(strategy["strategy_id"])
+            stop_reached = True
+    eligible_rows = [row for row in strategy_rows if row.get("eligibility") == "ELIGIBLE"]
+    all_complete = all(row.get("status") in {"PASS", "FAIL"} for row in eligible_rows)
+    if selected_strategy_id is not None:
+        terminal_status = "PASS"
+        conclusion = "STOPPED_AFTER_FIRST_PASS"
+    elif all_complete and eligible_rows:
+        terminal_status = "NO_GO"
+        conclusion = "V1A_PROVIDER_CONFORMANCE_NO_GO"
+    elif not eligible_rows:
+        terminal_status = "NO_GO"
+        conclusion = "EXTERNAL_BLOCKED"
+    else:
+        terminal_status = "PENDING"
+        conclusion = "AWAITING_REMAINING_ELIGIBLE_CANARIES"
+    if total_calls > 24:
+        raise EvaluationError(
+            "PROVIDER_CONFORMANCE_CALL_LIMIT", "canary calls exceeded frozen limit"
+        )
+    result = {
+        "schema_version": PROVIDER_CONFORMANCE_RESULT_SCHEMA_VERSION,
+        "manifest_path": str(manifest_path.resolve()),
+        "manifest_revision_id": manifest.get("revision_id"),
+        "manifest_sha256": _sha256_file(manifest_path.resolve()),
+        "artifact_root": str(artifact_root.resolve()),
+        "terminal_status": terminal_status,
+        "conclusion": conclusion,
+        "selected_strategy_id": selected_strategy_id,
+        "comparison_stop": stop_reached,
+        "max_new_transcript_bearing_provider_model_calls": 24,
+        "observed_provider_calls": total_calls,
+        "observed_model_calls": total_calls,
+        "strategies": strategy_rows,
+        "generated_at": _now(),
+    }
+    _write_new_json(output_path, result)
+    return result
 
 
 __all__ = [

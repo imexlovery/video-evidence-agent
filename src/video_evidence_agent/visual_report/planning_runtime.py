@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from time import perf_counter
-from typing import Any, Callable
+from typing import Any, Callable, Mapping
 from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
@@ -49,7 +49,10 @@ from .renderer import RenderError, render_report
 
 RUN_SCHEMA_VERSION = "visual-report-planning-run.v1a-prototype"
 EVENT_SCHEMA_VERSION = "visual-report-planning-event.v1a-prototype"
-RESPONSE_MODE = "json_object"
+API_SURFACE = "responses"
+RESPONSE_MODE = "json_schema"
+SCHEMA_MECHANISM = "responses.text.format.json_schema"
+REASONING_EFFORT = "none"
 TEMPERATURE = 0
 
 
@@ -139,9 +142,7 @@ def load_source(manifest_path: Path, segments_path: Path) -> SourceSnapshot:
     try:
         manifest = json.loads(manifest_bytes.decode("utf-8"))
         rows = [
-            json.loads(line)
-            for line in segments_bytes.decode("utf-8").splitlines()
-            if line.strip()
+            json.loads(line) for line in segments_bytes.decode("utf-8").splitlines() if line.strip()
         ]
         segments = [VideoSegment.model_validate(row) for row in rows]
         validate_video_segments(segments)
@@ -198,6 +199,12 @@ class PlanningConfig:
     output_token_limit: int = MAX_OUTPUT_TOKENS
     sdk_max_retries: int = 0
     sdk_version: str = "unknown"
+    api_surface: str = API_SURFACE
+    schema_mechanism: str = SCHEMA_MECHANISM
+    reasoning_effort: str = REASONING_EFFORT
+    strategy_id: str | None = None
+    strategy_manifest_sha256: str | None = None
+    model_version: str | None = None
 
     def public_snapshot(self) -> dict[str, object]:
         return {
@@ -206,11 +213,17 @@ class PlanningConfig:
             "timeout_seconds": self.timeout_seconds,
             "credential_present": self.credential_present,
             "response_mode": self.response_mode,
+            "api_surface": self.api_surface,
+            "schema_mechanism": self.schema_mechanism,
             "temperature": self.temperature,
             "thinking_mode": self.thinking_mode,
+            "reasoning_effort": self.reasoning_effort,
             "output_token_limit": self.output_token_limit,
             "sdk_max_retries": self.sdk_max_retries,
             "sdk_version": self.sdk_version,
+            "strategy_id": self.strategy_id,
+            "strategy_manifest_sha256": self.strategy_manifest_sha256,
+            "model_version": self.model_version,
             "mapper_prompt_version": MAPPER_PROMPT_VERSION,
             "planner_prompt_version": PLANNER_PROMPT_VERSION,
             "topic_proposal_schema": TOPIC_PROPOSAL_SCHEMA_VERSION,
@@ -270,10 +283,16 @@ class OpenAIPlanningProvider:
         self.config = config
 
     @classmethod
-    def from_environment(cls) -> "OpenAIPlanningProvider":
+    def from_environment(
+        cls, strategy: Mapping[str, object] | None = None
+    ) -> "OpenAIPlanningProvider":
+        if strategy is None:
+            raise PlanningError(
+                "CONFIGURATION_ERROR",
+                "a frozen provider conformance strategy is required for real runs",
+            )
         load_dotenv(Path(__file__).resolve().parents[3] / ".env", override=False)
         api_key = os.getenv("OPENAI_API_KEY", "").strip()
-        model = os.getenv("VISUAL_REPORT_MODEL", "").strip()
         base_url = os.getenv("OPENAI_BASE_URL", "").strip()
         try:
             timeout_seconds = float(os.getenv("VISUAL_REPORT_TIMEOUT_SECONDS", "120"))
@@ -283,12 +302,54 @@ class OpenAIPlanningProvider:
             ) from exc
         if not api_key:
             raise PlanningError("CONFIGURATION_ERROR", "OPENAI_API_KEY is required")
-        if not model:
-            raise PlanningError("CONFIGURATION_ERROR", "VISUAL_REPORT_MODEL is required")
         if timeout_seconds <= 0:
             raise PlanningError(
                 "CONFIGURATION_ERROR", "VISUAL_REPORT_TIMEOUT_SECONDS must be positive"
             )
+        strategy_id = strategy.get("strategy_id")
+        strategy_config = strategy.get("config")
+        if not isinstance(strategy_id, str) or not strategy_id:
+            raise PlanningError("CONFIGURATION_ERROR", "strategy_id is missing")
+        if strategy.get("eligibility") != "ELIGIBLE" or not isinstance(strategy_config, dict):
+            raise PlanningError("CONFIGURATION_ERROR", "provider strategy is not eligible")
+        expected = {
+            "provider": strategy_config.get("provider"),
+            "timeout_seconds": strategy_config.get("timeout_seconds"),
+            "api_surface": strategy_config.get("api_surface"),
+            "response_mode": strategy_config.get("response_mode"),
+            "schema_mechanism": strategy_config.get("schema_mechanism"),
+            "temperature": strategy_config.get("temperature"),
+            "thinking_mode": strategy_config.get("thinking_mode"),
+            "reasoning_effort": strategy_config.get("reasoning_effort"),
+            "output_token_limit": strategy_config.get("output_token_limit"),
+            "sdk_max_retries": strategy_config.get("sdk_max_retries"),
+        }
+        if expected["provider"] != _provider_label(base_url):
+            raise PlanningError(
+                "CONFIGURATION_ERROR", "provider endpoint differs from frozen strategy"
+            )
+        if expected["timeout_seconds"] != timeout_seconds:
+            raise PlanningError("CONFIGURATION_ERROR", "timeout differs from frozen strategy")
+        if expected["api_surface"] != API_SURFACE:
+            raise PlanningError("CONFIGURATION_ERROR", "strategy must use Responses API")
+        if expected["response_mode"] != RESPONSE_MODE:
+            raise PlanningError("CONFIGURATION_ERROR", "strategy must use native JSON Schema")
+        if expected["schema_mechanism"] != SCHEMA_MECHANISM:
+            raise PlanningError("CONFIGURATION_ERROR", "strategy schema mechanism is not supported")
+        if (
+            expected["temperature"] != TEMPERATURE
+            or expected["reasoning_effort"] != REASONING_EFFORT
+        ):
+            raise PlanningError("CONFIGURATION_ERROR", "strategy sampling controls differ")
+        if expected["thinking_mode"] != THINKING_MODE:
+            raise PlanningError("CONFIGURATION_ERROR", "strategy thinking mode differs")
+        if expected["output_token_limit"] != MAX_OUTPUT_TOKENS:
+            raise PlanningError("CONFIGURATION_ERROR", "strategy output limit differs")
+        if expected["sdk_max_retries"] != 0:
+            raise PlanningError("CONFIGURATION_ERROR", "strategy SDK retries must be zero")
+        model = strategy.get("model")
+        if not isinstance(model, str) or not model:
+            raise PlanningError("CONFIGURATION_ERROR", "strategy model is missing")
         options: dict[str, Any] = {
             "api_key": api_key,
             "timeout": timeout_seconds,
@@ -301,26 +362,104 @@ class OpenAIPlanningProvider:
             model=model,
             timeout_seconds=timeout_seconds,
             credential_present=True,
+            response_mode=RESPONSE_MODE,
+            api_surface=API_SURFACE,
+            schema_mechanism=SCHEMA_MECHANISM,
+            reasoning_effort=REASONING_EFFORT,
+            strategy_id=strategy_id,
+            strategy_manifest_sha256=(
+                str(strategy["strategy_manifest_sha256"])
+                if strategy.get("strategy_manifest_sha256")
+                else None
+            ),
+            model_version=(
+                str(strategy["model_version"]) if strategy.get("model_version") else None
+            ),
             sdk_version=importlib.metadata.version("openai"),
         )
+        expected_sdk_version = strategy_config.get("sdk_version")
+        if expected_sdk_version != config.sdk_version:
+            raise PlanningError(
+                "CONFIGURATION_ERROR", "OpenAI SDK version differs from frozen strategy"
+            )
         return cls(OpenAI(**options), config)
+
+    @staticmethod
+    def _schema_name(stage: str) -> str:
+        names = {
+            "topic_mapper": "v1a_topic_map_proposal",
+            "report_planner": "v1a_report_plan_proposal",
+        }
+        try:
+            return names[stage]
+        except KeyError as exc:
+            raise ProviderCallError("CONFIGURATION_ERROR", "unknown planning stage", 0) from exc
+
+    @staticmethod
+    def _usage(response: object) -> dict[str, Any]:
+        usage = getattr(response, "usage", None)
+        if usage is None:
+            return {}
+        try:
+            candidate = usage.model_dump(mode="json")
+            if isinstance(candidate, dict):
+                return candidate
+        except (AttributeError, TypeError, ValueError):
+            pass
+        return {}
+
+    @staticmethod
+    def _finish_reason(response: object) -> str | None:
+        incomplete = getattr(response, "incomplete_details", None)
+        reason = getattr(incomplete, "reason", None)
+        if isinstance(reason, str) and reason:
+            return reason
+        status = getattr(response, "status", None)
+        return status if isinstance(status, str) and status != "completed" else None
+
+    @staticmethod
+    def _output_text(response: object) -> str | None:
+        direct = getattr(response, "output_text", None)
+        if isinstance(direct, str) and direct:
+            return direct
+        output = getattr(response, "output", None)
+        if not isinstance(output, list):
+            return None
+        chunks: list[str] = []
+        for item in output:
+            content = getattr(item, "content", None)
+            if not isinstance(content, list):
+                continue
+            for part in content:
+                text = getattr(part, "text", None)
+                if isinstance(text, str):
+                    chunks.append(text)
+        joined = "".join(chunks)
+        return joined or None
 
     def complete(
         self, stage: str, system_instruction: str, payload: dict[str, object]
     ) -> ProviderResult:
-        del stage
         started = perf_counter()
+        output_contract = payload.get("output_contract")
+        schema = output_contract.get("json_schema") if isinstance(output_contract, dict) else None
+        if not isinstance(schema, dict):
+            raise ProviderCallError("CONFIGURATION_ERROR", "native response schema is missing", 0)
         try:
-            response = self.client.chat.completions.create(
+            response = self.client.responses.create(
                 model=self.config.model,
                 temperature=TEMPERATURE,
-                max_tokens=self.config.output_token_limit,
-                response_format={"type": RESPONSE_MODE},
-                extra_body={"thinking": {"type": self.config.thinking_mode}},
-                messages=[
-                    {"role": "system", "content": system_instruction},
-                    {"role": "user", "content": stable_json(payload)},
-                ],
+                max_output_tokens=self.config.output_token_limit,
+                reasoning={"effort": self.config.reasoning_effort},
+                instructions=system_instruction,
+                input=stable_json(payload),
+                text={
+                    "format": {
+                        "type": RESPONSE_MODE,
+                        "name": self._schema_name(stage),
+                        "schema": schema,
+                    }
+                },
             )
         except (TimeoutError, APITimeoutError) as exc:
             latency_ms = round((perf_counter() - started) * 1000)
@@ -333,24 +472,9 @@ class OpenAIPlanningProvider:
                 "PROVIDER_ERROR", f"provider request failed: {type(exc).__name__}", latency_ms
             ) from exc
         latency_ms = round((perf_counter() - started) * 1000)
-        usage: dict[str, Any] = {}
-        if response.usage is not None:
-            try:
-                candidate = response.usage.model_dump(mode="json")
-                if isinstance(candidate, dict):
-                    usage = candidate
-            except (AttributeError, TypeError, ValueError):
-                pass
-        if not response.choices:
-            raise ProviderCallError(
-                "PROVIDER_ERROR",
-                "provider returned no choices",
-                latency_ms,
-                usage=usage,
-            )
-        choice = response.choices[0]
-        finish_reason = getattr(choice, "finish_reason", None)
-        content = getattr(getattr(choice, "message", None), "content", None)
+        usage = self._usage(response)
+        finish_reason = self._finish_reason(response)
+        content = self._output_text(response)
         content_present = isinstance(content, str) and bool(content)
         content_bytes = len(content.encode("utf-8")) if isinstance(content, str) else 0
         content_sha256 = (
@@ -449,6 +573,8 @@ class RunRecorder:
 
     def configure(self, config: PlanningConfig, source: SourceSnapshot) -> None:
         self.payload["config"] = config.public_snapshot()
+        self.payload["strategy_id"] = config.strategy_id
+        self.payload["strategy_manifest_sha256"] = config.strategy_manifest_sha256
         self.payload["source"] = {
             "video_id": source.video_id,
             "manifest_path": str(source.manifest_path),
@@ -482,6 +608,8 @@ class RunRecorder:
         content_present: bool = False,
         content_bytes: int = 0,
         content_sha256: str | None = None,
+        schema_name: str | None = None,
+        schema_sha256: str | None = None,
     ) -> None:
         _append_jsonl(
             self.calls_path,
@@ -495,10 +623,18 @@ class RunRecorder:
                 "temperature": config.temperature,
                 "timeout_seconds": config.timeout_seconds,
                 "response_mode": config.response_mode,
+                "api_surface": config.api_surface,
+                "schema_mechanism": config.schema_mechanism,
                 "sdk_max_retries": config.sdk_max_retries,
                 "sdk_version": config.sdk_version,
                 "thinking_mode": config.thinking_mode,
+                "reasoning_effort": config.reasoning_effort,
                 "output_token_limit": config.output_token_limit,
+                "strategy_id": config.strategy_id,
+                "strategy_manifest_sha256": config.strategy_manifest_sha256,
+                "model_version": config.model_version,
+                "schema_name": schema_name,
+                "schema_sha256": schema_sha256,
                 "latency_ms": latency_ms,
                 "usage": usage,
                 "schema_valid": schema_valid,
@@ -572,6 +708,15 @@ def _call_stage(
     schema_error_category: str,
     validator: Callable[[dict[str, object]], Any],
 ) -> Any:
+    output_contract = payload.get("output_contract")
+    schema = output_contract.get("json_schema") if isinstance(output_contract, dict) else None
+    schema_name = {
+        "topic_mapper": "v1a_topic_map_proposal",
+        "report_planner": "v1a_report_plan_proposal",
+    }.get(stage)
+    schema_sha256 = (
+        _sha256_bytes(stable_json(schema).encode("utf-8")) if isinstance(schema, dict) else None
+    )
     recorder.admit_call()
     try:
         result = provider.complete(stage, instruction, payload)
@@ -584,6 +729,8 @@ def _call_stage(
             usage={},
             schema_valid=False,
             error_category="CANCELLED",
+            schema_name=schema_name,
+            schema_sha256=schema_sha256,
         )
         raise
     except ProviderCallError as exc:
@@ -599,6 +746,8 @@ def _call_stage(
             content_present=exc.content_present,
             content_bytes=exc.content_bytes,
             content_sha256=exc.content_sha256,
+            schema_name=schema_name,
+            schema_sha256=schema_sha256,
         )
         raise PlanningError(exc.category, str(exc)) from exc
     except Exception as exc:
@@ -610,6 +759,8 @@ def _call_stage(
             usage={},
             schema_valid=False,
             error_category="PROVIDER_ERROR",
+            schema_name=schema_name,
+            schema_sha256=schema_sha256,
         )
         raise PlanningError(
             "PROVIDER_ERROR", f"provider request failed: {type(exc).__name__}"
@@ -630,6 +781,8 @@ def _call_stage(
             content_present=result.content_present,
             content_bytes=result.content_bytes,
             content_sha256=result.content_sha256,
+            schema_name=schema_name,
+            schema_sha256=schema_sha256,
         )
         recorder.artifact(raw_path.stem, raw_path)
         raise
@@ -648,6 +801,8 @@ def _call_stage(
             content_present=result.content_present,
             content_bytes=result.content_bytes,
             content_sha256=result.content_sha256,
+            schema_name=schema_name,
+            schema_sha256=schema_sha256,
         )
         recorder.artifact(raw_path.stem, raw_path)
         raise PlanningError(schema_error_category, str(exc)) from exc
@@ -662,6 +817,8 @@ def _call_stage(
         content_present=result.content_present,
         content_bytes=result.content_bytes,
         content_sha256=result.content_sha256,
+        schema_name=schema_name,
+        schema_sha256=schema_sha256,
     )
     recorder.artifact(raw_path.stem, raw_path)
     return validated
@@ -674,10 +831,11 @@ def build_from_transcript(
     run_id: str,
     output_root: Path,
     provider: Any | None = None,
+    strategy: Mapping[str, object] | None = None,
 ) -> PlanningRunSummary:
     recorder = RunRecorder.create(output_root, run_id)
     try:
-        active_provider = provider or OpenAIPlanningProvider.from_environment()
+        active_provider = provider or OpenAIPlanningProvider.from_environment(strategy)
         source = load_source(manifest_path, segments_path)
         recorder.configure(active_provider.config, source)
         segments = list(source.segments)

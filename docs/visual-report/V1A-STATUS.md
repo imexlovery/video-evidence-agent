@@ -8,7 +8,15 @@ The unified recovery task `VR-V1A-GOAL-RECOVERY-003` repaired the observed
 provider output contract and passed provider-free regression. After the Owner
 explicitly approved restricted transcript egress, its bounded 36-call recovery
 ceiling was reached without a passing three-video canary gate; no formal
-recovery denominator was created.
+recovery denominator was created. That complete failed experiment is now frozen
+at commit `4ba28bf1b3288a6fb77bcc27378a45a69cd2b895`.
+
+The Owner subsequently authorized
+`VR-V1A-PROVIDER-CONFORMANCE-004`: restore the canonical V1-A content and
+anti-template contracts, then compare at most two predeclared provider/model/API
+strategies with native schema-constrained output. This Goal reached its exact
+provider-conformance no-go terminal; the historical recovery result remains
+unchanged.
 
 ## Current state
 
@@ -19,7 +27,7 @@ recovery denominator was created.
 | Requirements status | `READY_FOR_ENGINEERING_HANDOFF` |
 | Independent confidence | `100.0` |
 | Requirements blockers/errors | `0 / 0` |
-| Owner checkpoint | Quality/model boundary confirmed via `DEC-VR1A-048/049`; unified Goal recovery authorized via `DEC-VR1A-051/052` |
+| Owner checkpoint | Quality/model boundary confirmed via `DEC-VR1A-048/049`; historical Goal recovery via `DEC-VR1A-051/052`; canonical provider-conformance continuation via `DEC-VR1A-053/054` |
 | Implementation task | `VR-V1A-PLANNING-001` |
 | Implementation authorization | `AUTHORIZED` — explicit Owner instruction on 2026-08-30 |
 | Latest completed execution | `READY_FOR_OWNER_V1A_REVIEW — MEASUREMENT_EXECUTION_FAILED` |
@@ -28,11 +36,15 @@ recovery denominator was created.
 | Follow-up authorization | `AUTHORIZED — COMPLETED`; executed from commit `f8cb402d37bc05a30c7a912ed044548a71c128c7` while preserving the Owner's uncommitted `.env.example` update |
 | Goal recovery task | `VR-V1A-GOAL-RECOVERY-003` |
 | Goal recovery status | `READY_FOR_OWNER_V1A_REVIEW — GOAL_RECOVERY_EXHAUSTED` |
-| Recovery ceiling | At most two new formal six-run revisions and 36 new admitted provider/model calls, including canaries; stop after first execution-valid formal revision |
+| Frozen failed-experiment commit | `4ba28bf1b3288a6fb77bcc27378a45a69cd2b895` — `FAILED_EXPERIMENT / DO_NOT_PROMOTE` |
+| Active continuation task | `VR-V1A-PROVIDER-CONFORMANCE-004` |
+| Active continuation status | `READY_FOR_OWNER_V1A_REVIEW — V1A_PROVIDER_CONFORMANCE_NO_GO` |
+| Current continuation evidence | Frozen two-strategy native Responses manifest; all six canaries executed once and failed with retained `8/8` provider/model calls; no formal measurement created |
+| Active continuation ceiling | At most two predeclared native-schema strategies, one complete three-video canary set each, one formal six-run revision after the first pass, and 24 new transcript-bearing calls |
 | Product code/dependency/runtime changes in design phase | `0 / 0 / 0` |
 | Model calls in design phase | `0` |
 | V1-B/V1-C | `NOT_AUTHORIZED` |
-| Next gate | Owner review of the bounded recovery evidence; no self-acceptance or V1-B/V1-C |
+| Next gate | Owner review of the retained conformance no-go package; no formal measurement, self-acceptance, or V1-B/V1-C |
 
 ## Authoritative result
 
@@ -44,7 +56,7 @@ The independent validator generated
 - confidence `100.0`;
 - no blocker and no error;
 - evaluated artifact hash
-  `4c837d60d1f23b13e0cd2a147842ccaddce2a53d08392b5caf0e3b1daeb43d2e`.
+  `7ca61b0075c20e6beb700def30769d88a5075d9fcb6b4d0caa3b4aa3d05d3192`.
 
 This result proves documentation readiness only. It is not V1-A quality
 acceptance. The previous blocked revision
@@ -78,10 +90,19 @@ Failure categories include provider transport, strict Mapper schema, strict
 Planner schema/JSON serialization, and strict topic-selection/source bounds.
 The final p16 Kling identity
 `p0b-kling-2024-v1a-bf6742e01263-canary` failed the strict Planner source-list
-bound with `2/2` calls. The three-video gate therefore did not pass, and the
+bound with `2/2` calls and also returned only two sections against the minimum
+of three. The three-video gate therefore did not pass, and the
 recovery stopped at `READY_FOR_OWNER_V1A_REVIEW — GOAL_RECOVERY_EXHAUSTED`.
 No new formal manifest, report, rubric, human score, or Owner acceptance was
 created.
+
+The recovered runtime snapshot is not the canonical content design. Its
+operative prompt/payload code forces exactly four topics, empty subtopics,
+exactly three sections/eight blocks, fixed topic grouping, and a fixed block
+sequence. Those choices conflict with the canonical 4–12-topic,
+0–5-subtopic, 3–5-section, 8–14-block and content-affordance/anti-template
+requirements. The new task must remove that drift before any provider call and
+must preserve the frozen commit as failed evidence.
 
 ## Fixed V1-A boundary
 
@@ -93,6 +114,9 @@ created.
   canonical IDs, timestamps, `SourceRef`, budgets, state, and compilation.
 - Invalid output fails visibly. There is no semantic repair, third call, hidden
   retry, alternate provider/model fallback, or successful degraded report.
+- Real V1-A provider runs use the frozen Responses API `text.format.json_schema`
+  boundary with the exact submitted proposal schema; Chat Completions
+  `json_object` is not an eligible V1-A strategy.
 - V1-A compiles the current V0 `ReportPlan`, emits an empty current asset
   manifest, and calls the existing deterministic renderer.
 - Every run has a unique retained directory, including failures/cancellations.
@@ -124,22 +148,33 @@ accounts, deployment, publishing, V1-B, or V1-C.
 4. `docs/requirements/visual-report-v1a/00-handoff.md`
 5. `docs/requirements/visual-report-v1a/01-product-requirements.md` through
    `12-engineering-context.md`
-6. `docs/tasks/VISUAL-REPORT-V1A-PLANNING.md`
-7. `docs/tasks/VISUAL-REPORT-V1A-MEASUREMENT.md`
-8. `docs/tasks/VISUAL-REPORT-V1A-GOAL-RECOVERY.md`
-9. This resume page
+6. `docs/tasks/VISUAL-REPORT-V1A-PROVIDER-CONFORMANCE.md`
+7. `docs/tasks/VISUAL-REPORT-V1A-PLANNING.md`
+8. `docs/tasks/VISUAL-REPORT-V1A-MEASUREMENT.md`
+9. `docs/tasks/VISUAL-REPORT-V1A-GOAL-RECOVERY.md`
+10. This resume page
 
 If artifacts conflict, preserve existing work and resolve the higher authority
 before any implementation or provider call.
 
-## Recovery terminal boundary
+## Historical recovery and active continuation boundary
 
 The earlier external-network blocker is retained in the status history as a
 historical event. Its required authorization was subsequently provided and
 the approved network path was used. The current stop is the explicit recovery
 ceiling: `READY_FOR_OWNER_V1A_REVIEW — GOAL_RECOVERY_EXHAUSTED`. No alternate
 channel, fallback provider, partial transcript workaround, or additional
-formal attempt is authorized by this task.
+formal attempt is authorized by that closed task.
+
+The later Owner decision authorizes only
+`VR-V1A-PROVIDER-CONFORMANCE-004`. It is not a continuation of the old prompt
+candidate loop: native schema-constrained output is mandatory, both possible
+strategies and prompt bundles freeze before the first transcript call, each
+strategy runs one complete cross-video canary set, and no post-freeze repair or
+micro-version is permitted. The first 3/3 pass gates one fresh formal revision;
+two failed strategies end at `V1A_PROVIDER_CONFORMANCE_NO_GO`. Credentials,
+billing/quota/access/network/source authority and contract changes remain hard
+stops.
 
 ## Status history
 
@@ -157,3 +192,8 @@ formal attempt is authorized by this task.
 | 2026-08-30 | `GOAL_RECOVERY_AUTHORIZED` | Owner requested one Goal session to finish the approved V1-A scope and automatically diagnose, repair, and verify ordinary failures. `VR-V1A-GOAL-RECOVERY-003` preserves every historical identity, keeps the two-call/no-retry runtime contract, gates formal measurement behind three fresh canaries, and permits at most two new formal revisions / 36 new admitted calls before an honest Owner-review stop. |
 | 2026-08-30 | `READY_FOR_OWNER_V1A_REVIEW — EXTERNAL_BLOCKED` | Contract repair passed provider-free validation (`24` targeted and `62` full tests, Ruff, diff, protected-path, and V0 renderer regression). The first retained canary failed once with `PROVIDER_ERROR`/`APIConnectionError`; a fresh network candidate was recorded but external restricted transcript egress was rejected by the security boundary. No formal measurement or Owner acceptance was recorded. |
 | 2026-08-30 | `READY_FOR_OWNER_V1A_REVIEW — GOAL_RECOVERY_EXHAUSTED` | After explicit Owner authorization for the configured DeepSeek endpoint, `20` retained canary runs consumed the bounded `36/36` provider/model-call ceiling; none rendered, so no new formal revision was frozen. Provider-free targeted/full tests (`28`/`66`), Ruff, V0 renderer regression, protected-path, and historical identity preservation passed. Owner acceptance and V1-B/C remain unauthorized. |
+| 2026-08-30 | `FAILED_EXPERIMENT_FROZEN` | The complete exhausted-recovery worktree was committed as `4ba28bf1b3288a6fb77bcc27378a45a69cd2b895`. It is retained as `FAILED_EXPERIMENT / DO_NOT_PROMOTE`; the fixed 4-topic/3-section/8-block prompt drift is not canonical V1-A behavior. |
+| 2026-08-30 | `PROVIDER_CONFORMANCE_GOAL_AUTHORIZED` | Owner authorized one continuous Goal to restore canonical content/anti-template behavior, evaluate at most two native schema-constrained strategies with one frozen cross-video canary set each, run one fresh six-run formal measurement after the first 3/3 pass, and otherwise stop with an exact Owner-review no-go/failure/block state. Task `VR-V1A-PROVIDER-CONFORMANCE-004` is `AUTHORIZED — NOT_STARTED`; no new product/model work occurred in the documentation session. |
+| 2026-08-30 | `PROVIDER_CONFORMANCE_G0_COMPLETE` | G0 confirmed frozen HEAD `4ba28bf…`, documentation-only Owner work, 22 historical candidate manifests, 20 admitted failed canaries, the v3 one-provider/five-Mapper-failure inventory, and the p16 strict Planner errors. Safe configuration is available, but the old `json_object` adapter is not eligible; canonical restoration and native-schema provider-free admission remain before any new transcript call. |
+| 2026-08-30 | `PROVIDER_FREE_CANONICAL_READY` | Canonical content/anti-template prompts and payloads were restored; executable anti-overfit tests, native Responses JSON Schema request tests, full `69`-test/Ruff validation, saved-response replay `0/0`, V0 renderer regression, and protected-path checks passed. No transcript call occurred; strategy/canary freeze is next. |
+| 2026-08-30 | `READY_FOR_OWNER_V1A_REVIEW — V1A_PROVIDER_CONFORMANCE_NO_GO` | Frozen Strategy A and B used DeepSeek Responses `text.format.json_schema` with the canonical bundle and zero retry. All six predeclared canaries executed once, retained `8/8` provider/model calls, and failed before render; the append-only result records `V1A_PROVIDER_CONFORMANCE_NO_GO`. No formal measurement or human score was created; Owner review and V1-B/C remain unauthorized. |

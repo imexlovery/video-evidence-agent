@@ -13,7 +13,10 @@ from video_evidence_agent.schemas import VideoSegment
 from video_evidence_agent.visual_report.evaluation import (
     EVALUATOR_VERSION,
     evaluate_measurement,
+    finalize_provider_conformance,
     freeze_measurement,
+    freeze_provider_conformance,
+    load_provider_conformance_strategy,
 )
 from video_evidence_agent.visual_report.planning import (
     MAPPER_SYSTEM_INSTRUCTION,
@@ -127,19 +130,46 @@ def test_fake_provider_seam_counts_only_explicit_local_calls() -> None:
     assert provider.calls[0]["stage"] == "topic_mapper"
 
 
-def test_mapper_request_sets_a_four_topic_operational_budget() -> None:
+def test_mapper_request_uses_content_driven_operational_ranges() -> None:
     payload = mapper_payload({"video_id": "synthetic-v1a"}, _segments())
     budget = payload["topic_budget"]
-    assert budget == {
-        "required_top_level_topic_count": 4,
-        "allowed_top_level_topic_range": [4, 12],
-        "instruction": (
-            "Merge adjacent or overlapping candidates before output; "
-            "never emit more than 4 top-level topics for this request."
-        ),
+    assert budget["top_level_topic_range"] == [4, 12]
+    assert budget["subtopics_per_topic_range"] == [0, 5]
+    assert budget["coverage"] == "every input segment is mapped once or explicitly excluded"
+    assert "required_top_level_topic_count" not in json.dumps(payload, ensure_ascii=False)
+    assert "恰好输出 4 个顶层 topics" not in MAPPER_SYSTEM_INSTRUCTION
+    assert "meaningful child theme" in payload["subtopic_policy"]
+
+
+def test_planning_prompts_do_not_encode_fixed_report_structure() -> None:
+    mapper = mapper_payload({"video_id": "synthetic-v1a"}, _segments())
+    topic_map = bind_topic_map(
+        TopicMapProposal.model_validate(_json("topic-map-proposal.json")), _segments()
+    )
+    planner = planner_payload({"video_id": "synthetic-v1a"}, _segments(), topic_map)
+    serialized = json.dumps((mapper, planner), ensure_ascii=False)
+
+    assert "this_request_target" not in serialized
+    assert "section_topic_assignment" not in serialized
+    assert "section_source_allowlist" not in serialized
+    assert "block_type_sequence" not in serialized
+    assert planner["planning_budget"] == {
+        "section_count": [3, 5],
+        "blocks_per_section": [2, 4],
+        "total_blocks": [8, 14],
+        "max_visible_characters": 2600,
+        "max_source_segments_per_block": 4,
+        "allowed_block_types": [
+            "insight_card",
+            "bullet_group",
+            "metric_row",
+            "comparison_card",
+            "process_flow",
+            "takeaway_box",
+        ],
+        "final_block": "the only takeaway_box is the final block",
     }
-    assert "恰好输出 4 个顶层 topics" in MAPPER_SYSTEM_INSTRUCTION
-    assert payload["subtopic_policy"] == "Use subtopics: [] for every topic in this request."
+    assert "json_object" not in serialized
 
 
 @pytest.mark.parametrize(
@@ -199,8 +229,7 @@ class _FakeCompletionEndpoint:
 
 class _FakeOpenAIClient:
     def __init__(self, response: object | None = None, error: Exception | None = None) -> None:
-        self.completions = _FakeCompletionEndpoint(response=response, error=error)
-        self.chat = SimpleNamespace(completions=self.completions)
+        self.responses = _FakeCompletionEndpoint(response=response, error=error)
 
 
 def _test_planning_provider(
@@ -219,12 +248,8 @@ def _test_planning_provider(
 
 def test_provider_request_exposes_exact_contract_and_controls() -> None:
     response = SimpleNamespace(
-        choices=[
-            SimpleNamespace(
-                finish_reason="stop",
-                message=SimpleNamespace(content='{"schema_version":"test"}'),
-            )
-        ],
+        status="completed",
+        output_text='{"schema_version":"test"}',
         usage=None,
     )
     provider, client = _test_planning_provider(response=response)
@@ -237,31 +262,26 @@ def test_provider_request_exposes_exact_contract_and_controls() -> None:
         ),
     )
 
-    kwargs = client.completions.kwargs
+    kwargs = client.responses.kwargs
     assert kwargs is not None
     assert kwargs["model"] == "test-model"
-    assert kwargs["response_format"] == {"type": "json_object"}
+    assert kwargs["text"]["format"]["type"] == "json_schema"
+    assert kwargs["text"]["format"]["name"] == "v1a_topic_map_proposal"
     assert kwargs["temperature"] == 0
-    assert kwargs["max_tokens"] == MAX_OUTPUT_TOKENS
-    assert kwargs["extra_body"] == {"thinking": {"type": "disabled"}}
-    messages = kwargs["messages"]
-    assert isinstance(messages, list)
-    assert "source_segment_ids" in str(messages[0])
-    user_payload = json.loads(str(messages[1]["content"]))
+    assert kwargs["max_output_tokens"] == MAX_OUTPUT_TOKENS
+    assert kwargs["reasoning"] == {"effort": "none"}
+    assert "source_segment_ids" in str(kwargs["instructions"])
+    user_payload = json.loads(str(kwargs["input"]))
     assert "output_contract" in user_payload
-    assert "valid_example" in user_payload["output_contract"]
+    assert "shape_example" in user_payload["output_contract"]
     assert user_payload["output_contract"]["json_schema"]["additionalProperties"] is False
     assert "source_segment_ids" in user_payload["output_contract"]["field_contract"]
 
 
 def test_planner_request_exposes_exact_contract_and_operational_budget() -> None:
     response = SimpleNamespace(
-        choices=[
-            SimpleNamespace(
-                finish_reason="stop",
-                message=SimpleNamespace(content='{"schema_version":"test"}'),
-            )
-        ],
+        status="completed",
+        output_text='{"schema_version":"test"}',
         usage=None,
     )
     provider, client = _test_planning_provider(response=response)
@@ -279,124 +299,37 @@ def test_planner_request_exposes_exact_contract_and_operational_budget() -> None
         ),
     )
 
-    kwargs = client.completions.kwargs
+    kwargs = client.responses.kwargs
     assert kwargs is not None
-    assert kwargs["response_format"] == {"type": "json_object"}
-    assert kwargs["max_tokens"] == MAX_OUTPUT_TOKENS
-    assert kwargs["extra_body"] == {"thinking": {"type": "disabled"}}
-    messages = kwargs["messages"]
-    assert isinstance(messages, list)
-    assert "topic_ids" in str(messages[0])
-    user_payload = json.loads(str(messages[1]["content"]))
-    assert user_payload["planning_budget"]["this_request_target"] == {
-        "section_count": 3,
-        "total_blocks": 8,
-        "section_block_distribution": [2, 3, 3],
-        "section_topic_ids": [
-            ["topic-001"],
-            ["topic-002", "topic-003"],
-            ["topic-004"],
-        ],
-        "allowed_block_types": [
-            "insight_card",
-            "comparison_card",
-            "bullet_group",
-            "takeaway_box",
-        ],
-        "block_type_sequence": [
-            ["insight_card", "comparison_card"],
-            ["comparison_card", "insight_card", "bullet_group"],
-            ["insight_card", "comparison_card", "takeaway_box"],
-        ],
-        "block_source_segment_ids": [1, 4],
-        "comparison_side_items": [1, 4],
-        "bullet_group_items": [2, 2],
-    }
+    assert kwargs["text"]["format"]["type"] == "json_schema"
+    assert kwargs["text"]["format"]["name"] == "v1a_report_plan_proposal"
+    assert kwargs["max_output_tokens"] == MAX_OUTPUT_TOKENS
+    assert kwargs["reasoning"] == {"effort": "none"}
+    assert "topic_ids" in str(kwargs["instructions"])
+    user_payload = json.loads(str(kwargs["input"]))
+    assert user_payload["planning_budget"]["section_count"] == [3, 5]
     assert user_payload["output_contract"]["required_fields_by_type"]["every_block"] == [
         "type",
         "source_segment_ids",
     ]
     assert user_payload["topic_source_allowlist"] == {
-        topic.topic_id: [ref.segment_id for ref in topic.source_refs]
-        for topic in topic_map.topics
+        topic.topic_id: [ref.segment_id for ref in topic.source_refs] for topic in topic_map.topics
     }
-    assert user_payload["section_source_allowlist"]["closed_world"] is True
-    assert user_payload["section_source_allowlist"]["sections"] == [
-        {
-            "section_index": 1,
-            "topic_ids": [topic_map.topics[0].topic_id],
-            "allowed_source_segment_ids": [
-                ref.segment_id for ref in topic_map.topics[0].source_refs
-            ],
-        },
-        {
-            "section_index": 2,
-            "topic_ids": [
-                topic_map.topics[1].topic_id,
-                topic_map.topics[2].topic_id,
-            ],
-            "allowed_source_segment_ids": [
-                ref.segment_id
-                for topic in topic_map.topics[1:3]
-                for ref in topic.source_refs
-            ],
-        },
-        {
-            "section_index": 3,
-            "topic_ids": [topic_map.topics[3].topic_id],
-            "allowed_source_segment_ids": [
-                ref.segment_id for ref in topic_map.topics[3].source_refs
-            ],
-        },
-    ]
-    assert "non-empty subset" in user_payload["section_source_allowlist"]["pre_submit_check"]
-    assert user_payload["output_serialization"]["format"] == "single_line_json_object"
-    assert "all_object_fields_and_array_items_are_comma_delimited" in user_payload[
-        "output_serialization"
-    ]["pre_submit_check"]
-    assert user_payload["section_topic_assignment"] == [
-        {
-            "section_index": 1,
-            "topic_ids": [topic_map.topics[0].topic_id],
-            "allowed_source_segment_ids": [
-                ref.segment_id for ref in topic_map.topics[0].source_refs
-            ],
-        },
-        {
-            "section_index": 2,
-            "topic_ids": [
-                topic_map.topics[1].topic_id,
-                topic_map.topics[2].topic_id,
-            ],
-            "allowed_source_segment_ids": [
-                ref.segment_id
-                for topic in topic_map.topics[1:3]
-                for ref in topic.source_refs
-            ],
-        },
-        {
-            "section_index": 3,
-            "topic_ids": [topic_map.topics[3].topic_id],
-            "allowed_source_segment_ids": [
-                ref.segment_id for ref in topic_map.topics[3].source_refs
-            ],
-        },
-    ]
+    assert "section_source_allowlist" not in user_payload
+    assert "section_topic_assignment" not in user_payload
     assert user_payload["output_contract"]["json_schema"]["additionalProperties"] is False
-    assert "every block has a non-empty sibling source_segment_ids" in user_payload[
-        "output_contract"
-    ]["validation_checklist"]
-    assert "绝不能遗漏" in PLANNER_SYSTEM_INSTRUCTION
+    assert (
+        "hero and every block have non-empty source_segment_ids"
+        in user_payload["output_contract"]["validation_checklist"]
+    )
+    assert "每个 Topic Map topic 必须被一个 section 选择" in PLANNER_SYSTEM_INSTRUCTION
 
 
 def test_response_diagnostics_record_truncation_without_retry(tmp_path: Path) -> None:
     response = SimpleNamespace(
-        choices=[
-            SimpleNamespace(
-                finish_reason="length",
-                message=SimpleNamespace(content='{"schema_version":'),
-            )
-        ],
+        status="incomplete",
+        incomplete_details=SimpleNamespace(reason="max_output_tokens"),
+        output_text='{"schema_version":',
         usage=None,
     )
     provider, _ = _test_planning_provider(response=response)
@@ -413,7 +346,7 @@ def test_response_diagnostics_record_truncation_without_retry(tmp_path: Path) ->
 
     run_dir = tmp_path / "truncated-provider-response"
     trace = json.loads((run_dir / "model-calls.jsonl").read_text(encoding="utf-8"))
-    assert trace["finish_reason"] == "length"
+    assert trace["finish_reason"] == "max_output_tokens"
     assert trace["content_present"] is True
     assert trace["content_bytes"] > 0
     assert len(trace["content_sha256"]) == 64
@@ -424,9 +357,8 @@ def test_response_diagnostics_record_truncation_without_retry(tmp_path: Path) ->
 
 def test_no_content_response_is_provider_error_with_diagnostics(tmp_path: Path) -> None:
     response = SimpleNamespace(
-        choices=[
-            SimpleNamespace(finish_reason="stop", message=SimpleNamespace(content=None))
-        ],
+        status="completed",
+        output_text="",
         usage=None,
     )
     provider, _ = _test_planning_provider(response=response)
@@ -442,11 +374,12 @@ def test_no_content_response_is_provider_error_with_diagnostics(tmp_path: Path) 
         )
 
     trace = json.loads(
-        (tmp_path / "no-content-provider-response" / "model-calls.jsonl")
-        .read_text(encoding="utf-8")
+        (tmp_path / "no-content-provider-response" / "model-calls.jsonl").read_text(
+            encoding="utf-8"
+        )
     )
     assert trace["error_category"] == "PROVIDER_ERROR"
-    assert trace["finish_reason"] == "stop"
+    assert trace["finish_reason"] is None
     assert trace["content_present"] is False
     assert trace["content_bytes"] == 0
     assert trace["content_sha256"] is None
@@ -466,8 +399,7 @@ def test_transport_error_is_recorded_without_retry(tmp_path: Path) -> None:
         )
 
     trace = json.loads(
-        (tmp_path / "transport-provider-error" / "model-calls.jsonl")
-        .read_text(encoding="utf-8")
+        (tmp_path / "transport-provider-error" / "model-calls.jsonl").read_text(encoding="utf-8")
     )
     assert trace["error_category"] == "PROVIDER_ERROR"
     assert trace["finish_reason"] is None
@@ -763,3 +695,54 @@ def test_freeze_and_evaluate_predeclare_all_runs_without_fabricating_scores(tmp_
     assert aggregate["denominator"]["observed_model_calls"] == 0
     assert aggregate["evaluator_version"] == EVALUATOR_VERSION
     assert len(list((tmp_path / "evaluation" / freeze.revision_id / "rubrics").glob("*.json"))) == 6
+
+
+def test_provider_conformance_freezes_two_native_candidates_before_calls(tmp_path: Path) -> None:
+    manifest_path = tmp_path / "provider-conformance-manifest.json"
+    manifest = freeze_provider_conformance(
+        repository_root=Path.cwd(),
+        artifact_root=tmp_path / "runs",
+        card_root=Path("eval/visual-report-v1a/review-cards"),
+        output_path=manifest_path,
+    )
+
+    assert manifest["status"] == "FROZEN"
+    strategies = manifest["strategies"]
+    assert isinstance(strategies, list)
+    assert len(strategies) == 2
+    assert all(strategy["eligibility"] == "ELIGIBLE" for strategy in strategies)
+    assert {strategy["api_surface"] for strategy in strategies} == {"responses"}
+    assert {strategy["response_mode"] for strategy in strategies} == {"json_schema"}
+    assert {strategy["schema_mechanism"] for strategy in strategies} == {
+        "responses.text.format.json_schema"
+    }
+    assert strategies[0]["model"] != strategies[1]["model"]
+    assert strategies[0]["contract"] == strategies[1]["contract"]
+    canary_ids = [run["run_id"] for strategy in strategies for run in strategy["canary_runs"]]
+    assert len(canary_ids) == len(set(canary_ids)) == 6
+    assert all(strategy["config"]["sdk_max_retries"] == 0 for strategy in strategies)
+    assert all(strategy["config"]["temperature"] == 0 for strategy in strategies)
+
+    selected = load_provider_conformance_strategy(manifest_path, str(strategies[0]["strategy_id"]))
+    assert selected["strategy_id"] == strategies[0]["strategy_id"]
+    assert len(selected["strategy_manifest_sha256"]) == 64
+
+
+def test_provider_conformance_result_retains_unexecuted_canary_denominator(tmp_path: Path) -> None:
+    manifest_path = tmp_path / "provider-conformance-manifest.json"
+    freeze_provider_conformance(
+        repository_root=Path.cwd(),
+        artifact_root=tmp_path / "runs",
+        card_root=Path("eval/visual-report-v1a/review-cards"),
+        output_path=manifest_path,
+    )
+    result = finalize_provider_conformance(
+        manifest_path=manifest_path,
+        artifact_root=tmp_path / "runs",
+        output_path=tmp_path / "provider-conformance-result.json",
+    )
+
+    assert result["terminal_status"] == "PENDING"
+    assert result["observed_provider_calls"] == 0
+    assert len(result["strategies"]) == 2
+    assert all(row["status"] == "INCOMPLETE" for row in result["strategies"])

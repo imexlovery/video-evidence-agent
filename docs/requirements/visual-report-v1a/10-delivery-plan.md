@@ -65,7 +65,7 @@ artifact, S4 composes S1–S3, and the measured denominator must not begin befor
 S0–S5 are frozen. There is no justified parallel implementation stream in this
 small prototype.
 
-## Post-measurement Goal recovery delivery
+## Historical post-measurement Goal recovery delivery
 
 S0–S7 produced a working provider-free implementation but the first configured
 provider measurement failed before Planner. The Owner therefore authorized
@@ -90,6 +90,43 @@ invalid credentials, billing/quota/access, source/security authorization,
 unavailable compatible provider capability, a scope/threshold change, or the
 bounded recovery ceiling. Detailed limits and exact terminal states live in
 the task card and `09-test-acceptance.md`.
+
+That delivery unit is complete at `GOAL_RECOVERY_EXHAUSTED`; its 36-call
+authority is closed. Its sequential prompt candidates are retained as failed
+experiment evidence and are not a template for further delivery.
+
+## Authorized canonical provider-conformance delivery
+
+The next implementation session is one continuous Goal under
+`VR-V1A-PROVIDER-CONFORMANCE-004`:
+
+```text
+verify frozen commit and historical preservation
+  -> restore canonical variable Topic Mapper and Planner contracts
+  -> add anti-overfit provider-free tests
+  -> pass targeted/full/Ruff/replay/V0/protected gates
+  -> capability-qualify and pre-freeze at most two native-schema strategies
+  -> execute Strategy A across all three videos exactly once
+  -> if A passes 3/3, skip B; otherwise execute frozen Strategy B across all three
+  -> if neither passes, provider-conformance no-go
+  -> if one passes, freeze one fresh 3-video x 2-repeat formal revision
+  -> execute all six once, evaluator once, full regression and documentation closeout
+  -> stop for Owner review
+```
+
+The shared canonical code, both provider adapters, both strategy prompt bundles,
+and all canary identities freeze before Strategy A's first transcript call.
+Ordinary engineering errors are automatically repaired during the preceding
+provider-free admission. After freeze, failures consume the strategy and cannot
+start a prompt micro-version. This front-loads repair while keeping the
+provider comparison causal and bounded.
+
+The call ceiling is 24 new transcript-bearing calls: at most 12 across two
+three-video canary sets and 12 in the single formal measurement after the first
+pass. All three canaries in an admitted set run even if the first fails; this
+prevents another Kling-only search loop. Formal runs likewise all remain in the
+declared denominator. Credentials/billing/quota/access/network/source authority
+and product-contract changes are the only Owner/external hard stops.
 
 ## Vertical slices
 

@@ -1,0 +1,348 @@
+{
+  "schema_version": "visual-report-provider-conformance.v1a",
+  "repository_root": "/Users/tristana/Develop/video-evidence-agent",
+  "artifact_root": "/Users/tristana/Develop/video-evidence-agent/artifacts/visual-report/v1a",
+  "sources": [
+    {
+      "video_id": "p0b-kling-2024",
+      "manifest_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-kling-2024/manifest.json",
+      "segments_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-kling-2024/segments.jsonl",
+      "manifest_sha256": "82487e503cb428f3987350c7cf3332e04b004ad332a3b05eec202dfbb4d6ed8a",
+      "segments_sha256": "c350e1c6a69ca13ae0349061dfa1436782704ef737a9a28092504b18eb75010b",
+      "segment_count": 43,
+      "duration_ms": 2022421
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "manifest_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-rlinf-2026/manifest.json",
+      "segments_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-rlinf-2026/segments.jsonl",
+      "manifest_sha256": "9e75a3bb97b93aeb97c5324f0031a1c67060d6f23a5c3e241cea81edd06ebb4e",
+      "segments_sha256": "d284cb127b4cdd2c56d556cdf80c8c77754b6e2bdec7a51bb6565976de1ae9c0",
+      "segment_count": 46,
+      "duration_ms": 2093120
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "manifest_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-wuyi-goals/manifest.json",
+      "segments_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-wuyi-goals/segments.jsonl",
+      "manifest_sha256": "1f58070ad91b67cf7c8dd080873aff35952956f17ccb2bf3569ba6003993475e",
+      "segments_sha256": "2abcaf3c8582c293d869bdd4af8284a641cc934275f00f40842abc560040d37f",
+      "segment_count": 38,
+      "duration_ms": 1763207
+    }
+  ],
+  "review_cards": [
+    {
+      "video_id": "p0b-kling-2024",
+      "path": "/Users/tristana/Develop/video-evidence-agent/eval/visual-report-v1a/review-cards/p0b-kling-2024.v1.json",
+      "sha256": "8d47dca1e52205bae10b7cf84f8d473edfbcceb2d98477091371f573405df324",
+      "schema_version": "visual-report-review-card.v1a-prototype"
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "path": "/Users/tristana/Develop/video-evidence-agent/eval/visual-report-v1a/review-cards/p0b-rlinf-2026.v1.json",
+      "sha256": "258194029f7b758a66edebdd4f590f72cf59f3f53e94b83b8c5190978b67c0e1",
+      "schema_version": "visual-report-review-card.v1a-prototype"
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "path": "/Users/tristana/Develop/video-evidence-agent/eval/visual-report-v1a/review-cards/p0b-wuyi-goals.v1.json",
+      "sha256": "dba3dde7e7c8c21973cc41564bcf6e674a9c8863b376efa54f74ba2d9dd9dd87",
+      "schema_version": "visual-report-review-card.v1a-prototype"
+    }
+  ],
+  "environment": {
+    "admission": "READY",
+    "blockers": [],
+    "provider": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash-vision-exp",
+    "credential_present": true,
+    "timeout_seconds": 120.0,
+    "api_surface": "responses",
+    "response_mode": "json_schema",
+    "schema_mechanism": "responses.text.format.json_schema",
+    "temperature": 0,
+    "thinking_mode": "disabled",
+    "reasoning_effort": "none",
+    "output_token_limit": 8192,
+    "sdk_max_retries": 0,
+    "sdk_version": "3.3.1"
+  },
+  "shared_contract": {
+    "prompts": {
+      "mapper": {
+        "version": "topic-mapper.v1a-canonical-p1",
+        "sha256": "31c3c0917354e00ca82e168aabf9a25bd5c69b8ce09b7008f14466fc64669155"
+      },
+      "planner": {
+        "version": "report-planner.v1a-canonical-p1",
+        "sha256": "b4b3c22f0f9add79260e503c194ad70d3beb7136f49cfaaa67f79421d0a2a610"
+      }
+    },
+    "schemas": {
+      "topic_mapper": {
+        "name": "v1a_topic_map_proposal",
+        "schema_version": "visual-topic-map-proposal.v1a-prototype",
+        "sha256": "cd649e9f719cbe3b4da49e0426940af955d964a56adcfaedaf9dff3888865941"
+      },
+      "report_planner": {
+        "name": "v1a_report_plan_proposal",
+        "schema_version": "visual-report-plan-proposal.v1a-prototype",
+        "sha256": "76f7a4419e43350ca25b66547e1601dcdec3e6c83af3cd3a95cb5e02031e41c6"
+      }
+    },
+    "compiler_version": "visual-report-v1a-compiler.v1",
+    "call_schema_version": "visual-report-model-call.v1a-prototype",
+    "adapter_id": "openai.responses.text.json_schema.v1a"
+  },
+  "strategies": [
+    {
+      "strategy_id": "deepseek-v4-flash-vision-exp-responses-json-schema-a",
+      "order": 1,
+      "provider": "DeepSeek",
+      "provider_label": "https://api.deepseek.com",
+      "endpoint": "https://api.deepseek.com",
+      "model": "deepseek-v4-flash-vision-exp",
+      "model_version": "deepseek-v4-flash-vision-exp",
+      "api_surface": "responses",
+      "response_mode": "json_schema",
+      "schema_mechanism": "responses.text.format.json_schema",
+      "adapter": {
+        "adapter_id": "openai.responses.text.json_schema.v1a",
+        "module": "/Users/tristana/Develop/video-evidence-agent/src/video_evidence_agent/visual_report/planning_runtime.py",
+        "sha256": "e36dad066c5a5c7d371fc356c2956b3bc7afd1494079350d7106405def090d55",
+        "api_surface": "responses",
+        "schema_mechanism": "responses.text.format.json_schema"
+      },
+      "contract": {
+        "prompts": {
+          "mapper": {
+            "version": "topic-mapper.v1a-canonical-p1",
+            "sha256": "31c3c0917354e00ca82e168aabf9a25bd5c69b8ce09b7008f14466fc64669155"
+          },
+          "planner": {
+            "version": "report-planner.v1a-canonical-p1",
+            "sha256": "b4b3c22f0f9add79260e503c194ad70d3beb7136f49cfaaa67f79421d0a2a610"
+          }
+        },
+        "schemas": {
+          "topic_mapper": {
+            "name": "v1a_topic_map_proposal",
+            "schema_version": "visual-topic-map-proposal.v1a-prototype",
+            "sha256": "cd649e9f719cbe3b4da49e0426940af955d964a56adcfaedaf9dff3888865941"
+          },
+          "report_planner": {
+            "name": "v1a_report_plan_proposal",
+            "schema_version": "visual-report-plan-proposal.v1a-prototype",
+            "sha256": "76f7a4419e43350ca25b66547e1601dcdec3e6c83af3cd3a95cb5e02031e41c6"
+          }
+        },
+        "compiler_version": "visual-report-v1a-compiler.v1",
+        "call_schema_version": "visual-report-model-call.v1a-prototype",
+        "adapter_id": "openai.responses.text.json_schema.v1a"
+      },
+      "config": {
+        "provider": "https://api.deepseek.com",
+        "model": "deepseek-v4-flash-vision-exp",
+        "model_version": "deepseek-v4-flash-vision-exp",
+        "timeout_seconds": 120.0,
+        "credential_present": true,
+        "api_surface": "responses",
+        "response_mode": "json_schema",
+        "schema_mechanism": "responses.text.format.json_schema",
+        "temperature": 0,
+        "thinking_mode": "disabled",
+        "reasoning_effort": "none",
+        "output_token_limit": 8192,
+        "sdk_max_retries": 0,
+        "sdk_version": "3.3.1"
+      },
+      "prompt_bundle": {
+        "mapper": {
+          "version": "topic-mapper.v1a-canonical-p1",
+          "sha256": "31c3c0917354e00ca82e168aabf9a25bd5c69b8ce09b7008f14466fc64669155"
+        },
+        "planner": {
+          "version": "report-planner.v1a-canonical-p1",
+          "sha256": "b4b3c22f0f9add79260e503c194ad70d3beb7136f49cfaaa67f79421d0a2a610"
+        }
+      },
+      "schemas": {
+        "topic_mapper": {
+          "name": "v1a_topic_map_proposal",
+          "schema_version": "visual-topic-map-proposal.v1a-prototype",
+          "sha256": "cd649e9f719cbe3b4da49e0426940af955d964a56adcfaedaf9dff3888865941"
+        },
+        "report_planner": {
+          "name": "v1a_report_plan_proposal",
+          "schema_version": "visual-report-plan-proposal.v1a-prototype",
+          "sha256": "76f7a4419e43350ca25b66547e1601dcdec3e6c83af3cd3a95cb5e02031e41c6"
+        }
+      },
+      "capability_evidence": [
+        {
+          "source": "DeepSeek Responses API reference",
+          "url": "https://api-docs.deepseek.com/api/create-response/",
+          "claim": "Responses text.format supports provider-native json_schema with name and schema."
+        },
+        {
+          "source": "DeepSeek model and API availability",
+          "url": "https://api-docs.deepseek.com/quick_start/pricing/?article_id=article_1779470751466_8",
+          "claim": "deepseek-v4-flash-vision-exp is a declared DeepSeek model available to the Responses API."
+        }
+      ],
+      "eligibility": "ELIGIBLE",
+      "eligibility_blockers": [],
+      "canary_runs": [
+        {
+          "run_id": "p0b-kling-2024-v1a-candidate-a-canary",
+          "video_id": "p0b-kling-2024",
+          "planned_provider_calls": 2,
+          "planned_model_calls": 2
+        },
+        {
+          "run_id": "p0b-rlinf-2026-v1a-candidate-a-canary",
+          "video_id": "p0b-rlinf-2026",
+          "planned_provider_calls": 2,
+          "planned_model_calls": 2
+        },
+        {
+          "run_id": "p0b-wuyi-goals-v1a-candidate-a-canary",
+          "video_id": "p0b-wuyi-goals",
+          "planned_provider_calls": 2,
+          "planned_model_calls": 2
+        }
+      ]
+    },
+    {
+      "strategy_id": "deepseek-v4-flash-responses-json-schema-b",
+      "order": 2,
+      "provider": "DeepSeek",
+      "provider_label": "https://api.deepseek.com",
+      "endpoint": "https://api.deepseek.com",
+      "model": "deepseek-v4-flash",
+      "model_version": "deepseek-v4-flash",
+      "api_surface": "responses",
+      "response_mode": "json_schema",
+      "schema_mechanism": "responses.text.format.json_schema",
+      "adapter": {
+        "adapter_id": "openai.responses.text.json_schema.v1a",
+        "module": "/Users/tristana/Develop/video-evidence-agent/src/video_evidence_agent/visual_report/planning_runtime.py",
+        "sha256": "e36dad066c5a5c7d371fc356c2956b3bc7afd1494079350d7106405def090d55",
+        "api_surface": "responses",
+        "schema_mechanism": "responses.text.format.json_schema"
+      },
+      "contract": {
+        "prompts": {
+          "mapper": {
+            "version": "topic-mapper.v1a-canonical-p1",
+            "sha256": "31c3c0917354e00ca82e168aabf9a25bd5c69b8ce09b7008f14466fc64669155"
+          },
+          "planner": {
+            "version": "report-planner.v1a-canonical-p1",
+            "sha256": "b4b3c22f0f9add79260e503c194ad70d3beb7136f49cfaaa67f79421d0a2a610"
+          }
+        },
+        "schemas": {
+          "topic_mapper": {
+            "name": "v1a_topic_map_proposal",
+            "schema_version": "visual-topic-map-proposal.v1a-prototype",
+            "sha256": "cd649e9f719cbe3b4da49e0426940af955d964a56adcfaedaf9dff3888865941"
+          },
+          "report_planner": {
+            "name": "v1a_report_plan_proposal",
+            "schema_version": "visual-report-plan-proposal.v1a-prototype",
+            "sha256": "76f7a4419e43350ca25b66547e1601dcdec3e6c83af3cd3a95cb5e02031e41c6"
+          }
+        },
+        "compiler_version": "visual-report-v1a-compiler.v1",
+        "call_schema_version": "visual-report-model-call.v1a-prototype",
+        "adapter_id": "openai.responses.text.json_schema.v1a"
+      },
+      "config": {
+        "provider": "https://api.deepseek.com",
+        "model": "deepseek-v4-flash",
+        "model_version": "deepseek-v4-flash",
+        "timeout_seconds": 120.0,
+        "credential_present": true,
+        "api_surface": "responses",
+        "response_mode": "json_schema",
+        "schema_mechanism": "responses.text.format.json_schema",
+        "temperature": 0,
+        "thinking_mode": "disabled",
+        "reasoning_effort": "none",
+        "output_token_limit": 8192,
+        "sdk_max_retries": 0,
+        "sdk_version": "3.3.1"
+      },
+      "prompt_bundle": {
+        "mapper": {
+          "version": "topic-mapper.v1a-canonical-p1",
+          "sha256": "31c3c0917354e00ca82e168aabf9a25bd5c69b8ce09b7008f14466fc64669155"
+        },
+        "planner": {
+          "version": "report-planner.v1a-canonical-p1",
+          "sha256": "b4b3c22f0f9add79260e503c194ad70d3beb7136f49cfaaa67f79421d0a2a610"
+        }
+      },
+      "schemas": {
+        "topic_mapper": {
+          "name": "v1a_topic_map_proposal",
+          "schema_version": "visual-topic-map-proposal.v1a-prototype",
+          "sha256": "cd649e9f719cbe3b4da49e0426940af955d964a56adcfaedaf9dff3888865941"
+        },
+        "report_planner": {
+          "name": "v1a_report_plan_proposal",
+          "schema_version": "visual-report-plan-proposal.v1a-prototype",
+          "sha256": "76f7a4419e43350ca25b66547e1601dcdec3e6c83af3cd3a95cb5e02031e41c6"
+        }
+      },
+      "capability_evidence": [
+        {
+          "source": "DeepSeek Responses API reference",
+          "url": "https://api-docs.deepseek.com/api/create-response/",
+          "claim": "Responses text.format supports provider-native json_schema with name and schema."
+        },
+        {
+          "source": "DeepSeek model and API availability",
+          "url": "https://api-docs.deepseek.com/quick_start/pricing/?article_id=article_1779470751466_8",
+          "claim": "deepseek-v4-flash is a declared DeepSeek model available to the Responses API."
+        }
+      ],
+      "eligibility": "ELIGIBLE",
+      "eligibility_blockers": [],
+      "canary_runs": [
+        {
+          "run_id": "p0b-kling-2024-v1a-candidate-b-canary",
+          "video_id": "p0b-kling-2024",
+          "planned_provider_calls": 2,
+          "planned_model_calls": 2
+        },
+        {
+          "run_id": "p0b-rlinf-2026-v1a-candidate-b-canary",
+          "video_id": "p0b-rlinf-2026",
+          "planned_provider_calls": 2,
+          "planned_model_calls": 2
+        },
+        {
+          "run_id": "p0b-wuyi-goals-v1a-candidate-b-canary",
+          "video_id": "p0b-wuyi-goals",
+          "planned_provider_calls": 2,
+          "planned_model_calls": 2
+        }
+      ]
+    }
+  ],
+  "call_ledger": {
+    "max_new_transcript_bearing_provider_model_calls": 24,
+    "canary_max_calls": 12,
+    "formal_max_calls": 12,
+    "per_run_max_calls": 2,
+    "sdk_max_retries": 0,
+    "comparison_stop": "stop after first strategy with three rendered canaries and non-identical signatures"
+  },
+  "source_policy": "full transcript for every mapper and planner call; no chunking or fallback",
+  "revision_id": "vr1a-provider-0335b314c0a1",
+  "status": "FROZEN",
+  "frozen_at": "2026-08-30T14:36:54.499406+00:00"
+}

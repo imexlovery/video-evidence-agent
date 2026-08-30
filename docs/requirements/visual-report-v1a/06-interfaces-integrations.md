@@ -69,17 +69,43 @@ policy, not user-editable hidden environment knobs during a measured revision.
 | Purpose | One Topic Mapper and one Report Planner text generation call |
 | Payload | System instruction + JSON user payload containing authorized full transcript; Planner also receives canonical Topic Map and renderer grammar |
 | Response | One JSON object matching the stage proposal schema |
-| Model capability | Chinese long-context text; ≥50,000-character input envelope plus output; JSON object or strict structured-output support |
+| Model capability | Chinese long-context text; ≥50,000-character input envelope plus output; provider-native schema-constrained output for the exact selected model/API |
 | Parameters | Temperature 0; explicit timeout; no tools; no streaming requirement; no SDK automatic retry |
 | Quota/cost | Provider-defined; usage recorded; two-call/size envelope is the G1 cost control; monetary cost is `unavailable` without authoritative pricing |
 | Outage | Fail current run; no alternate provider/model/cache/manual fallback |
 | Reconciliation | Raw response is advisory; deterministic source/schema/budget validation owns acceptance |
 
-Strict JSON-schema response format is preferred when proven compatible with the
-configured endpoint. JSON-object mode is an allowed compatibility route because
-the existing provider path supports it; both routes use the same Pydantic
-contract. A provider capability change that breaks either route is a visible
-`PROVIDER_ERROR` or schema failure, not an adapter guess.
+For `VR-V1A-PROVIDER-CONFORMANCE-004`, strict provider-side schema-constrained
+output is required rather than preferred. The exact selected model/API must
+officially support a submitted JSON Schema or equivalent native typed schema at
+the generation boundary. JSON-object mode, prompt examples, parser cleanup, and
+post-generation Pydantic validation remain useful historical diagnostics but
+do not qualify a strategy for the new canary. Pydantic/binder/compiler checks
+remain authoritative after the provider response and may never be weakened to
+make a provider pass.
+
+### Provider-conformance strategy contract
+
+At most two materially distinct strategies may be declared. Each strategy
+freezes provider, exact model/version, API surface, native schema mechanism,
+submitted Mapper/Planner schema hashes, prompt-bundle hashes, reasoning/token/
+timeout settings, SDK version, and adapter code snapshot before the first real
+transcript call. Two prompt variants over the same model/API mechanism are not
+two strategies.
+
+Capability admission uses current official provider documentation or an
+official capability/metadata response for the exact model/API. It sends no real
+transcript and performs no uncounted generation. A schema projection may omit
+only cross-field/semantic constraints that the provider mechanism cannot
+express; it must preserve supported required fields, types, enums/
+discriminators, `additionalProperties=false`, and list bounds. Existing-ID
+membership, chronology, grounding, source entailment, and aggregate budgets
+remain deterministic gates.
+
+The strategy boundary is outside an individual run and is not provider
+fallback: Strategy B may execute only after the complete predeclared Strategy A
+three-video set fails, and only because both were frozen before Strategy A's
+first transcript call. No strategy changes within a run or canary set.
 
 ## Prompt transport shape
 

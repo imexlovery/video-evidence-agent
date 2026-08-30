@@ -18,11 +18,17 @@ credential secrecy, retained failures, and protected V0/P0-B artifacts.
 | Videos per run | 1 | One manifest + JSONL |
 | Transcript | 38–46 segments for fixed set; hard max 80/50,000 chars | Pre-call validation |
 | Model calls | 2 on success; 1 if Mapper succeeds and Planner fails; 0 on pre-call failure | `model-calls.jsonl` |
+| Provider-conformance canary | At most 2 strategies × 3 videos × 2 calls = 12 calls | Strategy registry + canary manifest |
 | Development measurement | 3 videos × 2 runs = 6 runs, 12 planned calls | Aggregate report |
 | Output size | 3–5 sections, 8–14 blocks, ≤2,600 visible authored characters | Compiler validation |
 | Stored data | Small JSON/JSONL/HTML per run | Local owner-controlled root |
 
 No growth, burst, queue, or multi-user scale claim is made.
+
+The active continuation therefore permits at most 24 new transcript-bearing
+calls: 12 across two possible complete canary sets and 12 in the one formal
+revision after the first passing strategy. Strategy B is a predeclared
+experiment branch, not runtime fallback; no individual run can switch strategy.
 
 ## Responsiveness, timeout, and cost
 
@@ -98,7 +104,7 @@ production audit service.
 | Unsupported numeric polish | Metric value must appear in cited transcript; human review for meaning | Metric tests/rubric |
 | Credential leakage | Environment-only secrets; redacted trace/error | Boolean config tests |
 | Hidden retry/fallback | SDK/application retry disabled; exact call trace | Failure tests |
-| Evidence cherry-picking | Unique append-only runs; all six runs in denominator | Measurement audit |
+| Evidence cherry-picking | Unique append-only runs; every admitted three-video canary set completes; all six formal runs remain in their denominator | Strategy/canary/formal manifest audit |
 | V0/P0-B contamination | Read-only protected paths + regression/diff review | Git/test checks |
 | Unauthorized publication | No publish/deploy/export surface | Scope/diff review |
 
@@ -132,6 +138,9 @@ reveals a concrete renderer defect.
 - Rollback: revert V1-A-specific code/docs/prompts and preserve V0 `render`.
 - Prompt/model/schema changes are versioned and require a complete new six-run
   measurement; old failures/results remain.
+- Inside `VR-V1A-PROVIDER-CONFORMANCE-004`, the experiment freezes before the
+  first transcript call: a post-freeze change cannot trigger a same-strategy
+  rerun or second formal revision under that task.
 - Support/incident response: not applicable — local Owner and implementer
   collaborate directly, with visible failure and explicit rerun.
 - Backup/restore: no service commitment; code/docs are version controlled and

@@ -148,8 +148,11 @@ summary 只陈述来源直接支持的意思。拿不准时保留更朴素的表
 
 ## Structured output and deterministic gates
 
-- Prefer strict provider JSON-schema output when supported; otherwise request a
-  JSON object. In both cases, `extra="forbid"` Pydantic models are authoritative.
+- The active provider-conformance continuation requires provider-native strict
+  JSON-schema or equivalent typed output for the exact model/API. JSON-object
+  mode alone is historical compatibility evidence and is not eligible for a
+  new strategy. `extra="forbid"` Pydantic models remain authoritative after
+  transport.
 - Models emit only existing segment/topic IDs. Binders generate canonical IDs,
   exact timestamps, metadata, and final V0 fields.
 - Structural normalization may trim surrounding whitespace and serialize JSON.
@@ -204,7 +207,7 @@ The cost boundary is exactly two admitted calls per successful run, one at each
 stage, plus the explicit input/output budgets. No price claim is made without an
 authoritative provider price snapshot.
 
-## Goal-mode engineering recovery after a failed revision
+## Historical Goal-mode recovery after a failed revision
 
 `VR-V1A-GOAL-RECOVERY-003` authorizes one bounded engineering control loop
 after the frozen `vr1a-dev-10f4334c8026` measurement failed before Planner.
@@ -224,9 +227,49 @@ autonomy:
 - execution-valid reports that miss semantic/human thresholds stop for Owner
   review and are not automatically prompt-tuned.
 
-The task permits at most two new formal measurement revisions and 36 new
-admitted provider/model calls across canaries and formal runs. This ceiling is
-not a target; the session stops after the first execution-valid formal revision.
+That task exhausted its `36/36` call ceiling without a rendered canary and is
+now historical. Its 22 candidate manifests and 20 failed Kling runs are
+immutable `FAILED_EXPERIMENT` evidence. The fixed four-topic/three-section/
+eight-block prompt and payload choices created during that loop are explicitly
+non-canonical and must not be promoted.
+
+## Canonical reset and provider-conformance behavior
+
+`VR-V1A-PROVIDER-CONFORMANCE-004` restores the original content contract before
+any new transcript-bearing provider call:
+
+- Mapper chooses 4–12 content-derived chronological topics and may use 0–5
+  source-derived subtopics; no exact-four or always-empty-subtopic instruction
+  is permitted.
+- Planner chooses 3–5 sections and 8–14 blocks from source affordances; no exact
+  3/8 target, fixed `[2,3,3]` distribution, fixed topic assignment, fixed block
+  sequence, disabled valid block type, or fixture-specific semantic hint is
+  permitted.
+- Provider examples demonstrate field shape only. They must not prescribe a
+  normalized report structure.
+- Provider-free static/contract tests inspect prompts, payloads, examples, and
+  helpers for those anti-patterns before the strategy experiment freezes.
+
+At most two materially distinct provider/model/API strategies may be evaluated.
+Each receives one frozen prompt bundle containing exactly one Mapper prompt and
+one Planner prompt. Both strategy bundles and adapters are predeclared before
+Strategy A's first transcript call and implement the same canonical semantics;
+Strategy B cannot learn from Strategy A output. Every eligible strategy runs
+one complete Kling/RLinf/Wu Yi canary set, each video once, even after an early
+failure. The first 3/3 strategy that renders on the original two responses and
+does not produce one identical cross-video structure signature proceeds
+unchanged to one fresh six-run measurement.
+
+Ordinary engineering defects are automatically repaired only before the first
+transcript call, while provider-free admission is still open. After experiment
+freeze, a canary failure is evidence: its strategy cannot be patched, re-prompted,
+or rerun under a micro-version. This prevents cross-run self-tuning while
+preserving the Owner's one-Goal operating model.
+
+The new maximum is 24 transcript-bearing provider/model calls: up to 12 across
+two complete canary sets and 12 in the single formal measurement after the
+first passing strategy. A Mapper failure consumes one actual call and prevents
+Planner for that run. No second formal revision is authorized in this Goal.
 
 ## Evaluation, drift, and versioning
 

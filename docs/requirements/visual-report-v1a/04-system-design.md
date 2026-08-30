@@ -102,9 +102,11 @@ Names are logical responsibilities, not a mandate for one file per row.
   implementation-delegated choice within context/JSON/quality constraints.
 - Framework status is `NOT_APPLICABLE`; two sequential calls plus deterministic
   validators do not justify an Agent framework, workflow engine, or Hypha.
-- Structured JSON schema mode is preferred when the configured compatible
-  provider supports it. Otherwise JSON-object mode is allowed, but the same
-  strict Pydantic validation and failure semantics apply.
+- The active provider-conformance continuation admits only an exact
+  provider/model/API path with native schema-constrained output. JSON-object
+  mode remains historical transport evidence but no longer qualifies a new
+  strategy. The same strict Pydantic/binder/compiler validation and failure
+  semantics apply after provider-side constrained decoding.
 
 ## Rejected alternatives
 

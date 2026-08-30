@@ -48,6 +48,8 @@ into Owner confirmation.
 | `DEC-VR1A-049 / USER_CONFIRMED` | Fix 3 videos × 2 repeats and the coverage, grounding, first-pass, human-quality, stability, and anti-template thresholds | Owner checkpoint confirmation | Predeclare the denominator and acceptance rule | Fewer/more repeats or different thresholds | Twelve planned calls plus human scoring | New measurement revision; historical revision retained | Six-run aggregate and rubrics |
 | `DEC-VR1A-051 / USER_CONFIRMED` | Replace repeated manual construction sessions with one Goal session that diagnoses, repairs, verifies, measures, and hands off V1-A | Owner message after v3 failure | Reduce coordination overhead while finishing the already-approved V1-A scope | One task per failure; stop after diagnosis | More implementation autonomy, bounded by exact V1-A invariants and hard stops | Owner may interrupt or issue a new scope decision | Goal task evidence and terminal status |
 | `DEC-VR1A-052 / USER_DELEGATED` | Automatic recovery occurs only across new immutable candidates/revisions, with three-video canaries, at most two new formal measurements, and at most 36 admitted calls | Goal-recovery delivery design under Owner delegation | Allow ordinary engineering repair without hiding retries or consuming unbounded calls | Unlimited loop; no repair; same-run retry | May stop before success, but preserves evidence and cost control | New Owner authorization for any further formal attempt | Run/revision inventory and call-count audit |
+| `DEC-VR1A-053 / USER_CONFIRMED` | Freeze the exhausted experiment, restore canonical V1-A/anti-template behavior, then evaluate at most two schema-constrained strategies in one Goal | Owner continuation message | Stop manual task-card churn and end prompt micro-version overfitting | Continue the 36-call loop; abandon V1-A; unrestricted provider search | Stronger experiment discipline may produce an honest no-go sooner | New Owner decision | Frozen commit, strategy registry, complete canary sets, exact terminal |
+| `DEC-VR1A-054 / USER_DELEGATED` | Predeclare both materially distinct tuples and prompt bundles; require native schema-constrained output; run all three canaries once; cap at 24 new calls and one formal revision | Owner explicitly allowed the Goal draft to be improved | Make provider comparison causal, bounded, and cross-video | JSON-object mode; per-video tuning; repair-and-rerun after canary | Ordinary fixes must finish before freeze; post-freeze defects consume a strategy | New Owner authorization for another experiment | Static anti-overfit tests, hashes, call ledger, manifests |
 
 ## Business, integration, and platform gap decisions
 
@@ -66,7 +68,7 @@ into Owner confirmation.
 | `ASM-VR1A-001` | Each fixed transcript fits both full-context calls with output headroom | Repository sizes are within the declared 50k-character envelope; provider tokenizer varies | Chosen model may reject or truncate context | Implementer verifies advertised/model-observed context before admitting a measured run; no truncation fallback |
 | `ASM-VR1A-002` | Existing ASR is adequate to judge planning quality | Three transcripts exist; known recognition/numeric traps remain | Model may be penalized for source errors | Freeze review cards with known ASR traps and distinguish source defect from planner defect |
 | `ASM-VR1A-003` | Empty assets are valid for every compiled V1-A plan | Existing `AssetManifest` permits zero assets; V1-A forbids image blocks | Renderer could have an undocumented empty-manifest regression | Integration and existing renderer tests before real calls |
-| `ASM-VR1A-004` | Current OpenAI-compatible endpoint supports JSON object output at temperature zero | Existing P0 transport uses this shape; exact V1-A model is not yet fixed | First call can fail before semantic evaluation | Capability/config preflight without transcript payload; visible configuration failure |
+| `ASM-VR1A-004` | At least one configured or otherwise authorized exact provider/model/API tuple supports native schema-constrained output at temperature zero | The previous JSON-object path does not establish this; exact strategy is implementation-delegated | No strategy can be admitted or the remaining one is externally blocked | Official exact-model/API capability evidence and non-secret configuration admission before transcript calls |
 | `ASM-VR1A-005` | Three videos are sufficient for a G1 directional decision | Owner requested at least three different videos | Results do not generalize to arbitrary content | Scope conclusion to these fixtures and require new evidence for promotion |
 
 ## Risk register
@@ -86,8 +88,11 @@ into Owner confirmation.
 | `RISK-VR1A-011` | V1-A changes the V0 renderer or frozen P0-B history | Low | High | Protected path diff or regression | Adapter boundary, protected-path review, full regression | Implementer | Git diff and pytest |
 | `RISK-VR1A-012` | Human rubric is inconsistent between repeats | Medium | Medium | Per-category delta >1 without content explanation | Versioned rubric, block/source citations for low scores, one Owner reviewer | Owner | Repeat comparison |
 | `RISK-VR1A-013` | Two-call claim is inflated by SDK/provider retry | Low | High | More wire attempts than admitted calls or ambiguous trace | Configure SDK retry count to zero for this adapter and record admitted/provider attempt counts | Implementer | Injected timeout/failure test |
-| `RISK-VR1A-014` | Goal recovery becomes an unbounded retry/tuning loop | Medium | High | Reused IDs, unchanged repeated attempts, hidden candidates, or call ceiling exceeded | New immutable identities, diagnosis before each candidate, two-formal/36-call ceiling, stop after first valid revision | Implementer/Owner | Task ledger, manifests, traces, aggregate inventory |
-| `RISK-VR1A-015` | Valid JSON mode is mistaken for conformance to the V1-A business schema | High after v3 evidence | High | Provider returns parseable JSON with guessed fields or missing version/refs | Transport exact schema or valid example, explicit token/reasoning controls, strict validation, observed-shape regressions, three-video canary | Implementer | Runtime-request test plus canary first-pass schema evidence |
+| `RISK-VR1A-014` | Goal recovery becomes an unbounded retry/tuning loop | Realized in the exhausted experiment | High | Reused semantic candidates, prompt micro-versions, Kling-only early aborts, or call ceiling pressure | Freeze failed history; predeclare at most two strategies; one complete canary set each; 24-call/one-formal ceiling; no post-freeze repair | Implementer/Owner | Strategy registry, manifests, traces, aggregate inventory |
+| `RISK-VR1A-015` | Valid JSON mode is mistaken for conformance to the V1-A business schema | High after v3 evidence | High | Provider returns parseable JSON with guessed fields or missing version/refs | Require official provider-native schema-constrained output for the exact model/API, then retain strict Pydantic/binder/compiler gates | Implementer | Capability evidence, runtime-request test, first-response canary evidence |
+| `RISK-VR1A-016` | Recovery hard-codes one structure and passes schema while destroying the content/anti-template hypothesis | Realized in the exhausted experiment | High | Exact-four topics, empty subtopics, exact 3/8 report, fixed topic assignment or block sequence appears in prompt/payload/helper | Restore canonical ranges; static anti-overfit tests; classify baseline `DO_NOT_PROMOTE`; cross-video signature gate | Implementer/Owner | Prompt/payload inspection, tests, three-video signatures |
+| `RISK-VR1A-017` | Strategy B is tuned after observing Strategy A and no longer provides an independent provider comparison | Medium | High | Prompt/schema/code hash changes or provider-specific semantic hint appears after A begins | Predeclare/freeze both tuples and prompt bundles before A; B differs in native provider/model/API capability only; no post-freeze repair | Implementer | Strategy registry timestamps/hashes and Git/run snapshots |
+| `RISK-VR1A-018` | A canary pass is mistaken for product-quality or Owner acceptance | Medium | High | Human scores are auto-filled or canary reports enter the formal denominator | Label canary as provider conformance only; one fresh six-run measurement; rubrics remain pending Owner review | Owner | Manifest separation, aggregate and status labels |
 
 ## Intelligence, source-data, stability, customer-operation, vendor, compliance, and support risks
 
@@ -123,7 +128,9 @@ append-only ledger therefore retains the historical recommendations
 
 - `DEC-VR1A-048`: the later implementer may select the exact
   OpenAI-compatible text model only inside the explicit full-context,
-  JSON-object, temperature-zero, no-fallback, exact-snapshot boundary.
+  temperature-zero, no-fallback, exact-snapshot boundary. Its historical
+  JSON-object allowance is narrowed for the active continuation by
+  `DEC-VR1A-053/054`, which require native schema-constrained output.
 - `DEC-VR1A-049`: Development measurement is three videos × two repeats, using
   the thresholds in `09-test-acceptance.md` for coverage, grounding,
   first-response success, human quality, repeat stability, and anti-template
@@ -137,10 +144,19 @@ Goal recovery recorded as `DEC-VR1A-051`. `DEC-VR1A-052` translates that
 authorization into a bounded engineering loop without changing the two-call,
 strict-schema, fixed-denominator, quality-threshold, or Owner-acceptance rules.
 
+That recovery ended at its frozen 36-call ceiling. The Owner then authorized
+the next continuation in `DEC-VR1A-053` and explicitly allowed the draft Goal to
+be improved. `DEC-VR1A-054` narrows the delegated implementation protocol:
+native schema-constrained strategies only, both predeclared before any real
+transcript call, one complete cross-video canary set per strategy, no
+cross-strategy prompt learning, at most 24 new calls, and at most one formal
+measurement. These rules restore the canonical V1-A content contract; they do
+not change its quality thresholds or Owner-only acceptance.
+
 ## Residual non-blocking questions
 
 | Question | Why non-blocking | Owner | Default | Decision deadline |
 |---|---|---|---|---|
 | Should successful local HTML be visually screenshot-reviewed at both 1080 px and about 390 px during S7? | V1-A measures content planning; current renderer already has responsive evidence | Owner | Inspect all six HTML files for overflow and screenshot one representative report per video if layout anomalies appear | Before S7 review handoff |
 | Should raw provider response bodies be retained indefinitely? | Schema/debug evidence can be separated from long-term retention | Owner | Retain inside local run directories through Owner review, then archive/delete only by explicit Owner action | Before any G2 promotion |
-| Which prompt wording revision wins after pre-measurement fake/manual calibration? | Prompt text can be refined before the frozen measurement without changing the contract | Implementer | Freeze exactly one Mapper and one Planner revision before declaring the six IDs | Before S6 |
+| Which eligible provider/model/API tuple should occupy Strategy A versus B? | Exact identities remain implementation-delegated, but eligibility and experiment order are now fully constrained | Implementer | Rank by official native-schema support, full-context fit, existing authorized credential/access, then smallest adapter change; freeze both before the first transcript call | Before the first conformance canary |

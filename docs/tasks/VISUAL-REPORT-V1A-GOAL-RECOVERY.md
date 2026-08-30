@@ -431,19 +431,19 @@ work as passed.
 
 | Evidence | Result |
 |---|---|
-| Goal ID/status | `PENDING` |
-| Baseline HEAD and preserved worktree | `PENDING` |
-| v3 failure/root-cause classification | `PENDING` |
-| Changed source/test/config/docs paths | `PENDING` |
-| Provider-free targeted gate | `PENDING` |
-| Canary revisions, IDs, calls, terminal states | `PENDING` |
-| Formal revisions and manifests | `PENDING` |
-| Formal run inventory and `provider_calls/model_calls` | `PENDING` |
-| Evaluator aggregate and `measurement_valid` | `PENDING` |
-| Report and pending-rubric inventory | `PENDING` |
-| Full regression/Ruff/diff/V0 renderer | `PENDING` |
-| Protected and historical evidence preservation | `PENDING` |
-| Final exact terminal state | `PENDING` |
+| Goal ID/status | `01a05229-fefa-7250-b60b-e2c22e2581b1 / COMPLETE` |
+| Baseline HEAD and preserved worktree | Started from committed implementation `f8cb402d37bc05a30c7a912ed044548a71c128c7`; the Owner's `.env.example`, requirements/status work, historical runs, aggregates, rubrics, and manifests were preserved |
+| v3 failure/root-cause classification | Frozen `vr1a-dev-10f4334c8026`: `1` `PROVIDER_ERROR`, `5` `TOPIC_MAP_SCHEMA_ERROR`, `6/6` calls, no Planner or report, `measurement_valid=false` |
+| Changed source/test/config/docs paths | V1-A `planning.py`, `planning_runtime.py`, `evaluation.py`, planning tests, `.env.example`, V1-A requirements/status/tasks, and versioned candidate manifests only |
+| Provider-free targeted gate | Final targeted planning suite `28 passed` |
+| Canary revisions, IDs, calls, terminal states | `22` immutable candidate manifests; `20` admitted Kling runs; `20/20 FAILED`; `36/36` provider/model calls; no `RENDERED` run |
+| Formal revisions and manifests | No new formal recovery revision or manifest; historical v1/v2/v3 manifests retained |
+| Formal run inventory and `provider_calls/model_calls` | `0` new formal runs and `0/0` new formal calls because the three-video canary gate never passed |
+| Evaluator aggregate and `measurement_valid` | No new aggregate; isolated historical-v3 evaluation correctly returned `MEASUREMENT_STALE` and did not overwrite history |
+| Report and pending-rubric inventory | No new report/rubric; all historical reports/rubrics preserved, with the six v3 rubrics still pending Owner review |
+| Full regression/Ruff/diff/V0 renderer | `66 passed`; Ruff passed; `git diff --check` passed; V0 renderer regression passed (`4` sections, `13` blocks, `4` used assets) |
+| Protected and historical evidence preservation | `PROTECTED_PATH_CHECK=PASS`, `CANARY_PRESERVATION=PASS`, historical identity preservation `PASS` |
+| Final exact terminal state | `READY_FOR_OWNER_V1A_REVIEW — GOAL_RECOVERY_EXHAUSTED` |
 
 ### 2026-08-30 — G1/G2 recovery stop at external boundary
 
@@ -538,11 +538,12 @@ work as passed.
   `vr1a-canary-1187f095b1fa` remain preserved and admitted no calls.
 - The final canary failure was p16 Kling
   `p0b-kling-2024-v1a-bf6742e01263-canary`, retained as `FAILED` with
-  `provider_calls/model_calls=2/2` and `PLAN_PROPOSAL_SCHEMA_ERROR` because
-  one insight block returned six source IDs against the strict four-ID bound.
-  This reached the combined recovery ceiling of `36/36`; no retry, third
-  call, semantic repair, or alternate candidate execution was admitted after
-  it.
+  `provider_calls/model_calls=2/2` and `PLAN_PROPOSAL_SCHEMA_ERROR`. Its raw
+  Planner object had two simultaneous validation errors: one insight block
+  returned six source IDs against the strict four-ID bound, and the proposal
+  returned only two sections against the strict minimum of three. This reached
+  the combined recovery ceiling of `36/36`; no retry, third call, semantic
+  repair, or alternate candidate execution was admitted after it.
 - No new formal recovery revision was frozen or executed: the three-video
   canary gate did not pass and the external-call ceiling was exhausted. The
   historical manifests `measurement-manifest-v1.json` →
@@ -563,6 +564,24 @@ work as passed.
   The bounded autonomous recovery budget ended without an execution-valid
   formal measurement; the Owner review boundary remains active and no
   acceptance is implied.
+
+### 2026-08-30 — frozen failed-experiment classification
+
+- The complete exhausted-recovery snapshot was committed on branch
+  `visual-report` as
+  `4ba28bf1b3288a6fb77bcc27378a45a69cd2b895` with commit subject
+  `chore(visual-report): freeze exhausted V1-A recovery`.
+- This snapshot is retained as `FAILED_EXPERIMENT / DO_NOT_PROMOTE`. Its
+  transport diagnostics and strict validation evidence may inform later work,
+  but its prompt/payload behavior is not the canonical V1-A content contract:
+  it forces exactly four top-level topics, empty subtopics, exactly three
+  sections and eight blocks, a fixed section/topic assignment, and a fixed
+  block-type sequence.
+- Those fixed choices conflict with the canonical 4–12 Topic Mapper range,
+  0–5 content-derived subtopics, 3–5 Planner sections, 8–14 blocks, and
+  content-affordance/anti-template requirements. A later task must remove this
+  drift before any new transcript-bearing provider call; it must not amend,
+  delete, relabel, or promote the frozen failed experiment.
 
 ## Completion rule
 
