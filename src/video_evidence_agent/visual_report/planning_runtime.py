@@ -27,9 +27,11 @@ from .planning import (
     COMPILER_VERSION,
     MAPPER_PROMPT_VERSION,
     MAPPER_SYSTEM_INSTRUCTION,
+    MAX_OUTPUT_TOKENS,
     PLAN_PROPOSAL_SCHEMA_VERSION,
     PLANNER_PROMPT_VERSION,
     PLANNER_SYSTEM_INSTRUCTION,
+    THINKING_MODE,
     TOPIC_MAP_SCHEMA_VERSION,
     TOPIC_PROPOSAL_SCHEMA_VERSION,
     PlanningError,
@@ -192,6 +194,8 @@ class PlanningConfig:
     credential_present: bool
     response_mode: str = RESPONSE_MODE
     temperature: int = TEMPERATURE
+    thinking_mode: str = THINKING_MODE
+    output_token_limit: int = MAX_OUTPUT_TOKENS
     sdk_max_retries: int = 0
     sdk_version: str = "unknown"
 
@@ -203,6 +207,8 @@ class PlanningConfig:
             "credential_present": self.credential_present,
             "response_mode": self.response_mode,
             "temperature": self.temperature,
+            "thinking_mode": self.thinking_mode,
+            "output_token_limit": self.output_token_limit,
             "sdk_max_retries": self.sdk_max_retries,
             "sdk_version": self.sdk_version,
             "mapper_prompt_version": MAPPER_PROMPT_VERSION,
@@ -225,9 +231,25 @@ def _provider_label(base_url: str) -> str:
 
 
 class ProviderCallError(RuntimeError):
-    def __init__(self, category: str, message: str, latency_ms: int) -> None:
+    def __init__(
+        self,
+        category: str,
+        message: str,
+        latency_ms: int,
+        *,
+        usage: dict[str, Any] | None = None,
+        finish_reason: str | None = None,
+        content_present: bool = False,
+        content_bytes: int = 0,
+        content_sha256: str | None = None,
+    ) -> None:
         self.category = category
         self.latency_ms = latency_ms
+        self.usage = usage or {}
+        self.finish_reason = finish_reason
+        self.content_present = content_present
+        self.content_bytes = content_bytes
+        self.content_sha256 = content_sha256
         super().__init__(message)
 
 
@@ -236,6 +258,10 @@ class ProviderResult:
     raw_text: str
     usage: dict[str, Any]
     latency_ms: int
+    finish_reason: str | None = None
+    content_present: bool = True
+    content_bytes: int = 0
+    content_sha256: str | None = None
 
 
 class OpenAIPlanningProvider:
@@ -288,7 +314,9 @@ class OpenAIPlanningProvider:
             response = self.client.chat.completions.create(
                 model=self.config.model,
                 temperature=TEMPERATURE,
+                max_tokens=self.config.output_token_limit,
                 response_format={"type": RESPONSE_MODE},
+                extra_body={"thinking": {"type": self.config.thinking_mode}},
                 messages=[
                     {"role": "system", "content": system_instruction},
                     {"role": "user", "content": stable_json(payload)},
@@ -305,10 +333,6 @@ class OpenAIPlanningProvider:
                 "PROVIDER_ERROR", f"provider request failed: {type(exc).__name__}", latency_ms
             ) from exc
         latency_ms = round((perf_counter() - started) * 1000)
-        if not response.choices or response.choices[0].message.content is None:
-            raise ProviderCallError(
-                "PROVIDER_ERROR", "provider returned no message content", latency_ms
-            )
         usage: dict[str, Any] = {}
         if response.usage is not None:
             try:
@@ -317,10 +341,40 @@ class OpenAIPlanningProvider:
                     usage = candidate
             except (AttributeError, TypeError, ValueError):
                 pass
+        if not response.choices:
+            raise ProviderCallError(
+                "PROVIDER_ERROR",
+                "provider returned no choices",
+                latency_ms,
+                usage=usage,
+            )
+        choice = response.choices[0]
+        finish_reason = getattr(choice, "finish_reason", None)
+        content = getattr(getattr(choice, "message", None), "content", None)
+        content_present = isinstance(content, str) and bool(content)
+        content_bytes = len(content.encode("utf-8")) if isinstance(content, str) else 0
+        content_sha256 = (
+            _sha256_bytes(content.encode("utf-8")) if isinstance(content, str) else None
+        )
+        if not content_present:
+            raise ProviderCallError(
+                "PROVIDER_ERROR",
+                "provider returned no message content",
+                latency_ms,
+                usage=usage,
+                finish_reason=finish_reason,
+                content_present=False,
+                content_bytes=content_bytes,
+                content_sha256=content_sha256,
+            )
         return ProviderResult(
-            raw_text=response.choices[0].message.content,
+            raw_text=content,
             usage=usage,
             latency_ms=latency_ms,
+            finish_reason=finish_reason,
+            content_present=content_present,
+            content_bytes=content_bytes,
+            content_sha256=content_sha256,
         )
 
 
@@ -424,6 +478,10 @@ class RunRecorder:
         usage: dict[str, Any],
         schema_valid: bool,
         error_category: str | None = None,
+        finish_reason: str | None = None,
+        content_present: bool = False,
+        content_bytes: int = 0,
+        content_sha256: str | None = None,
     ) -> None:
         _append_jsonl(
             self.calls_path,
@@ -439,10 +497,16 @@ class RunRecorder:
                 "response_mode": config.response_mode,
                 "sdk_max_retries": config.sdk_max_retries,
                 "sdk_version": config.sdk_version,
+                "thinking_mode": config.thinking_mode,
+                "output_token_limit": config.output_token_limit,
                 "latency_ms": latency_ms,
                 "usage": usage,
                 "schema_valid": schema_valid,
                 "error_category": error_category,
+                "finish_reason": finish_reason,
+                "content_present": content_present,
+                "content_bytes": content_bytes,
+                "content_sha256": content_sha256,
             },
         )
         aggregate = self.payload.setdefault("usage", {})
@@ -528,9 +592,13 @@ def _call_stage(
             prompt_version=prompt_version,
             config=provider.config,
             latency_ms=exc.latency_ms,
-            usage={},
+            usage=exc.usage,
             schema_valid=False,
             error_category=exc.category,
+            finish_reason=exc.finish_reason,
+            content_present=exc.content_present,
+            content_bytes=exc.content_bytes,
+            content_sha256=exc.content_sha256,
         )
         raise PlanningError(exc.category, str(exc)) from exc
     except Exception as exc:
@@ -558,6 +626,10 @@ def _call_stage(
             usage=result.usage,
             schema_valid=False,
             error_category=exc.category,
+            finish_reason=result.finish_reason,
+            content_present=result.content_present,
+            content_bytes=result.content_bytes,
+            content_sha256=result.content_sha256,
         )
         recorder.artifact(raw_path.stem, raw_path)
         raise
@@ -572,6 +644,10 @@ def _call_stage(
             usage=result.usage,
             schema_valid=False,
             error_category=schema_error_category,
+            finish_reason=result.finish_reason,
+            content_present=result.content_present,
+            content_bytes=result.content_bytes,
+            content_sha256=result.content_sha256,
         )
         recorder.artifact(raw_path.stem, raw_path)
         raise PlanningError(schema_error_category, str(exc)) from exc
@@ -582,6 +658,10 @@ def _call_stage(
         latency_ms=result.latency_ms,
         usage=result.usage,
         schema_valid=True,
+        finish_reason=result.finish_reason,
+        content_present=result.content_present,
+        content_bytes=result.content_bytes,
+        content_sha256=result.content_sha256,
     )
     recorder.artifact(raw_path.stem, raw_path)
     return validated

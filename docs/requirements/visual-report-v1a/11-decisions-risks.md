@@ -46,6 +46,8 @@ into Owner confirmation.
 | `DEC-VR1A-026 / SYSTEM_RECOMMENDED` | Measure 3 videos × 2 repeats and apply the quality rubric thresholds | Historical recommendation | Need repeat stability and a predeclared denominator | One run each; more repetitions | Twelve calls are bounded but quality scoring costs human time | Superseded by Owner confirmation | `DEC-VR1A-049` |
 | `DEC-VR1A-048 / USER_CONFIRMED` | Exact model identity is implementation-delegated inside the explicit compatibility/configuration boundary | Owner checkpoint confirmation | Preserve provider flexibility without implicit choice or fallback | Fixed model named in requirements | Implementer must preflight and snapshot the selected model | New Owner decision before measurement freeze | Run manifest and config tests |
 | `DEC-VR1A-049 / USER_CONFIRMED` | Fix 3 videos × 2 repeats and the coverage, grounding, first-pass, human-quality, stability, and anti-template thresholds | Owner checkpoint confirmation | Predeclare the denominator and acceptance rule | Fewer/more repeats or different thresholds | Twelve planned calls plus human scoring | New measurement revision; historical revision retained | Six-run aggregate and rubrics |
+| `DEC-VR1A-051 / USER_CONFIRMED` | Replace repeated manual construction sessions with one Goal session that diagnoses, repairs, verifies, measures, and hands off V1-A | Owner message after v3 failure | Reduce coordination overhead while finishing the already-approved V1-A scope | One task per failure; stop after diagnosis | More implementation autonomy, bounded by exact V1-A invariants and hard stops | Owner may interrupt or issue a new scope decision | Goal task evidence and terminal status |
+| `DEC-VR1A-052 / USER_DELEGATED` | Automatic recovery occurs only across new immutable candidates/revisions, with three-video canaries, at most two new formal measurements, and at most 36 admitted calls | Goal-recovery delivery design under Owner delegation | Allow ordinary engineering repair without hiding retries or consuming unbounded calls | Unlimited loop; no repair; same-run retry | May stop before success, but preserves evidence and cost control | New Owner authorization for any further formal attempt | Run/revision inventory and call-count audit |
 
 ## Business, integration, and platform gap decisions
 
@@ -84,6 +86,8 @@ into Owner confirmation.
 | `RISK-VR1A-011` | V1-A changes the V0 renderer or frozen P0-B history | Low | High | Protected path diff or regression | Adapter boundary, protected-path review, full regression | Implementer | Git diff and pytest |
 | `RISK-VR1A-012` | Human rubric is inconsistent between repeats | Medium | Medium | Per-category delta >1 without content explanation | Versioned rubric, block/source citations for low scores, one Owner reviewer | Owner | Repeat comparison |
 | `RISK-VR1A-013` | Two-call claim is inflated by SDK/provider retry | Low | High | More wire attempts than admitted calls or ambiguous trace | Configure SDK retry count to zero for this adapter and record admitted/provider attempt counts | Implementer | Injected timeout/failure test |
+| `RISK-VR1A-014` | Goal recovery becomes an unbounded retry/tuning loop | Medium | High | Reused IDs, unchanged repeated attempts, hidden candidates, or call ceiling exceeded | New immutable identities, diagnosis before each candidate, two-formal/36-call ceiling, stop after first valid revision | Implementer/Owner | Task ledger, manifests, traces, aggregate inventory |
+| `RISK-VR1A-015` | Valid JSON mode is mistaken for conformance to the V1-A business schema | High after v3 evidence | High | Provider returns parseable JSON with guessed fields or missing version/refs | Transport exact schema or valid example, explicit token/reasoning controls, strict validation, observed-shape regressions, three-video canary | Implementer | Runtime-request test plus canary first-pass schema evidence |
 
 ## Intelligence, source-data, stability, customer-operation, vendor, compliance, and support risks
 
@@ -127,6 +131,11 @@ append-only ledger therefore retains the historical recommendations
 
 No Owner checkpoint remains open in this requirements package. The independent
 validator, not this narrative, decides handoff readiness.
+
+After the v3 execution failure, the Owner separately authorized the unified
+Goal recovery recorded as `DEC-VR1A-051`. `DEC-VR1A-052` translates that
+authorization into a bounded engineering loop without changing the two-call,
+strict-schema, fixed-denominator, quality-threshold, or Owner-acceptance rules.
 
 ## Residual non-blocking questions
 

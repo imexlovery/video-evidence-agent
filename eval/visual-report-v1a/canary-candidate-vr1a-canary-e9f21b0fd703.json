@@ -1,0 +1,47 @@
+{
+  "schema_version": "visual-report-canary-candidate.v1a",
+  "candidate_revision": "vr1a-canary-e9f21b0fd703",
+  "supersedes_candidate_revision": "vr1a-canary-c0a39e4f8c05",
+  "status": "CANARY_PENDING",
+  "formal_denominator": "excluded",
+  "repair": "Planner p15 preserves p14's closed-world source and exact two-item bullet-group constraints and adds an explicit single-line JSON serialization/parser pre-submit contract after the observed stop-with-malformed-JSON response.",
+  "provider": {
+    "admission": "READY",
+    "provider": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash-vision-exp",
+    "credential_present": true,
+    "timeout_seconds": 120.0,
+    "response_mode": "json_object",
+    "temperature": 0,
+    "thinking_mode": "disabled",
+    "output_token_limit": 8192,
+    "sdk_max_retries": 0,
+    "sdk_version": "3.3.1"
+  },
+  "prompts": {
+    "mapper_version": "topic-mapper.v1a-p5",
+    "mapper_sha256": "4a6ea7f0082ddb97eeca3df96bd0b88e7450f2d98d3afc912629aebabc966f81",
+    "planner_version": "report-planner.v1a-p15",
+    "planner_sha256": "e9f21b0fd7030c127ba38ee13144df7e06e568bfffb53a9d0427e3d5c102ec85"
+  },
+  "canaries": [
+    {
+      "video_id": "p0b-kling-2024",
+      "run_id": "p0b-kling-2024-v1a-e9f21b0fd703-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "run_id": "p0b-rlinf-2026-v1a-e9f21b0fd703-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "run_id": "p0b-wuyi-goals-v1a-e9f21b0fd703-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    }
+  ]
+}

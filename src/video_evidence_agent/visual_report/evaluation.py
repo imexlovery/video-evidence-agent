@@ -25,10 +25,12 @@ from .planning import (
     COMPILER_VERSION,
     MAPPER_PROMPT_VERSION,
     MAPPER_SYSTEM_INSTRUCTION,
+    MAX_OUTPUT_TOKENS,
     PLAN_PROPOSAL_SCHEMA_VERSION,
     PLANNER_PROMPT_VERSION,
     PLANNER_SYSTEM_INSTRUCTION,
     REVIEW_CARD_SCHEMA_VERSION,
+    THINKING_MODE,
     TOPIC_MAP_SCHEMA_VERSION,
     TOPIC_PROPOSAL_SCHEMA_VERSION,
     PlanningError,
@@ -251,6 +253,8 @@ def environment_snapshot(repository_root: Path) -> dict[str, object]:
         "timeout_seconds": timeout_seconds if timeout_seconds is not None else "invalid",
         "response_mode": "json_object",
         "temperature": 0,
+        "thinking_mode": THINKING_MODE,
+        "output_token_limit": MAX_OUTPUT_TOKENS,
         "sdk_max_retries": 0,
         "sdk_version": sdk_version,
     }
@@ -584,13 +588,15 @@ def _score_run(
         and source_snapshot.get("manifest_sha256") == source_row.get("manifest_sha256")
         and source_snapshot.get("segments_sha256") == source_row.get("segments_sha256")
         and isinstance(config_snapshot, dict)
-        and all(config_snapshot.get(key) == expected_config.get(key) for key in (
+            and all(config_snapshot.get(key) == expected_config.get(key) for key in (
             "provider",
             "model",
             "timeout_seconds",
             "credential_present",
             "response_mode",
             "temperature",
+            "thinking_mode",
+            "output_token_limit",
             "sdk_max_retries",
             "sdk_version",
         ))

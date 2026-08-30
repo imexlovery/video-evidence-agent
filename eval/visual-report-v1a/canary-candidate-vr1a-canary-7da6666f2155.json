@@ -1,0 +1,47 @@
+{
+  "schema_version": "visual-report-canary-candidate.v1a",
+  "candidate_revision": "vr1a-canary-7da6666f2155",
+  "supersedes_candidate_revision": "vr1a-canary-d61de0d61859",
+  "status": "CANARY_PENDING",
+  "formal_denominator": "excluded",
+  "repair": "Mapper p4 makes subtopics optional-but-disabled for this request, preventing subtopic source refs from crossing parent topics; Mapper remains exactly four broad topics and Planner remains p3.",
+  "provider": {
+    "admission": "READY",
+    "provider": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash-vision-exp",
+    "credential_present": true,
+    "timeout_seconds": 120.0,
+    "response_mode": "json_object",
+    "temperature": 0,
+    "thinking_mode": "disabled",
+    "output_token_limit": 8192,
+    "sdk_max_retries": 0,
+    "sdk_version": "3.3.1"
+  },
+  "prompts": {
+    "mapper_version": "topic-mapper.v1a-p4",
+    "mapper_sha256": "1657cfcfe62097a9d8d7cff0f5ba6f892b58859c7c7cab74e3ecd260ce73ceb7",
+    "planner_version": "report-planner.v1a-p3",
+    "planner_sha256": "0246e2474ddd4d310349e245792832cef6b45aee5120f6928d9fec14a3777b32"
+  },
+  "canaries": [
+    {
+      "video_id": "p0b-kling-2024",
+      "run_id": "p0b-kling-2024-v1a-7da6666f2155-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "run_id": "p0b-rlinf-2026-v1a-7da6666f2155-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "run_id": "p0b-wuyi-goals-v1a-7da6666f2155-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    }
+  ]
+}

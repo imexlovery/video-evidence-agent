@@ -68,6 +68,40 @@ avoids turning the evaluation into template matching.
 7. If a prompt/model/policy changes, create a new measurement revision and rerun
    all six identities; never replace or selectively rerun the earlier revision.
 
+## Authorized Goal recovery protocol
+
+After `vr1a-dev-10f4334c8026` produced one provider failure and five first-stage
+schema failures, the Owner authorized `VR-V1A-GOAL-RECOVERY-003` as one
+continuous diagnose–repair–verify session. The following gates apply before a
+new formal measurement:
+
+1. Preserve the v3 manifest, all six run directories, aggregate, and pending
+   rubrics unchanged.
+2. Reproduce and classify the contract failure without weakening the strict
+   Mapper/Planner schemas.
+3. Add provider-free tests for the observed wrong shapes and prove the runtime
+   request exposes the exact required schema/valid example, output-token limit,
+   and explicit reasoning/thinking setting.
+4. Run one fresh canary per fixed video. All three must reach `RENDERED` on the
+   first Mapper and Planner responses with `2/2` calls each. Canary IDs are
+   diagnostic evidence and never enter the six-run denominator.
+5. Freeze six new IDs only after the canary gate passes; execute all six once
+   and evaluate the complete revision once.
+6. If an in-scope execution defect remains, preserve the failed revision,
+   repair it, and repeat the complete gate with new identities. At most two new
+   formal revisions and 36 new admitted provider/model calls are allowed.
+
+Automatic recovery is allowed only across new immutable identities and
+revisions. It never authorizes SDK retry, a third call, semantic repair,
+selective formal rerun, provider fallback inside a run, or optimization against
+an execution-valid six-report set. Credentials/account/billing/source-rights
+blocks and any required V1-B/V1-C expansion stop for Owner action.
+
+The latest formal revision is execution-valid only when all six declared runs
+reach `RENDERED`, observed calls equal `12/12`, both first responses validate in
+every run, compilation/render/source refs pass, and six report paths plus six
+pending Owner rubrics exist. Human quality acceptance remains Owner-only.
+
 ## Owner-confirmed quality rubric
 
 ### Topic Mapper

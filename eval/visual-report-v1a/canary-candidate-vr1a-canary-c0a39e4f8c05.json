@@ -1,0 +1,47 @@
+{
+  "schema_version": "visual-report-canary-candidate.v1a",
+  "candidate_revision": "vr1a-canary-c0a39e4f8c05",
+  "supersedes_candidate_revision": "vr1a-canary-5da9bfd5d191",
+  "status": "CANARY_PENDING",
+  "formal_denominator": "excluded",
+  "repair": "Planner p14 keeps the closed-world per-section source allowlist and requires the sole section 2 bullet_group to contain exactly two merged items, addressing the observed six-item schema rejection; the strict compiler remains unchanged.",
+  "provider": {
+    "admission": "READY",
+    "provider": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash-vision-exp",
+    "credential_present": true,
+    "timeout_seconds": 120.0,
+    "response_mode": "json_object",
+    "temperature": 0,
+    "thinking_mode": "disabled",
+    "output_token_limit": 8192,
+    "sdk_max_retries": 0,
+    "sdk_version": "3.3.1"
+  },
+  "prompts": {
+    "mapper_version": "topic-mapper.v1a-p5",
+    "mapper_sha256": "4a6ea7f0082ddb97eeca3df96bd0b88e7450f2d98d3afc912629aebabc966f81",
+    "planner_version": "report-planner.v1a-p14",
+    "planner_sha256": "c0a39e4f8c055bf2268d0b06c6077497e796fa4cb45f50ac205548de344ae748"
+  },
+  "canaries": [
+    {
+      "video_id": "p0b-kling-2024",
+      "run_id": "p0b-kling-2024-v1a-c0a39e4f8c05-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "run_id": "p0b-rlinf-2026-v1a-c0a39e4f8c05-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "run_id": "p0b-wuyi-goals-v1a-c0a39e4f8c05-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    }
+  ]
+}

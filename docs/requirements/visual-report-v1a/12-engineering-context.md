@@ -94,6 +94,7 @@ Routes below make that non-adoption and each project-owned seam explicit.
 | Internal module/function names | implementation-delegated | Implementer | Small project-owned code within approved paths | Framework/service abstraction | Code review and tests |
 | Prompt wording before freeze | implementation-delegated | Implementer | One versioned prompt per role satisfying contracts | Role merge or post-freeze selective tuning | Prompt snapshot and measurement revision |
 | Six-run thresholds/protocol | fixed constraint | Owner | Values in `09-test-acceptance.md` | Implementer self-approval or selective rerun | `DEC-VR1A-049` + frozen measurement |
+| Goal recovery after v3 execution failure | implementation-delegated within fixed constraints | Implementer | Diagnose/repair/test; three-video canary; wholly new formal revision; at most two formal revisions and 36 admitted calls | Same-run retry/repair, weakened schema, selective formal rerun, semantic auto-tuning, hidden evidence | `DEC-VR1A-051/052`, task ledger, run manifests and traces |
 | V1-B/C, G2, production, publishing | prohibited | Owner | Separate future requirements and authorization | Automatic continuation | New Owner decision |
 
 All implementation-facing decisions now have a fixed, invariant,
@@ -331,3 +332,23 @@ No shared-framework change or requirements blocker remains. Later
 implementation needs a configured compatible model/credential, but missing
 runtime credentials block only real Development execution, not code
 construction or provider-free verification.
+
+## Current post-implementation recovery context
+
+The committed V1-A implementation baseline is
+`f8cb402d37bc05a30c7a912ed044548a71c128c7`. Preserve all current Owner work,
+including the uncommitted `.env.example`, requirement evidence/status changes,
+the untracked v3 measurement task/manifest, and every ignored run/evaluation
+artifact. The frozen failed revision is `vr1a-dev-10f4334c8026`: one of six
+runs ended in `PROVIDER_ERROR`, five ended in `TOPIC_MAP_SCHEMA_ERROR`, observed
+calls were `6/6`, Planner was never called, no report rendered, and the
+aggregate correctly says `measurement_valid=false`.
+
+`VR-V1A-GOAL-RECOVERY-003` now authorizes bounded product/prompt/test/config
+repair in the existing V1-A modules, followed by provider-free regression,
+three-video canaries, and up to two wholly new formal six-run revisions. The
+agent may select the exact supported model/API response mode and explicit
+reasoning/token controls inside `DEC-VR1A-048`, but each selection is frozen and
+recorded and never serves as an in-run fallback. The strict proposal/binder/
+compiler boundary, current renderer, fixed fixtures and quality thresholds,
+evidence retention, and Owner-only acceptance remain unchanged.

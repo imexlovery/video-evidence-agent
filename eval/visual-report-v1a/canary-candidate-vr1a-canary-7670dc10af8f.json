@@ -1,0 +1,47 @@
+{
+  "schema_version": "visual-report-canary-candidate.v1a",
+  "candidate_revision": "vr1a-canary-7670dc10af8f",
+  "supersedes_candidate_revision": "vr1a-canary-7da6666f2155",
+  "status": "CANARY_PENDING",
+  "formal_denominator": "excluded",
+  "repair": "Mapper p5 and Planner p4 add explicit final self-checks and transmit the exact Pydantic JSON schemas inside the JSON-object payload; no tools, fallback, semantic repair, or extra call is introduced.",
+  "provider": {
+    "admission": "READY",
+    "provider": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash-vision-exp",
+    "credential_present": true,
+    "timeout_seconds": 120.0,
+    "response_mode": "json_object",
+    "temperature": 0,
+    "thinking_mode": "disabled",
+    "output_token_limit": 8192,
+    "sdk_max_retries": 0,
+    "sdk_version": "3.3.1"
+  },
+  "prompts": {
+    "mapper_version": "topic-mapper.v1a-p5",
+    "mapper_sha256": "4a6ea7f0082ddb97eeca3df96bd0b88e7450f2d98d3afc912629aebabc966f81",
+    "planner_version": "report-planner.v1a-p4",
+    "planner_sha256": "2b9bbac1595d3dd4051310d5829b56befea031eab28a90db209d432fde7cbef7"
+  },
+  "canaries": [
+    {
+      "video_id": "p0b-kling-2024",
+      "run_id": "p0b-kling-2024-v1a-7670dc10af8f-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "run_id": "p0b-rlinf-2026-v1a-7670dc10af8f-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "run_id": "p0b-wuyi-goals-v1a-7670dc10af8f-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    }
+  ]
+}

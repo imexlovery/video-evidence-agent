@@ -20,7 +20,7 @@
       "decision_ids": ["DEC-VR1A-004", "DEC-VR1A-012", "DEC-VR1A-013"]
     },
     "functional_rules_and_edge_cases": {
-      "decision_ids": ["DEC-VR1A-004", "DEC-VR1A-007", "DEC-VR1A-011", "DEC-VR1A-013", "DEC-VR1A-022", "DEC-VR1A-044"]
+      "decision_ids": ["DEC-VR1A-004", "DEC-VR1A-007", "DEC-VR1A-011", "DEC-VR1A-013", "DEC-VR1A-022", "DEC-VR1A-044", "DEC-VR1A-051", "DEC-VR1A-052"]
     },
     "data_sources_state_and_memory": {
       "decision_ids": ["DEC-VR1A-009", "DEC-VR1A-010", "DEC-VR1A-027", "DEC-VR1A-028", "DEC-VR1A-029", "DEC-VR1A-038", "DEC-VR1A-046"]
@@ -35,16 +35,16 @@
       "decision_ids": ["DEC-VR1A-016", "DEC-VR1A-017", "DEC-VR1A-018", "DEC-VR1A-021", "DEC-VR1A-028", "DEC-VR1A-045"]
     },
     "load_performance_reliability_cost": {
-      "decision_ids": ["DEC-VR1A-019", "DEC-VR1A-022", "DEC-VR1A-023", "DEC-VR1A-030", "DEC-VR1A-031", "DEC-VR1A-044"]
+      "decision_ids": ["DEC-VR1A-019", "DEC-VR1A-022", "DEC-VR1A-023", "DEC-VR1A-030", "DEC-VR1A-031", "DEC-VR1A-044", "DEC-VR1A-052"]
     },
     "deployment_operations_and_commercial_readiness": {
       "decision_ids": ["DEC-VR1A-024", "DEC-VR1A-027", "DEC-VR1A-032", "DEC-VR1A-033", "DEC-VR1A-034"]
     },
     "existing_system_and_engineering_context": {
-      "decision_ids": ["DEC-VR1A-008", "DEC-VR1A-020", "DEC-VR1A-048", "DEC-VR1A-035", "DEC-VR1A-046"]
+      "decision_ids": ["DEC-VR1A-008", "DEC-VR1A-020", "DEC-VR1A-048", "DEC-VR1A-035", "DEC-VR1A-046", "DEC-VR1A-051"]
     },
     "acceptance_and_delivery_constraints": {
-      "decision_ids": ["DEC-VR1A-024", "DEC-VR1A-049", "DEC-VR1A-042", "DEC-VR1A-043", "DEC-VR1A-047"]
+      "decision_ids": ["DEC-VR1A-024", "DEC-VR1A-049", "DEC-VR1A-042", "DEC-VR1A-043", "DEC-VR1A-047", "DEC-VR1A-050", "DEC-VR1A-051", "DEC-VR1A-052"]
     }
   },
   "critical_gates": {
@@ -61,7 +61,7 @@
       "decision_ids": ["DEC-VR1A-012"]
     },
     "happy_failure_and_recovery_paths": {
-      "decision_ids": ["DEC-VR1A-007", "DEC-VR1A-013", "DEC-VR1A-022", "DEC-VR1A-044"]
+      "decision_ids": ["DEC-VR1A-007", "DEC-VR1A-013", "DEC-VR1A-022", "DEC-VR1A-044", "DEC-VR1A-051", "DEC-VR1A-052"]
     },
     "input_contracts_validation_and_limits": {
       "decision_ids": ["DEC-VR1A-005", "DEC-VR1A-009", "DEC-VR1A-014"]
@@ -79,7 +79,7 @@
       "decision_ids": ["DEC-VR1A-009", "DEC-VR1A-046"]
     },
     "mutation_lifecycle_versioning_and_undo": {
-      "decision_ids": ["DEC-VR1A-029", "DEC-VR1A-043"]
+      "decision_ids": ["DEC-VR1A-029", "DEC-VR1A-043", "DEC-VR1A-052"]
     },
     "data_source_authority_rights_quality_lineage_and_freshness": {
       "decision_ids": ["DEC-VR1A-005", "DEC-VR1A-028"]
@@ -112,19 +112,19 @@
       "decision_ids": ["DEC-VR1A-033"]
     },
     "system_lifecycle_admin_and_change_governance": {
-      "decision_ids": ["DEC-VR1A-024", "DEC-VR1A-034"]
+      "decision_ids": ["DEC-VR1A-024", "DEC-VR1A-034", "DEC-VR1A-051", "DEC-VR1A-052"]
     },
     "existing_system_baseline_and_change_boundary": {
       "decision_ids": ["DEC-VR1A-035", "DEC-VR1A-046"]
     },
     "downstream_framework_constraints_and_decision_authority": {
-      "decision_ids": ["DEC-VR1A-020", "DEC-VR1A-048"]
+      "decision_ids": ["DEC-VR1A-020", "DEC-VR1A-048", "DEC-VR1A-051"]
     },
     "development_base_and_hypha_recommendation_disposition": {
       "decision_ids": ["DEC-VR1A-020"]
     },
     "measurable_acceptance_and_go_live_evidence": {
-      "decision_ids": ["DEC-VR1A-049", "DEC-VR1A-047"]
+      "decision_ids": ["DEC-VR1A-049", "DEC-VR1A-047", "DEC-VR1A-050", "DEC-VR1A-051", "DEC-VR1A-052"]
     },
     "agent_module_routes_dependency_mode_availability_fallback_and_rollback": {
       "decision_ids": ["DEC-VR1A-007", "DEC-VR1A-020", "DEC-VR1A-044"]
@@ -136,7 +136,7 @@
       "decision_ids": ["DEC-VR1A-004", "DEC-VR1A-006", "DEC-VR1A-011"]
     },
     "hard_constraints_and_safety_precedence": {
-      "decision_ids": ["DEC-VR1A-003", "DEC-VR1A-007", "DEC-VR1A-021", "DEC-VR1A-024"]
+      "decision_ids": ["DEC-VR1A-003", "DEC-VR1A-007", "DEC-VR1A-021", "DEC-VR1A-024", "DEC-VR1A-051", "DEC-VR1A-052"]
     },
     "tool_permissions_and_approvals": {
       "decision_ids": ["DEC-VR1A-037"]
@@ -163,7 +163,7 @@
       "decision_ids": ["DEC-VR1A-007", "DEC-VR1A-044"]
     },
     "cost_boundary": {
-      "decision_ids": ["DEC-VR1A-023"]
+      "decision_ids": ["DEC-VR1A-023", "DEC-VR1A-052"]
     }
   }
 }

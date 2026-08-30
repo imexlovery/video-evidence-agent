@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from pydantic import ValidationError
@@ -16,6 +17,7 @@ from video_evidence_agent.visual_report.evaluation import (
 )
 from video_evidence_agent.visual_report.planning import (
     MAPPER_SYSTEM_INSTRUCTION,
+    MAX_OUTPUT_TOKENS,
     PLANNER_SYSTEM_INSTRUCTION,
     FakePlanningProvider,
     PlanningError,
@@ -24,10 +26,13 @@ from video_evidence_agent.visual_report.planning import (
     TopicMapProposal,
     bind_topic_map,
     mapper_payload,
+    planner_payload,
     transcript_character_count,
     validate_transcript_envelope,
 )
 from video_evidence_agent.visual_report.planning_runtime import (
+    OpenAIPlanningProvider,
+    PlanningConfig,
     build_from_transcript,
     replay_proposals,
 )
@@ -122,6 +127,355 @@ def test_fake_provider_seam_counts_only_explicit_local_calls() -> None:
     assert provider.calls[0]["stage"] == "topic_mapper"
 
 
+def test_mapper_request_sets_a_four_topic_operational_budget() -> None:
+    payload = mapper_payload({"video_id": "synthetic-v1a"}, _segments())
+    budget = payload["topic_budget"]
+    assert budget == {
+        "required_top_level_topic_count": 4,
+        "allowed_top_level_topic_range": [4, 12],
+        "instruction": (
+            "Merge adjacent or overlapping candidates before output; "
+            "never emit more than 4 top-level topics for this request."
+        ),
+    }
+    assert "恰好输出 4 个顶层 topics" in MAPPER_SYSTEM_INSTRUCTION
+    assert payload["subtopic_policy"] == "Use subtopics: [] for every topic in this request."
+
+
+@pytest.mark.parametrize(
+    "variant",
+    [
+        "missing_schema_version",
+        "integer_segment_ordinals",
+        "segment_ids_field",
+        "topics_as_strings",
+        "description_instead_of_summary_and_refs",
+        "too_many_topics",
+    ],
+)
+def test_observed_mapper_wrong_shapes_remain_strictly_rejected(variant: str) -> None:
+    payload = _json("topic-map-proposal.json")
+    topics = payload["topics"]
+    assert isinstance(topics, list)
+    if variant == "missing_schema_version":
+        payload.pop("schema_version")
+    elif variant == "integer_segment_ordinals":
+        for topic in topics:
+            assert isinstance(topic, dict)
+            topic["source_segment_ids"] = [0, 1]
+    elif variant == "segment_ids_field":
+        for topic in topics:
+            assert isinstance(topic, dict)
+            topic["segment_ids"] = topic.pop("source_segment_ids")
+    elif variant == "topics_as_strings":
+        payload["topics"] = [topic["title"] for topic in topics if isinstance(topic, dict)]
+    elif variant == "description_instead_of_summary_and_refs":
+        for topic in topics:
+            assert isinstance(topic, dict)
+            topic["description"] = topic.pop("summary")
+            topic.pop("source_segment_ids")
+    else:
+        first = topics[0]
+        assert isinstance(first, dict)
+        payload["topics"] = [*topics, *[first.copy() for _ in range(9)]]
+
+    with pytest.raises(ValidationError):
+        TopicMapProposal.model_validate(payload)
+
+
+class _FakeCompletionEndpoint:
+    def __init__(self, response: object | None = None, error: Exception | None = None) -> None:
+        self.response = response
+        self.error = error
+        self.kwargs: dict[str, object] | None = None
+
+    def create(self, **kwargs: object) -> object:
+        self.kwargs = kwargs
+        if self.error is not None:
+            raise self.error
+        assert self.response is not None
+        return self.response
+
+
+class _FakeOpenAIClient:
+    def __init__(self, response: object | None = None, error: Exception | None = None) -> None:
+        self.completions = _FakeCompletionEndpoint(response=response, error=error)
+        self.chat = SimpleNamespace(completions=self.completions)
+
+
+def _test_planning_provider(
+    response: object | None = None, error: Exception | None = None
+) -> tuple[OpenAIPlanningProvider, _FakeOpenAIClient]:
+    client = _FakeOpenAIClient(response=response, error=error)
+    config = PlanningConfig(
+        provider_label="test-provider",
+        model="test-model",
+        timeout_seconds=5,
+        credential_present=True,
+        sdk_version="test-sdk",
+    )
+    return OpenAIPlanningProvider(client, config), client
+
+
+def test_provider_request_exposes_exact_contract_and_controls() -> None:
+    response = SimpleNamespace(
+        choices=[
+            SimpleNamespace(
+                finish_reason="stop",
+                message=SimpleNamespace(content='{"schema_version":"test"}'),
+            )
+        ],
+        usage=None,
+    )
+    provider, client = _test_planning_provider(response=response)
+    provider.complete(
+        "topic_mapper",
+        MAPPER_SYSTEM_INSTRUCTION,
+        mapper_payload(
+            {"video_id": "synthetic-v1a", "title": "合成样例", "duration_ms": 8000},
+            _segments(),
+        ),
+    )
+
+    kwargs = client.completions.kwargs
+    assert kwargs is not None
+    assert kwargs["model"] == "test-model"
+    assert kwargs["response_format"] == {"type": "json_object"}
+    assert kwargs["temperature"] == 0
+    assert kwargs["max_tokens"] == MAX_OUTPUT_TOKENS
+    assert kwargs["extra_body"] == {"thinking": {"type": "disabled"}}
+    messages = kwargs["messages"]
+    assert isinstance(messages, list)
+    assert "source_segment_ids" in str(messages[0])
+    user_payload = json.loads(str(messages[1]["content"]))
+    assert "output_contract" in user_payload
+    assert "valid_example" in user_payload["output_contract"]
+    assert user_payload["output_contract"]["json_schema"]["additionalProperties"] is False
+    assert "source_segment_ids" in user_payload["output_contract"]["field_contract"]
+
+
+def test_planner_request_exposes_exact_contract_and_operational_budget() -> None:
+    response = SimpleNamespace(
+        choices=[
+            SimpleNamespace(
+                finish_reason="stop",
+                message=SimpleNamespace(content='{"schema_version":"test"}'),
+            )
+        ],
+        usage=None,
+    )
+    provider, client = _test_planning_provider(response=response)
+    segments = _segments()
+    topic_map = bind_topic_map(
+        TopicMapProposal.model_validate(_json("topic-map-proposal.json")), segments
+    )
+    provider.complete(
+        "report_planner",
+        PLANNER_SYSTEM_INSTRUCTION,
+        planner_payload(
+            {"video_id": "synthetic-v1a", "title": "合成样例", "duration_ms": 8000},
+            segments,
+            topic_map,
+        ),
+    )
+
+    kwargs = client.completions.kwargs
+    assert kwargs is not None
+    assert kwargs["response_format"] == {"type": "json_object"}
+    assert kwargs["max_tokens"] == MAX_OUTPUT_TOKENS
+    assert kwargs["extra_body"] == {"thinking": {"type": "disabled"}}
+    messages = kwargs["messages"]
+    assert isinstance(messages, list)
+    assert "topic_ids" in str(messages[0])
+    user_payload = json.loads(str(messages[1]["content"]))
+    assert user_payload["planning_budget"]["this_request_target"] == {
+        "section_count": 3,
+        "total_blocks": 8,
+        "section_block_distribution": [2, 3, 3],
+        "section_topic_ids": [
+            ["topic-001"],
+            ["topic-002", "topic-003"],
+            ["topic-004"],
+        ],
+        "allowed_block_types": [
+            "insight_card",
+            "comparison_card",
+            "bullet_group",
+            "takeaway_box",
+        ],
+        "block_type_sequence": [
+            ["insight_card", "comparison_card"],
+            ["comparison_card", "insight_card", "bullet_group"],
+            ["insight_card", "comparison_card", "takeaway_box"],
+        ],
+        "block_source_segment_ids": [1, 4],
+        "comparison_side_items": [1, 4],
+        "bullet_group_items": [2, 2],
+    }
+    assert user_payload["output_contract"]["required_fields_by_type"]["every_block"] == [
+        "type",
+        "source_segment_ids",
+    ]
+    assert user_payload["topic_source_allowlist"] == {
+        topic.topic_id: [ref.segment_id for ref in topic.source_refs]
+        for topic in topic_map.topics
+    }
+    assert user_payload["section_source_allowlist"]["closed_world"] is True
+    assert user_payload["section_source_allowlist"]["sections"] == [
+        {
+            "section_index": 1,
+            "topic_ids": [topic_map.topics[0].topic_id],
+            "allowed_source_segment_ids": [
+                ref.segment_id for ref in topic_map.topics[0].source_refs
+            ],
+        },
+        {
+            "section_index": 2,
+            "topic_ids": [
+                topic_map.topics[1].topic_id,
+                topic_map.topics[2].topic_id,
+            ],
+            "allowed_source_segment_ids": [
+                ref.segment_id
+                for topic in topic_map.topics[1:3]
+                for ref in topic.source_refs
+            ],
+        },
+        {
+            "section_index": 3,
+            "topic_ids": [topic_map.topics[3].topic_id],
+            "allowed_source_segment_ids": [
+                ref.segment_id for ref in topic_map.topics[3].source_refs
+            ],
+        },
+    ]
+    assert "non-empty subset" in user_payload["section_source_allowlist"]["pre_submit_check"]
+    assert user_payload["output_serialization"]["format"] == "single_line_json_object"
+    assert "all_object_fields_and_array_items_are_comma_delimited" in user_payload[
+        "output_serialization"
+    ]["pre_submit_check"]
+    assert user_payload["section_topic_assignment"] == [
+        {
+            "section_index": 1,
+            "topic_ids": [topic_map.topics[0].topic_id],
+            "allowed_source_segment_ids": [
+                ref.segment_id for ref in topic_map.topics[0].source_refs
+            ],
+        },
+        {
+            "section_index": 2,
+            "topic_ids": [
+                topic_map.topics[1].topic_id,
+                topic_map.topics[2].topic_id,
+            ],
+            "allowed_source_segment_ids": [
+                ref.segment_id
+                for topic in topic_map.topics[1:3]
+                for ref in topic.source_refs
+            ],
+        },
+        {
+            "section_index": 3,
+            "topic_ids": [topic_map.topics[3].topic_id],
+            "allowed_source_segment_ids": [
+                ref.segment_id for ref in topic_map.topics[3].source_refs
+            ],
+        },
+    ]
+    assert user_payload["output_contract"]["json_schema"]["additionalProperties"] is False
+    assert "every block has a non-empty sibling source_segment_ids" in user_payload[
+        "output_contract"
+    ]["validation_checklist"]
+    assert "绝不能遗漏" in PLANNER_SYSTEM_INSTRUCTION
+
+
+def test_response_diagnostics_record_truncation_without_retry(tmp_path: Path) -> None:
+    response = SimpleNamespace(
+        choices=[
+            SimpleNamespace(
+                finish_reason="length",
+                message=SimpleNamespace(content='{"schema_version":'),
+            )
+        ],
+        usage=None,
+    )
+    provider, _ = _test_planning_provider(response=response)
+    manifest, segments = _source_paths()
+
+    with pytest.raises(PlanningError, match="MODEL_OUTPUT_PARSE_ERROR"):
+        build_from_transcript(
+            manifest_path=manifest,
+            segments_path=segments,
+            run_id="truncated-provider-response",
+            output_root=tmp_path,
+            provider=provider,
+        )
+
+    run_dir = tmp_path / "truncated-provider-response"
+    trace = json.loads((run_dir / "model-calls.jsonl").read_text(encoding="utf-8"))
+    assert trace["finish_reason"] == "length"
+    assert trace["content_present"] is True
+    assert trace["content_bytes"] > 0
+    assert len(trace["content_sha256"]) == 64
+    assert trace["output_token_limit"] == MAX_OUTPUT_TOKENS
+    assert trace["thinking_mode"] == "disabled"
+    assert json.loads((run_dir / "run.json").read_text(encoding="utf-8"))["provider_calls"] == 1
+
+
+def test_no_content_response_is_provider_error_with_diagnostics(tmp_path: Path) -> None:
+    response = SimpleNamespace(
+        choices=[
+            SimpleNamespace(finish_reason="stop", message=SimpleNamespace(content=None))
+        ],
+        usage=None,
+    )
+    provider, _ = _test_planning_provider(response=response)
+    manifest, segments = _source_paths()
+
+    with pytest.raises(PlanningError, match="PROVIDER_ERROR"):
+        build_from_transcript(
+            manifest_path=manifest,
+            segments_path=segments,
+            run_id="no-content-provider-response",
+            output_root=tmp_path,
+            provider=provider,
+        )
+
+    trace = json.loads(
+        (tmp_path / "no-content-provider-response" / "model-calls.jsonl")
+        .read_text(encoding="utf-8")
+    )
+    assert trace["error_category"] == "PROVIDER_ERROR"
+    assert trace["finish_reason"] == "stop"
+    assert trace["content_present"] is False
+    assert trace["content_bytes"] == 0
+    assert trace["content_sha256"] is None
+
+
+def test_transport_error_is_recorded_without_retry(tmp_path: Path) -> None:
+    provider, _ = _test_planning_provider(error=RuntimeError("transport failed"))
+    manifest, segments = _source_paths()
+
+    with pytest.raises(PlanningError, match="PROVIDER_ERROR"):
+        build_from_transcript(
+            manifest_path=manifest,
+            segments_path=segments,
+            run_id="transport-provider-error",
+            output_root=tmp_path,
+            provider=provider,
+        )
+
+    trace = json.loads(
+        (tmp_path / "transport-provider-error" / "model-calls.jsonl")
+        .read_text(encoding="utf-8")
+    )
+    assert trace["error_category"] == "PROVIDER_ERROR"
+    assert trace["finish_reason"] is None
+    assert trace["content_present"] is False
+    assert trace["content_bytes"] == 0
+    assert trace["content_sha256"] is None
+
+
 def _source_paths() -> tuple[Path, Path]:
     return FIXTURE_ROOT / "manifest.json", FIXTURE_ROOT / "segments.jsonl"
 
@@ -149,6 +503,16 @@ def test_source_run_spine_success_uses_full_transcript_in_both_calls(tmp_path: P
     assert run_payload["provider_calls"] == run_payload["model_calls"] == 2
     assert json.loads((summary.run_dir / "assets.json").read_text(encoding="utf-8"))["assets"] == []
     assert (summary.run_dir / "report.html").is_file()
+    call_rows = [
+        json.loads(line)
+        for line in (summary.run_dir / "model-calls.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert [call["finish_reason"] for call in call_rows] == ["stop", "stop"]
+    assert all(call["content_present"] for call in call_rows)
+    assert all(call["content_bytes"] > 0 for call in call_rows)
+    assert all(len(call["content_sha256"]) == 64 for call in call_rows)
+    assert all(call["thinking_mode"] == "disabled" for call in call_rows)
+    assert all(call["output_token_limit"] == MAX_OUTPUT_TOKENS for call in call_rows)
     assert (
         provider.calls[0]["payload"]["transcript_segments"]
         == provider.calls[1]["payload"]["transcript_segments"]
@@ -313,6 +677,23 @@ def test_binder_rejects_non_contiguous_or_missing_segment_accounting() -> None:
         bind_topic_map(TopicMapProposal.model_validate(missing), segments)
 
 
+def test_binder_rejects_subtopic_sources_outside_parent_topic() -> None:
+    segments = _segments()
+    payload = _json("topic-map-proposal.json")
+    first_topic = payload["topics"][0]
+    assert isinstance(first_topic, dict)
+    first_topic["subtopics"] = [
+        {
+            "title": "越界子主题",
+            "summary": "测试越界引用",
+            "source_segment_ids": [segments[2].segment_id],
+        }
+    ]
+
+    with pytest.raises(PlanningError, match="subtopic sources must belong to parent topic"):
+        bind_topic_map(TopicMapProposal.model_validate(payload), segments)
+
+
 def test_transcript_limit_is_checked_before_provider_admission() -> None:
     segments = _segments()
     oversized = [segments[0].model_copy(update={"transcript_text": "x" * 50_001})]
@@ -364,14 +745,20 @@ def test_freeze_and_evaluate_predeclare_all_runs_without_fabricating_scores(tmp_
     assert len(freeze.runs) == 6
     assert sum(run.planned_model_calls for run in freeze.runs) == 12
     assert freeze.provider["credential_present"] is True
-    assert freeze.provider["admission"] == "BLOCKED_CONFIGURATION"
+    assert freeze.provider["thinking_mode"] == "disabled"
+    assert freeze.provider["output_token_limit"] == MAX_OUTPUT_TOKENS
 
     aggregate = evaluate_measurement(
         measurement_path=measurement_path,
         output_root=tmp_path / "evaluation",
     )
     assert aggregate["measurement_valid"] is False
-    assert aggregate["conclusion"] == "BLOCKED_PROVIDER_CONFIGURATION"
+    expected_conclusion = (
+        "MEASUREMENT_EXECUTION_FAILED"
+        if freeze.provider["admission"] == "READY"
+        else "BLOCKED_PROVIDER_CONFIGURATION"
+    )
+    assert aggregate["conclusion"] == expected_conclusion
     assert aggregate["denominator"]["declared_model_calls"] == 12
     assert aggregate["denominator"]["observed_model_calls"] == 0
     assert aggregate["evaluator_version"] == EVALUATOR_VERSION

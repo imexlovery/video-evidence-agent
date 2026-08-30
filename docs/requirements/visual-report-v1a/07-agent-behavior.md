@@ -204,6 +204,30 @@ The cost boundary is exactly two admitted calls per successful run, one at each
 stage, plus the explicit input/output budgets. No price claim is made without an
 authoritative provider price snapshot.
 
+## Goal-mode engineering recovery after a failed revision
+
+`VR-V1A-GOAL-RECOVERY-003` authorizes one bounded engineering control loop
+after the frozen `vr1a-dev-10f4334c8026` measurement failed before Planner.
+This loop is outside an individual pipeline run and does not change model
+autonomy:
+
+- every failed run and formal revision remains immutable;
+- a demonstrated prompt/schema transport, response-mode, reasoning-control,
+  token-budget, CLI, compiler, trace, or evaluator defect may be repaired;
+- provider-free tests must pass before a fresh three-video canary;
+- canaries use new diagnostic run IDs and are excluded from the formal six-run
+  denominator;
+- every material repair or configuration change creates a new candidate and,
+  after the canary passes, a wholly new frozen six-run revision;
+- no single run gains a retry, repair call, field coercion, fallback model, or
+  third call;
+- execution-valid reports that miss semantic/human thresholds stop for Owner
+  review and are not automatically prompt-tuned.
+
+The task permits at most two new formal measurement revisions and 36 new
+admitted provider/model calls across canaries and formal runs. This ceiling is
+not a target; the session stops after the first execution-valid formal revision.
+
 ## Evaluation, drift, and versioning
 
 - Population: the fixed Kling, RLinf, and Wu Yi transcripts; two runs each under
@@ -214,8 +238,10 @@ authoritative provider price snapshot.
 - Any prompt, model, schema, source, compiler, or policy change invalidates the
   current aggregate conclusion and requires a new measurement revision over all
   six runs.
-- No automatic feedback ingestion, prompt mutation, training, canary, or online
-  drift loop exists at G1. Owner decides promotion/rollback.
+- No product-runtime feedback ingestion, self-modifying prompt, training, or
+  online drift loop exists at G1. The bounded engineering canary/recovery loop
+  above requires explicit Owner authorization, preserves frozen evidence, and
+  cannot self-accept or promote V1-A. Owner decides promotion/rollback.
 
 ## Tools, multi-agent behavior, interruption, and memory
 

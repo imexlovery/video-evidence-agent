@@ -65,6 +65,32 @@ artifact, S4 composes S1–S3, and the measured denominator must not begin befor
 S0–S5 are frozen. There is no justified parallel implementation stream in this
 small prototype.
 
+## Post-measurement Goal recovery delivery
+
+S0–S7 produced a working provider-free implementation but the first configured
+provider measurement failed before Planner. The Owner therefore authorized
+`VR-V1A-GOAL-RECOVERY-003` as one continuous delivery unit:
+
+```text
+preserve v3 failure evidence
+  -> diagnose the real provider output contract
+  -> smallest prompt/transport/observability repair
+  -> provider-free regression
+  -> one fresh canary per fixed video
+  -> freeze six new formal identities
+  -> execute and evaluate the complete revision once
+  -> if an in-scope execution defect remains, preserve it and repeat with a new revision
+  -> full regression and Owner-review handoff
+```
+
+The implementation agent continues through ordinary schema, prompt-contract,
+provider-mode, reasoning/token configuration, test, CLI, compiler, trace, and
+evaluator defects without another Owner checkpoint. It must stop for missing or
+invalid credentials, billing/quota/access, source/security authorization,
+unavailable compatible provider capability, a scope/threshold change, or the
+bounded recovery ceiling. Detailed limits and exact terminal states live in
+the task card and `09-test-acceptance.md`.
+
 ## Vertical slices
 
 | Slice | User value | Scope | Dependencies | Verification | Definition of done |
