@@ -12,17 +12,17 @@
 | Compile renderer plan | Proposal validator/compiler | `REQ-VR1A-006`–`011` |
 | Trace run/model calls | Local run recorder | `REQ-VR1A-012`, `013` |
 | Render HTML | Existing V0 renderer | `REQ-VR1A-010`, `015` |
-| Measure three videos | V1-A evaluation harness + human cards | `REQ-VR1A-014`, `016` |
+| Review three product reports | V1-A prototype reviewer + human cards | `REQ-VR1A-021`, `022` |
 
 ## Task catalog
 
 | Task ID | Trigger | Input → output | Side effect | Completion | Failure/retry | Evidence |
 |---|---|---|---|---|---|---|
-| `TASK-VR1A-BUILD` | Explicit CLI | Manifest + segments → complete run directory | External text calls; local files | Two calls, validated plan, rendered HTML | No automatic retry; explicit new run ID | Run manifest/call trace/artifacts |
-| `TASK-VR1A-MAP` | Build enters mapping | Full transcript → Topic Map proposal/canonical map | One model call | Segment accounting passes | Failure stops before Planner | Raw/canonical map + validation |
-| `TASK-VR1A-PLAN` | Canonical map exists | Full transcript + map → proposal/compiled V0 plan | One model call | Grounding/budget/V0 schema pass | Failure stops before renderer | Raw proposal/compiled plan |
+| `TASK-VR1A-BUILD` | Explicit CLI | Manifest + segments → complete run directory | External text calls; local files | Two semantic stages, validated plan, rendered HTML | At most one eligible identical technical retry per run | Run/attempt manifest, call trace, artifacts |
+| `TASK-VR1A-MAP` | Build enters mapping | Full transcript → semantic Topic Map proposal/canonical map | One model call, or two when the run spends its technical retry here | At least one grounded usable topic; diagnostics emitted | Semantic failure stops before Planner; eligible technical failure may retry once | Raw/canonical map + normalization/attempt evidence |
+| `TASK-VR1A-PLAN` | Canonical map exists | Full transcript + map → semantic proposal/compiled V0 plan | One model call, or two when the run's unused retry is spent here | Grounding/current V0 contract passes without semantic rewriting/merge/split | Semantic failure stops before renderer; eligible technical failure may retry once | Raw proposal/compiler ledger/compiled plan |
 | `TASK-VR1A-RENDER` | Compiled plan exists | Plan + empty assets → HTML | Reuses local renderer | Renderer exits successfully | Existing renderer failure semantics | HTML + render summary |
-| `TASK-VR1A-MEASURE` | Frozen config + review cards | Six run directories → evaluation report | Local evaluation files only | All attempts scored and retained | No selective replacement | Measurement JSON/Markdown |
+| `TASK-VR1A-REVIEW` | Frozen config + review cards | Three run directories + HTML/screenshots → prototype review package | Local review files only | All attempts/diagnostics retained; three content/visual rubrics pending Owner | No schema-first-hit promotion or selective replacement | Prototype aggregate, rubrics, screenshots |
 
 ## Semantic input contracts
 
@@ -30,8 +30,8 @@
 |---|---|---|---|---|---|---|
 | `IN-VR1A-TRANSCRIPT/VideoSegment-v1` | Existing ingest; decision source | JSONL rows with video/segment IDs, consecutive ordinal, `[start_ms,end_ms)`, text, ASR provenance | Chinese technical/knowledge video; ≤80 segments and ≤50,000 Unicode characters; named fixture exceptions within these limits | Existing Pydantic + `validate_video_segments`; full external processing Owner-authorized | Unique IDs/ordinals; chronological non-overlap | Fail before model call |
 | `IN-VR1A-MANIFEST/ingest-v1` | Existing ingest; metadata/rights | Video ID, duration, title/source/attribution/use basis | Exactly one video matching transcript | JSON object and cross-file ID/duration checks | One manifest | Fail before model call |
-| `IN-VR1A-MODEL-CONFIG/v1` | Local operator/environment | Explicit provider endpoint if non-default, model, API/schema response mode, timeout, prompt versions, credential-present boolean | One frozen strategy per run; temperature 0; no hidden retry | Secrets remain environment-only; active continuation requires the exact model/API to support the input envelope and native schema-constrained output | Immutable inside one run and its declared canary/formal set | Configuration error |
-| `IN-VR1A-REVIEW-CARD/v1` | Human reviewer before measurement | Must-cover topics, optional topics, known ASR traps, prohibited claims, source IDs | One card per fixed video | Source IDs validated; card revision frozen before measurement | Unique video ID | Measurement cannot start |
+| `IN-VR1A-MODEL-CONFIG/v1` | Local operator/environment | Explicit provider endpoint if non-default, model, API/response mode, timeout, prompt versions, credential-present boolean | One frozen tuple for all three product runs; temperature 0 when supported; SDK retry zero; application retry budget one per run | Secrets remain environment-only; v2 uses DeepSeek JSON-object capability and does not require provider-side business-schema enforcement | Immutable inside the three-video product set and both attempts | Configuration error |
+| `IN-VR1A-REVIEW-CARD/v1` | Human reviewer before product build | Must-cover topics, optional topics, known ASR traps, prohibited claims, source IDs, content/visual rubric | One card per fixed video | Source IDs validated; card revision frozen before product runs | Unique video ID | Product set cannot start |
 
 ### Valid, boundary, and invalid transcript examples
 
@@ -212,14 +212,59 @@ It may normalize JSON serialization and surrounding whitespace. It may not
 rewrite claims, invent a ref, remove an invalid block, change a block type,
 truncate content, add a third model call, or substitute a manual plan.
 
+## Current semantic-v2 product contract
+
+The v1 contracts above remain the frozen meaning of every historical run. The
+Owner cancelled the unexecuted official-OpenAI isolation proposal and then
+confirmed a DeepSeek-first product-prototype contract in `DEC-VR1A-061`. The
+full normative task is
+[`VR-V1A-CONTRACT-SIMPLIFICATION-006`](../../tasks/VISUAL-REPORT-V1A-CONTRACT-SIMPLIFICATION.md);
+execution has not started in this documentation session.
+
+The current version adds:
+
+- `OUT-VR1A-TOPIC-PROPOSAL/visual-topic-map-proposal.v1a-semantic-v2`, whose
+  topics contain title, summary, importance, start/end segment IDs, and
+  representative segment IDs without exact partition/exclusion/subtopic rules;
+- a deterministic Topic Resolver that removes unknown/duplicate IDs, expands
+  valid spans, generates IDs/times/refs, and reports overlap/uncovered segments;
+- `OUT-VR1A-PLAN-PROPOSAL/visual-report-plan-proposal.v1a-semantic-v2`, whose
+  sections contain flat content units and advisory block-type hints rather than
+  the final discriminated typed-block union; and
+- `OUT-VR1A-NORMALIZATION/visual-report-normalization.v1a-semantic-v2`, an
+  ordered raw-to-canonical governance ledger recording rule, path,
+  before/after counts or hashes, reason, and whether a whole unit was omitted
+  or structurally mapped.
+
+Allowed v2 normalization is syntactic, referential, or structural only: trim
+whitespace, apply optional empty presentation defaults, discard unknown fields,
+deduplicate/remove unknown IDs, resolve topic spans, assign canonical
+identity/time/refs, map complete supplied shapes to compatible existing block
+types, omit whole unusable units with evidence, and validate current V0 limits.
+It may not truncate semantic text or rewrite, merge, split, shorten, expand, or
+synthesize semantic units. No usable topic, fewer than three grounded content
+units, fewer than three or more than five usable supplied sections, or any need
+for semantic transformation remains a product-pipeline failure.
+At the product-set level, valid transport/JSON followed by this insufficiency
+maps to `PROTOTYPE_CONTENT_INSUFFICIENT`, not to a technical-inconclusive state.
+
+The v2 compiler must not fabricate a claim, source, metric, comparison side,
+process meaning, or missing block. Every final block and Hero retain at least
+one valid model-selected segment ID; topic spans cannot silently replace all
+missing block evidence. Historical v1 `no repair` evidence is not relabeled.
+One identical technical retry per run is allowed only for the API/JSON anomaly
+categories in the task card; valid semantic output is never retried for quality.
+
 ## Semantic output contracts
 
 | Output ID | Consumer/purpose | Completion/quality | Provenance/control | Partial/failure behavior |
 |---|---|---|---|---|
-| `OUT-VR1A-TOPIC-MAP` | Planner/reviewer; complete source map | Canonical schema; all segments accounted | Full refs + prompt/model/run versions | No successful partial map |
-| `OUT-VR1A-PLAN-PROPOSAL` | Compiler/reviewer; model's editorial proposal | Valid proposal schema and topic accounting | Raw response retained; source IDs visible | Diagnostic only if compile fails |
+| `OUT-VR1A-TOPIC-MAP` | Planner/reviewer; global semantic map | At least one usable topic; span/representative coverage, uncovered and overlap diagnostics | Full refs + prompt/model/run versions | No usable map stops before Planner |
+| `OUT-VR1A-PLAN-PROPOSAL` | Compiler/reviewer; model's editorial proposal | Shallow semantic sections/units with grounded IDs | Raw response retained; source IDs visible | Diagnostic only if compile fails |
 | `OUT-VR1A-REPORT-PLAN` | Existing renderer | Current V0 schema; budgets/refs pass | Deterministic compiler version | Absent on invalid proposal |
 | `OUT-VR1A-HTML` | Owner; local reading | Existing renderer succeeds | Plan/assets/run lineage | Absent on any upstream failure |
+| `OUT-VR1A-VISUAL-REVIEW` | Owner; product judgment | 1080 px and approximately 390 px screenshots plus visible QA observations | HTML/run/viewport lineage | Absent when report does not render |
+| `OUT-VR1A-PROTOTYPE-REVIEW` | Owner; V1-A product decision | Three reports, content/visual rubrics and cross-video comparison | All attempts and diagnostics retained | Technical absence is technical-inconclusive; valid but unusable semantic output is content-insufficient |
 | `OUT-VR1A-RUN-MANIFEST` | Operator/evaluator | Terminal state, versions, counts, timings, usage, paths | Append-oriented run identity | Always present after run creation when filesystem permits |
 | `OUT-VR1A-ERROR` | Operator | Stable category + affected stage/ID, no credential/content dump | Retained in manifest/diagnostics | Non-zero exit |
 
@@ -231,15 +276,15 @@ Artifacts cannot advance state merely by existing.
 | State | Allowed work | Exit guard | Failure destination |
 |---|---|---|---|
 | `CREATED` | Validate config/source | Inputs/config valid | `FAILED`/`CANCELLED` |
-| `MAPPING` | One Mapper call | Canonical Topic Map passes | `FAILED`/`CANCELLED` |
+| `MAPPING` | Mapper attempt 1 and, if eligible, attempt 2 | Canonical Topic Map passes; run retry budget ≤1 | `FAILED`/`CANCELLED` |
 | `TOPIC_MAPPED` | Assemble Planner context | Planner request admitted | `FAILED` |
-| `PLANNING` | One Planner call | Proposal compiles to V0 plan | `FAILED`/`CANCELLED` |
+| `PLANNING` | Planner attempt 1 and, if the run budget remains and failure is eligible, attempt 2 | Proposal compiles to V0 plan without semantic transformation | `FAILED`/`CANCELLED` |
 | `PLAN_VALIDATED` | Render through V0 | Renderer succeeds | `FAILED` |
-| `RENDERED` | Record completion | Call count exactly 2 and artifacts complete | `FAILED` |
+| `RENDERED` | Record completion | Call count is 2 or 3; retry ledger is consistent; artifacts complete | `FAILED` |
 | `FAILED` | Preserve diagnostics | Terminal | None |
 | `CANCELLED` | Preserve any completed stage | Terminal | None |
 
-Measurement acceptance is a separate human-owned status; a `RENDERED` run is
+Product acceptance is a separate human-owned status; a `RENDERED` run is
 not automatically a quality pass.
 
 ## Error taxonomy
@@ -264,18 +309,23 @@ not automatically a quality pass.
 - `OUTPUT_IO_ERROR`
 - `CANCELLED`
 
-All failures are non-retryable inside the run. The operator decides whether to
-create a new run after correcting the cause.
+Only connection/timeout/HTTP `429`/provider `5xx`, empty content,
+provider-declared incomplete/truncated output, or malformed non-decodable JSON
+may spend the run's single technical retry. The retry repeats the current stage
+with identical request/configuration and retains both attempts. Valid JSON with
+weak/invalid semantics, grounding, or V0 incompatibility is non-retryable.
 
 ## Configuration, ordering, concurrency, and idempotency
 
 - Prompt versions, model, endpoint label, temperature, timeout, and maximum
   input envelope are fixed at run creation.
-- Calls are sequential and one run owns at most two admitted calls.
+- Calls are sequential and one run owns two base calls plus at most one
+  eligible technical retry, for at most three admitted calls.
 - Concurrency is one local run. No lock/queue is added beyond rejecting an
   existing run directory.
-- Repeating the command requires a new run ID; model output is not claimed to be
-  byte-deterministic.
+- Repeating the whole command requires a new run ID; the one in-run retry keeps
+  the same run and gains a distinct attempt ID. Model output is not claimed to
+  be byte-deterministic.
 - The compiler and renderer remain deterministic for identical validated inputs.
 
 ## Roles and permissions
@@ -284,11 +334,12 @@ create a new run after correcting the cause.
 |---|---|---|---|
 | Read the three transcript/manifests | Owner/implementer | Yes | Read-only |
 | Send full transcript text to configured provider | Local operator | Yes | Explicit V1-A authorization; no private data expected |
-| Change prompt/model/config | Implementer | Yes before a new revision | Invalidates current measurement; rerun all fixtures |
+| Change prompt/model/config | Implementer | Yes before a new product-set revision | Invalidates the current three-video set; rerun all fixtures only under new Owner authority |
 | Publish media/report | Any | No for current restricted fixtures | Separate rights authorization required |
 | Accept V1-A / authorize V1-B | Owner only | Yes | After reviewing evidence; separate decisions |
 
 ## Notifications, background behavior, and feature flags
 
 Not applicable — all work is one foreground CLI invocation. There is no worker,
-callback, notification, feature flag, provider fallback, or hidden retry.
+callback, notification, feature flag, provider fallback, or hidden retry. The
+single explicit application retry is synchronous and attempt-recorded.

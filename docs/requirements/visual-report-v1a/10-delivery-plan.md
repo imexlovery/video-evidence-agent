@@ -16,7 +16,7 @@ requirements package passes its independent readiness check and the Owner
 separately authorizes implementation.
 
 The delivery is complete only when the bounded implementation, deterministic
-checks, six-run Development measurement, and Owner review package exist. It is
+checks, three product reports, desktop/mobile evidence, and Owner review package exist. It is
 not production release, V1-A acceptance, V1-B authorization, or permission to
 publish restricted fixtures.
 
@@ -34,17 +34,20 @@ publish restricted fixtures.
 
 - Preserve the V0 renderer and frozen P0-B artifacts; add the smallest
   project-owned planning path around their public contracts.
-- Keep Topic Mapper and Report Planner separate: one admitted model call each,
-  sequentially, with the full transcript in both contexts.
+- Keep Topic Mapper and Report Planner separate: one base model call each,
+  sequentially, with the full transcript in both contexts; allow at most one
+  identical technical retry across a run.
 - Treat model output as an untrusted proposal. Pydantic validation, source
   binding, IDs, timestamps, budgets, compilation, state, and rendering remain
   deterministic.
-- Fail visibly. Do not semantically repair, retry, fall back to another model,
-  delete an invalid block, or substitute a manual plan inside a run.
+- Fail visibly. Do not rewrite, merge, split, truncate, or synthesize semantic
+  content; do not retry semantic failures, fall back to another model, or
+  substitute a manual plan. The one eligible API/JSON retry is explicit and
+  attempt-recorded.
 - Give every run a new directory and retain successes, failures, and
   cancellations in the declared evidence denominator.
-- Freeze prompts, schemas, provider/model, compiler, sources, review cards, and
-  evaluation code before the six measured runs.
+- Freeze prompts, semantic contracts, provider/model, compiler, sources, review
+  cards, and product-review code before the three product runs.
 
 ## Dependency and critical path
 
@@ -55,13 +58,13 @@ Readiness + Owner implementation authorization
   -> S2 Topic Mapper proposal + binder
   -> S3 Report Planner proposal + compiler
   -> S4 end-to-end CLI + existing renderer
-  -> S5 evaluation cards and harness
-  -> S6 frozen 3-video x 2-repeat Development measurement
-  -> S7 evidence/status handoff for Owner review
+  -> S5 review cards, viewport capture and product-review harness
+  -> S6 frozen three-video product build with bounded technical retry
+  -> S7 content/visual evidence and status handoff for Owner review
 ```
 
 The path is deliberately sequential because S3 consumes the canonical S2
-artifact, S4 composes S1–S3, and the measured denominator must not begin before
+artifact, S4 composes S1–S3, and the product set must not begin before
 S0–S5 are frozen. There is no justified parallel implementation stream in this
 small prototype.
 
@@ -95,9 +98,9 @@ That delivery unit is complete at `GOAL_RECOVERY_EXHAUSTED`; its 36-call
 authority is closed. Its sequential prompt candidates are retained as failed
 experiment evidence and are not a template for further delivery.
 
-## Authorized canonical provider-conformance delivery
+## Completed canonical provider-conformance delivery
 
-The next implementation session is one continuous Goal under
+The completed implementation session ran as one continuous Goal under
 `VR-V1A-PROVIDER-CONFORMANCE-004`:
 
 ```text
@@ -128,7 +131,75 @@ prevents another Kling-only search loop. Formal runs likewise all remain in the
 declared denominator. Credentials/billing/quota/access/network/source authority
 and product-contract changes are the only Owner/external hard stops.
 
-## Vertical slices
+The task closed at `V1A_PROVIDER_CONFORMANCE_NO_GO`: both DeepSeek Responses
+strategies completed their three-video sets, all six canaries failed, `8/8`
+calls were retained, and no formal measurement was created. Its authority is
+exhausted and must not be reused.
+
+## Cancelled minimal strict-boundary isolation delivery
+
+`VR-V1A-BOUNDARY-ISOLATION-005` was a documentation-only proposal. The Owner
+declined the official OpenAI credential/provider path before authorization, so
+the task is retained as `NEVER_EXECUTED` evidence and the four-call flow below
+must not run.
+
+```text
+preserve e72503f and all historical evidence
+  -> build and validate one strict provider-schema projection without changing canonical models
+  -> pass provider-free request/equivalence/replay/regression gates
+  -> freeze one direct strict provider/model/API tuple and four call identities
+  -> synthetic Mapper call
+  -> independent synthetic Planner call
+  -> if both pass, one full RLinf Mapper call
+  -> if mapping passes, one full RLinf Planner call and render
+  -> classify the first failing boundary and stop for Owner review
+```
+
+The maximum is four generation requests. Calls 1–2 use the existing synthetic
+fixture and isolate stage schemas independently. Calls 3–4 are the only possible
+real-transcript calls and use only RLinf. No three-video canary, repeat, formal
+measurement, evaluator, rubric, or Route B/C implementation occurs. Ordinary
+engineering defects would have been repaired before Call 1; no Call 1 occurred.
+
+## Current semantic-v2 product-prototype delivery
+
+`VR-V1A-CONTRACT-SIMPLIFICATION-006` is the Owner-confirmed product contract.
+Its future implementation runs as one continuous Goal:
+
+```text
+preserve e72503f and every historical/cancelled artifact
+  -> add versioned semantic-v2 raw/canonical contracts and governance ledger
+  -> implement/test Topic Resolver and non-semantic deterministic compiler
+  -> prove no rewrite/merge/split/synthesis and the one-retry policy with fakes
+  -> use existing DeepSeek Chat Completions JSON-object boundary only
+  -> pass provider-free v2 replay, V0, full, Ruff and protected/history gates
+  -> freeze one prompt/contract/compiler/provider tuple and three identities
+  -> execute Kling/RLinf/Wu Yi product runs once each
+  -> allow at most one identical recorded technical retry per run
+  -> render each successful report and capture desktop/mobile screenshots
+  -> create three content/visual rubrics and cross-video product comparison
+  -> full regression and documentation closeout
+  -> stop for Owner review
+```
+
+Every complete run keeps one accepted Mapper and one accepted Planner
+proposal; an eligible technical anomaly may add the single recorded wire
+attempt allowed for that run. The Topic Mapper proposes approximate
+spans/representative evidence rather than exact segment
+partition; the Planner proposes flat semantic content units rather than final
+typed union blocks. Deterministic code owns identity/ref binding, compatible
+type mapping and V0 validation, with every change recorded, but cannot rewrite,
+merge, split, truncate, or synthesize semantic content.
+
+Provider-free work uses `0/0` calls. The three runs use six base calls and at
+most three technical retries, for a nine-call ceiling. A retry uses the
+identical current-stage request and never reacts to valid semantic output.
+First-attempt schema/JSON success remains diagnostic; three report contents and
+their 1080 px/approximately 390 px visual results drive Owner review. No
+per-video tuning, prompt micro-version, second model/provider, six-run formal,
+official OpenAI, GLM/Qwen, or semantic fabrication is allowed.
+
+## Historical v1 vertical slices
 
 | Slice | User value | Scope | Dependencies | Verification | Definition of done |
 |---|---|---|---|---|---|
@@ -145,7 +216,7 @@ and product-contract changes are the only Owner/external hard stops.
 
 No multi-agent or concurrent delivery is planned. One implementer owns the
 bounded sequence and may batch independent read-only reviews, but must not run
-the six measurement identities concurrently if doing so obscures call counts,
+the three product identities concurrently if doing so obscures call counts,
 logs, or local artifact ownership.
 
 ## Shared contracts, module owners, and review boundaries
@@ -153,8 +224,8 @@ logs, or local artifact ownership.
 | Contract | Canonical owner | V1-A permission | Review boundary |
 |---|---|---|---|
 | `VideoSegment` and ingest manifest | Existing P0-B source/ingest modules | Read serialized artifacts only | Any schema/source mutation is out of scope |
-| Topic/plan proposal contracts | New V1-A planning module | Create and version | Strict `extra="forbid"`; model never becomes authority |
-| Canonical Topic Map | New deterministic binder | Create | Exact source-ID/time accounting required |
+| Topic/plan proposal contracts | New V1-A planning module | Create and version | Shallow allowlisted semantic-v2 parse; unknown fields are logged/discarded; model never becomes authority; historical strict schemas remain unchanged |
+| Canonical Topic Map | New deterministic binder | Create | Every retained source ID/time binds exactly; uncovered/overlap diagnostics replace an exact partition requirement |
 | Current `ReportPlan` and `AssetManifest` | Existing V0 visual-report module | Consume unchanged; fix only a demonstrated regression with Owner-visible evidence | Renderer contract regression blocks delivery |
 | Run state and evidence | New local recorder/evaluator | Create append-oriented artifacts | Files do not advance state by their mere presence |
 | P0-B evaluation/history | Frozen existing evaluation package | No changes | Any diff blocks delivery |
@@ -165,18 +236,18 @@ There is no database, API, migration, or backfill. Add provisional V1-A schemas
 before orchestration; add compiler adapters after those schemas; add the CLI
 only after the composed path is tested. Existing V0 schema versions remain
 unchanged. Any future V1-A schema change creates a new explicit version and a
-new measurement revision rather than rewriting historical artifacts.
+new complete product revision rather than rewriting historical artifacts.
 
 ## Environments, fixtures, and test data
 
 - Python `>=3.12,<3.13`, project-local uv environment, current lock file.
 - Unit and integration tests use a local fake provider and synthetic Chinese
   segments. Saved replay responses make no provider/model call.
-- Real Development measurement uses only `p0b-kling-2024`,
+- The current product prototype uses only `p0b-kling-2024`,
   `p0b-rlinf-2026`, and `p0b-wuyi-goals` with matching manifests.
 - Real transcripts may be sent to the current configured provider by Owner
   authorization; media files are never sent by V1-A.
-- Review cards are created and frozen before measurement. The V0 RLinf plan may
+- Review cards are created and frozen before the product runs. The V0 RLinf plan may
   inform reviewer calibration but is not machine-consumed Gold.
 
 ## Rollout, feature flags, compatibility, and rollback
@@ -192,8 +263,9 @@ or historical V1-A measurement evidence.
 
 For G1, operation is limited to one foreground run owned by the local operator.
 Required evidence is explicit configuration failure, bounded provider timeout,
-no automatic retry/fallback, terminal run state, non-secret logs, preserved
-partial diagnostics, and deterministic replay. There is no uptime, paging,
+one explicit identical technical retry with no hidden/semantic retry or
+fallback, terminal run state, non-secret logs, preserved partial diagnostics,
+and deterministic replay. There is no uptime, paging,
 backup, disaster-recovery, or on-call commitment.
 
 ## Commercial go-live and customer lifecycle
@@ -209,9 +281,14 @@ commercial commitments implicitly.
   acceptance item.
 - Source, schema, failure, adversarial, replay, integration, renderer-regression,
   and protected-diff checks pass.
-- Six predeclared run identities and all their terminal states are retained.
-- The Owner-approved thresholds are evaluated exactly as written; misses are
-  reported, not repaired or selectively rerun inside the measurement revision.
+- Three predeclared product-run identities and every attempt/terminal state are
+  retained; total provider calls do not exceed nine.
+- Three canonical reports, six viewport screenshots, content/visual rubrics,
+  and cross-video comparison exist, or the exact technical/contract stop is
+  recorded; valid but unusable semantic output is separately labeled
+  content-insufficient, without an automatic product-route No-Go claim.
+- The Owner-approved thresholds are evaluated as product evidence; misses are
+  reported, not semantically repaired or selectively regenerated.
 - Provider/model/config/prompt/source/compiler/review-card versions, call count,
   usage, latency, and cost availability are reported honestly.
 - Status stops for Owner review. V1-A acceptance and V1-B/C remain Owner-only

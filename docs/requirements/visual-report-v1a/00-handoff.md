@@ -2,7 +2,8 @@
 
 Package drafted: 2026-08-30
 
-The Owner confirmed the final model/measurement checkpoint on 2026-08-30.
+The Owner confirmed the original model/measurement checkpoint on 2026-08-30
+and the current semantic-v2 product-prototype contract on 2026-08-31.
 Authoritative readiness is still assigned only by the validator-generated
 `requirements-readiness.json`; this document does not assign its own READY state.
 
@@ -15,15 +16,28 @@ historical evidence. The latest exhausted snapshot is frozen at
 20 failed Kling canaries, and `36/36` provider/model calls, but no passing
 cross-video gate or new formal measurement.
 
-The Owner has authorized
-`VR-V1A-PROVIDER-CONFORMANCE-004` as the next single-Goal continuation. Before
-any new transcript-bearing call it must restore the canonical 4–12 Topic Mapper
-range, 0–5 subtopics, 3–5 Planner sections, 8–14 blocks, content-affordance
-selection, and anti-template behavior. It may evaluate at most two predeclared,
-materially distinct provider/model/API strategies that use native
-schema-constrained output. JSON-object mode plus prompt instructions no longer
-qualifies for this bounded continuation. Details and terminal states are fixed
-in [the provider-conformance task](../../tasks/VISUAL-REPORT-V1A-PROVIDER-CONFORMANCE.md).
+The Owner-authorized `VR-V1A-PROVIDER-CONFORMANCE-004` continuation restored the
+canonical content/anti-template contract, executed both frozen DeepSeek
+Responses strategies, and closed at
+`READY_FOR_OWNER_V1A_REVIEW — V1A_PROVIDER_CONFORMANCE_NO_GO`. Its complete
+state is frozen at `e72503f5b20831c1e86a1b72c93fb4c4f7debe2a`; its strategy,
+canary, and call authority are closed.
+
+The later direct-official-OpenAI proposal
+[`VR-V1A-BOUNDARY-ISOLATION-005`](../../tasks/VISUAL-REPORT-V1A-BOUNDARY-ISOLATION.md)
+was never authorized or executed. The Owner has no OpenAI API key, does not
+want to purchase one, and explicitly redirected work away from Route A.
+
+The current Owner-confirmed product contract is
+[`VR-V1A-CONTRACT-SIMPLIFICATION-006`](../../tasks/VISUAL-REPORT-V1A-CONTRACT-SIMPLIFICATION.md).
+It keeps the two independent calls and the current V0 compiler/renderer
+boundary, uses only the already available DeepSeek provider, and replaces the
+strict model-facing v1 schemas with shallow semantic v2 proposals plus an
+observable deterministic compiler and Topic Resolver. It validates a
+three-video product prototype, permits one explicit technical retry per run,
+and evaluates content and real rendered views rather than provider conformance.
+GLM/Qwen remain future options rather than current requirements or fallback.
+Execution has not started in this documentation session.
 
 ## Product definition
 
@@ -44,11 +58,11 @@ production operation.
 | User-confirmation evidence | “V1-A 按 G1 PROTOTYPE 继续设计” |
 | Rationale and approver | Owner is validating feasibility and content quality with three local research fixtures |
 | Permitted users/data/environments | One Owner; the three authorized P0-B transcripts; local macOS checkout; full transcript text may be sent to the configured external OpenAI-compatible provider |
-| Permitted integrations/actions/scale/reliance | Two sequential model calls per run, deterministic validation/compilation, one local report at a time, Development measurement only |
+| Permitted integrations/actions/scale/reliance | Two semantic stages per run, at most one recorded technical retry per run, deterministic compilation, one local report at a time, three-video product prototype only |
 | Prohibited use | Production reliance, public service, public redistribution of restricted fixtures, media upload, MP4/ASR automation, automatic keyframes, OCR/VLM, Agent/LangGraph/RAG, database/queue, accounts, deployment |
 | Grade-independent safety floor | Treat transcript as data, require source-linked claims, reject unknown refs and unsupported metrics, keep renderer/layout deterministic, preserve every failed run, never expose credentials |
 | Next grade and horizon | `G2 CONTROLLED_PILOT`, only after V1-A quality acceptance and separate Owner authorization; no date committed |
-| Promotion triggers/evidence/approvers | Three-video Development measurement passes, provider/data policy remains acceptable, bounded workload and support owner are defined; Owner approves promotion |
+| Promotion triggers/evidence/approvers | Owner accepts three grounded and visually usable prototype reports, provider/data policy remains acceptable, and a later G2 workload/support design is separately approved |
 
 ## Deferred-by-grade items
 
@@ -64,8 +78,8 @@ production operation.
 
 There is one local Owner and no customer, tenant, account, hosted service,
 billing, support promise, or availability commitment. The only commitment is a
-reproducible, inspectable Development measurement with honest failures and no
-claim beyond the three fixtures.
+reproducible, inspectable three-video product review package with honest
+failures and no claim beyond the three fixtures.
 
 ## Primary inputs, outputs, and data sources
 
@@ -73,7 +87,7 @@ claim beyond the three fixtures.
 |---|---|---|---|---|
 | Build from transcript | Existing ingest manifest + `VideoSegment` JSONL | Full ordered transcript and fixed planning contracts | Topic Map, Report Plan, empty assets manifest, `report.html`, run trace | Owner/implementer |
 | Invalid or failed run | Same inputs plus provider/model result | Schema/source/budget validators | Preserved failed run directory and non-zero error; no successful report claim | Implementer |
-| Three-video measurement | Frozen prompt/model/config + three fixed transcripts + human review cards | Kling, RLinf, and Wu Yi transcript snapshots | Six repeat runs, evaluation matrix, retained failures | Owner |
+| Three-video product prototype | Frozen prompt/model/config + three fixed transcripts + human review cards | Kling, RLinf, and Wu Yi transcript snapshots | Three reports, desktop/mobile screenshots, content/visual rubrics, retained attempts | Owner |
 
 ## Existing data, database, and creative assets
 
@@ -90,17 +104,18 @@ claim beyond the three fixtures.
 
 | Axis | Target | Measurement/release evidence | Owner | Link |
 |---|---|---|---|---|
-| Intelligent behavior | `A1` draft Topic Map and Report Plan with grounded sources | Three-video evaluation, two repeats each, zero major unsupported claim | Owner | [Agent behavior](07-agent-behavior.md) |
+| Intelligent behavior | `A1` draft Topic Map and Report Plan with grounded sources | Three-video content review, zero major unsupported claim, useful editorial structure | Owner | [Agent behavior](07-agent-behavior.md) |
 | System completeness | One foreground transcript-to-HTML path with explicit artifacts and failures | CLI/contract/integration/replay tests | Implementer | [Functional specification](03-functional-spec.md) |
-| Production resilience | Not claimed | Bounded timeouts, no hidden retry, preserved failures | Owner | [Quality](08-quality-security-operations.md) |
+| Production resilience | Not claimed | Bounded timeouts, one explicit technical retry, preserved attempt evidence | Owner | [Quality](08-quality-security-operations.md) |
 | Commercial operation | Not applicable — no service or customers | Scope review | Owner | [Quality](08-quality-security-operations.md) |
 
 ## Implementation objective
 
-Add the smallest project-owned V1-A planning path that performs exactly one
-Topic Mapper call and one Report Planner call, compiles the validated proposal
-into the existing V0 `ReportPlan`, renders local HTML, and supplies a repeatable
-three-video Development measurement.
+Add the smallest project-owned V1-A planning path that performs one Topic
+Mapper stage and one Report Planner stage, compiles semantic proposals without
+rewriting/merging/splitting semantics, renders local HTML, and supplies three
+content- and visually reviewable product prototypes. A run may make one
+identical technical retry when an eligible API/JSON anomaly occurs.
 
 ## Documentation-only phase boundary
 
@@ -145,18 +160,19 @@ free layout, public publishing, prompt self-improvement, fine-tuning, and V1-B/C
 | Two calls, two roles | Topic Mapper optimizes coverage; Planner optimizes compression | [Model behavior](07-agent-behavior.md) |
 | Model emits IDs, not timestamps | Deterministic binder owns canonical `SourceRef` values | [Functional specification](03-functional-spec.md) |
 | Proposal then compiler | Model output is not the renderer contract until validated and compiled | [System design](04-system-design.md) |
-| No semantic auto-repair | Invalid or ungrounded model output fails and is retained | [Functional specification](03-functional-spec.md) |
+| Non-semantic compiler only | It may bind/validate/map structure but cannot rewrite, merge, or split semantic content | [Functional specification](03-functional-spec.md) |
+| One technical retry | One identical, explicit, attempt-recorded retry per run is allowed only for eligible API/JSON anomalies | [Interfaces](06-interfaces-integrations.md) |
 | Text-only V1-A | No image blocks; empty assets manifest feeds existing renderer | [Interfaces](06-interfaces-integrations.md) |
-| Three-video Development measurement | RLinf development reference; Kling and Wu Yi broaden structure | [Acceptance](09-test-acceptance.md) |
+| Three-video product prototype | RLinf development reference; Kling and Wu Yi broaden content and visual structure | [Acceptance](09-test-acceptance.md) |
 
 ## Top risks and mitigations
 
 | Risk | Impact | Mitigation | Link |
 |---|---|---|---|
-| Mapper omission becomes invisible | Planner cannot recover missing content | Every input segment must map to a topic or explicit exclusion | [Risks](11-decisions-risks.md) |
+| Mapper omission becomes invisible | Planner cannot recover missing content | Coverage diagnostics plus must-cover human review; no hidden topic synthesis | [Risks](11-decisions-risks.md) |
 | Polished unsupported conclusion | Misleading report | Source-ID binding, metric lexical gate, human entailment review | [Agent behavior](07-agent-behavior.md) |
 | Same template across videos | Product feels generic | Content-affordance rules, no block quota, cross-video signature review | [Acceptance](09-test-acceptance.md) |
-| Provider/schema drift | Run becomes non-reproducible | Explicit model/config snapshot, strict validation, fail closed | [Quality](08-quality-security-operations.md) |
+| Technical API/JSON anomaly masks product quality | Prototype set becomes inconclusive | One identical recorded retry; technical failure separated from product judgment | [Quality](08-quality-security-operations.md) |
 
 ## Delivery and ownership
 
@@ -164,7 +180,7 @@ free layout, public publishing, prompt self-improvement, fine-tuning, and V1-B/C
 - Target environment: current Python 3.12/uv macOS checkout.
 - Operating owner: repository Owner.
 - Implementation owner: one bounded later implementation session.
-- Release/measurement acceptance owner: repository Owner.
+- Product-prototype acceptance owner: repository Owner.
 
 ## Downstream implementation contract
 
@@ -189,14 +205,18 @@ free layout, public publishing, prompt self-improvement, fine-tuning, and V1-B/C
 | Renderer/layout authority | required invariant | Owner | Existing typed plan and deterministic renderer | LLM HTML/CSS/layout | Plan/schema review |
 | Internal module/function split | implementation-delegated | Later implementer | Small project-owned code under approved paths | New framework/service | Code review |
 | Exact provider model | implementation-delegated, Owner-confirmed envelope | Owner/implementer | Explicit configured text model with sufficient context and JSON output | Implicit model or hidden fallback | `DEC-VR1A-048`; run manifest |
-| Quality thresholds/repeat plan | fixed constraint, Owner-confirmed | Owner | Values in `09-test-acceptance.md` | Self-acceptance or selective rerun by implementer | `DEC-VR1A-049`; frozen measurement |
-| Provider-conformance continuation | fixed experiment boundary with delegated implementation details | Owner/implementer | Restore canonical content contract; predeclare at most two native schema-constrained strategies; one three-video canary set each; first passing strategy runs one six-run measurement | JSON-object-only transport, prompt micro-versions, per-video tuning, same-strategy rerun, more than 24 new calls | `DEC-VR1A-053/054`; strategy/canary/formal manifests |
+| Product quality and visual review | fixed constraint, Owner-confirmed | Owner | Three reports; content/grounding/structure plus desktop/mobile review | Schema-first-hit as primary outcome or implementer self-acceptance | `DEC-VR1A-049/061`; prototype review package |
+| Provider-conformance continuation | closed historical experiment | None | Preserve its completed no-go evidence | Reopen calls, mutate results, or reuse it as current product acceptance | `DEC-VR1A-053/054`; strategy/canary/formal manifests |
+| Minimal strict-boundary isolation design | rejected/cancelled before execution | Owner | Retain as historical design evidence only | Official OpenAI credential/provider call or use as current authority | `DEC-VR1A-055/056/057/058`; cancelled isolation card |
+| V1-A semantic-v2 product prototype | fixed constraint; Owner-confirmed | Owner | Two semantic stages; non-semantic compiler; one recorded technical retry per run; one three-video product set; content/visual review | Semantic rewrite/merge/split, model repair, provider fallback, six-run formal, schema compliance as product goal | `DEC-VR1A-061`; contract-simplification card |
 | V1-B/C start | prohibited | Owner | Separate later authorization | Automatic continuation | New Owner instruction |
 
 ## Readiness gate
 
-The checkpoint is closed by `DEC-VR1A-048` and `DEC-VR1A-049`. The independent
-validator now determines the package status in `requirements-readiness.json`.
+The original implementation/measurement checkpoint is historical. The latest
+product contract is `DEC-VR1A-061`. The independent validator determines this
+package's documentation readiness in `requirements-readiness.json`; this
+documentation session still performs no implementation or provider call.
 
 ## Package index
 

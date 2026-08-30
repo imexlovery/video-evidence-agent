@@ -21,8 +21,9 @@
 | `ASSET-VR1A-MANIFESTS / AVAILABLE` | Matching `manifest.json` plus `eval/p0b/corpus.jsonl` | P0-B corpus | JSON/JSONL metadata, attribution, use basis | Authority for title/duration/rights; read-only | Reuse; conflict blocks run |
 | `ASSET-VR1A-V0-PLAN / AVAILABLE` | `artifacts/visual-report/v0-rlinf/report-plan.json` | V0 Owner | 4 sections, 13 blocks | Local development reference; not automatic Gold | Human comparison only |
 | `ASSET-VR1A-RENDERER / AVAILABLE` | `src/video_evidence_agent/visual_report/` | Repository | Current V0 Pydantic/HTML contract | Preserve behavior | Reuse unchanged |
-| `ASSET-VR1A-REVIEW-CARDS / AVAILABLE` | `eval/visual-report-v1a/review-cards/` | Implementer created; Owner reviews | Three versioned small JSON cards; current human rubrics remain pending | Derived locally from authorized transcripts | Validate and snapshot unchanged into any new formal revision |
-| `ASSET-VR1A-HISTORICAL-RUNS / AVAILABLE_IMMUTABLE` | `artifacts/visual-report/v1a/` plus `eval/visual-report-v1a/` manifests | V1-A recorder/evaluator | Three historical formal revisions, 22 recovery candidate manifests, 20 failed recovery canaries | Local restricted evidence; no public redistribution | Preserve every identity/aggregate/rubric; create only new unique strategy/canary/formal identities |
+| `ASSET-VR1A-REVIEW-CARDS / AVAILABLE` | `eval/visual-report-v1a/review-cards/` | Implementer created; Owner reviews | Three versioned cards; content/visual rubrics remain pending | Derived locally from authorized transcripts | Validate and snapshot unchanged into the new product-prototype set |
+| `ASSET-VR1A-HISTORICAL-RUNS / AVAILABLE_IMMUTABLE` | `artifacts/visual-report/v1a/` plus `eval/visual-report-v1a/` manifests | V1-A recorder/evaluator | Three historical formal revisions, 22 recovery candidate manifests, 20 failed recovery canaries | Local restricted evidence; no public redistribution | Preserve every identity/aggregate/rubric; create three new unique product-run identities |
+| `ASSET-VR1A-NORMALIZATION-LEDGER / CURRENT CONTRACT` | New semantic-v2 run directories | Deterministic normalizer | Ordered raw-to-final rules, affected paths, before/after values and whole-unit omission counts | Contains derived transcript text; local restricted evidence | Create once per v2 run; replayable; never rewrite historical v1 artifacts |
 | `STORE-VR1A-DATABASE / NOT_APPLICABLE` | None | None | None | No G1 need | Must not add |
 | Brand/creative assets | Not applicable | None | None | V1-A creates no visual identity | Existing renderer retained |
 
@@ -34,13 +35,15 @@ formatting must not alter stored values.
 ```text
 VideoManifest 1 ── 1 TranscriptSnapshot
 TranscriptSnapshot 1 ── * VideoSegment
-PlanningRun 1 ── 2 ModelCallTrace
-PlanningRun 1 ── 1 TopicMapProposal ──compile──> TopicMap
-TopicMap 1 ── 1 ReportPlanProposal ──compile──> V0 ReportPlan
+PlanningRun 1 ── 2..3 ModelAttemptTrace
+PlanningRun 1 ── 1 TopicMapProposal ──resolve──> TopicMap
+TopicMap 1 ── 1 ReportPlanProposal ──normalize/compile──> V0 ReportPlan
+PlanningRun 1 ── 1 NormalizationLedger
 V0 ReportPlan + EmptyAssetManifest ──render──> report.html
 PlanningRun 1 ── * RunEvent
-MeasurementRevision 1 ── 6 PlanningRun
-MeasurementRevision 1 ── 3 ReviewCard
+ProductPrototypeSet 1 ── 3 PlanningRun
+ProductPrototypeSet 1 ── 3 ReviewCard
+ProductPrototypeSet 1 ── 6 ViewportReview
 ```
 
 ## Data dictionary
@@ -55,7 +58,8 @@ MeasurementRevision 1 ── 3 ReviewCard
 | `DATA-VR1A-MODEL-REV` | Provider label + explicit model name | Run config | Operational | `run.json` |
 | `DATA-VR1A-USAGE` | Provider token/usage payload when present | Provider trace | None | `model-calls.jsonl`; absence is `{}` |
 | `DATA-VR1A-COST` | Monetary cost | Derived only with authoritative price | None | `unavailable` when pricing/usage cannot prove it |
-| `DATA-VR1A-MEASUREMENT` | Per-run deterministic/human scores | Evaluation harness/Owner | None | Versioned evaluation report |
+| `DATA-VR1A-PROTOTYPE-REVIEW` | Per-video diagnostics, screenshots and pending content/visual rubrics | Prototype reviewer/Owner | None | Versioned three-report review package |
+| `DATA-VR1A-NORMALIZATION` | Ordered rule ID, JSON path, reason, before/after value and discard counters | Deterministic normalizer | Derived transcript content | `normalization.json`; raw response remains immutable |
 
 ## Data-source register
 
@@ -63,8 +67,8 @@ MeasurementRevision 1 ── 3 ReviewCard
 |---|---|---|---|---|---|---|
 | `SRC-VR1A-SEGMENTS / first-party artifact` | Owner; external text processing explicitly authorized | Complete ASR coverage, 38–46 stable segments; recognition/numeric errors possible | Frozen local snapshot; transcript text is untrusted data | JSONL → validated segment list → two prompt contexts → bound refs | Invalid source stops; source artifact overrides model | Read-only |
 | `SRC-VR1A-MANIFEST / first-party metadata` | P0-B corpus authority for identity/duration/attribution/use | One per video | Frozen; conflict blocks | Manifest fields copied deterministically into final plan/run | Corpus/manifest outrank model/proposal | Read-only |
-| `SRC-VR1A-MODEL / derived proposal` | Configured provider; advisory only | Variable structured output | Prompt/model/provider revision recorded | Raw JSON → strict schema → bind/compile | Never outranks transcript; invalid output fails | Retained with run |
-| `SRC-VR1A-REVIEW-CARD / human evaluation` | Implementer drafts; Owner is acceptance authority | Must-cover/optional/prohibited cases for one source snapshot | Frozen before measured prompt runs | Source IDs → evaluation labels → aggregate report | Card/source mismatch blocks measurement | Version controlled |
+| `SRC-VR1A-MODEL / derived proposal` | Configured provider; advisory only | Variable JSON-object semantic output | Prompt/model/provider revision recorded | Raw JSON → shallow v2 parse → observable normalization → bind/compile | Never outranks transcript; invalid/empty/ambiguous JSON or semantic-repair need fails | Retained with run |
+| `SRC-VR1A-REVIEW-CARD / human evaluation` | Implementer drafts; Owner is acceptance authority | Must-cover/optional/prohibited/content/visual cases for one source snapshot | Frozen before product runs | Source IDs + rendered views → pending rubric + product comparison | Card/source mismatch blocks product set | Version controlled |
 | `SRC-VR1A-V0-PLAN / development reference` | V0 Owner | One high-quality RLinf plan; authoring bias acknowledged | Fixed reference revision | Human comparison only | Never copied as generated output or universal Gold | Read-only |
 
 ## Primary lineage
@@ -74,16 +78,18 @@ manifest + VideoSegment JSONL
 → source validation and snapshot hashes
 → full ordered Mapper context
 → raw Topic Map proposal
-→ deterministic segment accounting and SourceRef binding
+→ deterministic Topic Resolver, coverage diagnostics and SourceRef binding
 → canonical topic-map.json
 → full ordered Planner context + Topic Map + renderer grammar
 → raw Report Plan proposal
+→ deterministic non-semantic normalization with retained event ledger
 → deterministic topic/source/budget/metric validation
 → current V0 report-plan.json + empty assets.json
 → existing renderer
 → report.html
-→ deterministic metrics + human review cards
-→ Development measurement conclusion
+→ 1080 px desktop + approximately 390 px mobile screenshots
+→ deterministic diagnostics + pending human content/visual review cards
+→ Owner product-prototype conclusion
 ```
 
 ## Run artifact layout
@@ -94,11 +100,17 @@ artifacts/visual-report/v1a/<run-id>/
 ├── events.jsonl
 ├── model-calls.jsonl
 ├── topic-map.raw.json
+├── topic-map.normalized.json
 ├── topic-map.json
 ├── report-plan.raw.json
+├── report-plan.normalized.json
 ├── report-plan.json
 ├── assets.json
+├── normalization.json
 ├── validation.json
+├── screenshots/
+│   ├── desktop.png
+│   └── mobile.png
 └── report.html
 ```
 
@@ -108,6 +120,9 @@ artifacts/visual-report/v1a/<run-id>/
   by a measured run so results can be tied to a snapshot; it is not a general
   repository-integrity exercise.
 - Raw response files may be absent when a provider fails before returning body.
+- Semantic-v2 normalized files and `normalization.json` exist only after the
+  corresponding raw JSON object is parseable; a pre-response failure records
+  the absence explicitly in run/events evidence.
 - `report.html` exists only for a successfully validated/rendered run.
 - No transcript duplicate or complete rendered prompt is stored; the source
   hash, prompt revision, and structured context contract reconstruct the input.
@@ -131,8 +146,11 @@ artifacts/visual-report/v1a/<run-id>/
   terminal state. Corrections create a new run.
 - A prompt/model/schema/policy change creates a new revision; comparison across
   revisions names both rather than replacing old results.
-- If a measured revision changes, all three videos and both repeats are rerun;
-  no selective replacement is allowed.
+- If a frozen product-set prompt/model/compiler policy changes, the set becomes
+  stale. No selective replacement is allowed without new Owner authority.
+- An eligible technical retry remains inside the same run with a distinct
+  attempt identity; both raw attempts and the identical request/config snapshot
+  are retained.
 - Existing V0 HTML remains canonical only for V0; each V1-A run's HTML is
   derived from that run's compiled plan.
 

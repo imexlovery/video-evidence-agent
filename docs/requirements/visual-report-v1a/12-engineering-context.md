@@ -15,8 +15,10 @@
 - Selection method: AI recommendation explicitly confirmed by the Owner.
 - User-confirmation evidence: “V1-A 按 G1 PROTOTYPE 继续设计。”
 - Permitted implementation/runtime scope: one local foreground transcript-to-HTML
-  path; three fixed transcripts; exactly one Mapper and one Planner call per
-  successful run; deterministic compilation; local Development measurement.
+  path; three fixed transcripts, one product run each; one accepted Mapper and
+  one accepted Planner proposal per successful run; at most one identical,
+  recorded technical retry shared by the run; deterministic compilation and
+  desktop/mobile product review.
 - Prohibited scope: product code changes in this design phase; and in later
   V1-A implementation, MP4/ASR orchestration, frames/assets, OCR/VLM, Agent,
   LangGraph, RAG, database/queue/service/API/UI/deployment, public publishing,
@@ -36,9 +38,10 @@
   topology.
 - Product implementation strategy: `FRAMEWORKLESS` project-owned orchestration.
 - Required public capabilities: explicit provider configuration,
-  provider-native schema-constrained completion for the active continuation,
-  strict proposal validation, append-oriented local artifacts, deterministic
-  replay/compiler, current V0 render command.
+  one accepted DeepSeek JSON-object proposal per stage, versioned shallow
+  semantic proposals, observable non-semantic normalization/source resolution,
+  one explicit technical retry budget, append-oriented local artifacts,
+  replay/compiler, screenshots, and the current V0 render command.
 - Compatibility envelope: existing `VideoSegment`, ingest `manifest.json`,
   `visual-report.v0-prototype`, `visual-report-assets.v0-prototype`, uv lock, and
   existing `video-evidence` commands remain compatible.
@@ -61,11 +64,11 @@ Routes below make that non-adoption and each project-owned seam explicit.
 | Tools/MCP | `NOT_APPLICABLE` | None | Models have no tool authority | No tool calls | None | None | Scope review | Owner | None |
 | Memory/context | `PROJECT_OWNED` | Deterministic full-transcript context builders | Two bounded request contexts, no persistent model memory | Current transcript/map only | Planning module | Limits and prompt versions | Boundary/prompt-injection tests | Implementer | Reject oversize input |
 | Execution/workspace | `NOT_APPLICABLE` | None | Model cannot execute code or mutate files | Local Python process owns writes | Local operator | Explicit artifact root | Side-effect review | Owner | None |
-| Prompt/inference/models | `PROJECT_OWNED` | OpenAI-compatible SDK transport + two versioned role prompts | Product-specific roles and schemas | At most two predeclared native-schema provider/model/API strategies | Planning provider adapter | One call per stage; schema-constrained output; temperature zero; no retry/fallback | Capability evidence, fake tests, full cross-video canary | Implementer/Owner | Fail run; only the already-frozen next strategy may be evaluated |
+| Prompt/inference/models | `PROJECT_OWNED` | Existing OpenAI-compatible SDK + DeepSeek endpoint + two versioned role prompts | Product-specific roles and semantic-v2 schemas | One accepted shallow JSON proposal per stage; normalization is project-owned and logged | Planning provider adapter | Existing IDs only; no semantic fabrication or provider fallback; at most one identical recorded technical retry per run | JSON request, attempt, normalization/replay and product-run evidence | Implementer/Owner | Technical-inconclusive after retry; GLM/Qwen/other model not used inside the task |
 | Storage/data/artifacts | `PROJECT_OWNED` | Local filesystem | G1 needs inspectable runs, not a database | Unique immutable run paths | Run recorder | Layout in `05-data-memory.md` | Duplicate/retention/replay checks | Owner | Owner-controlled archive/delete |
 | Serving Cache/WorkCache | `NOT_APPLICABLE` | None | No service or cache | None | None | None | Dependency review | Owner | None |
 | Policy/identity/approval | `PROJECT_OWNED` | CLI preconditions + Owner gates | Enforce scope/phase authority without account system | Local operator; Owner accepts/promotes | Owner | No publish/deploy/V1-B/C | Status/diff review | Owner | Stop |
-| Evaluation/testing | `PROJECT_OWNED` | Pytest, fake adapter, review cards/evaluator | V1-A quality needs deterministic and human evidence | Three fixed videos × two repeats | Implementer + Owner | Protocol in `09-test-acceptance.md` | Tests plus frozen measurement | Owner | New full revision after change |
+| Evaluation/testing | `PROJECT_OWNED` | Pytest, fake adapter, product review cards and browser screenshots | V1-A quality needs deterministic and human evidence | Three fixed videos × one product run, reviewed at 1080 px and about 390 px | Implementer + Owner | Protocol in `09-test-acceptance.md` | Tests, three reports, six screenshots and Owner rubric | Owner | New complete three-video product revision after change |
 | Product surface | `PROJECT_OWNED` | Existing `build-from-transcript` subcommand + existing HTML | Smallest local surface | No API/UI | Visual-report module | Existing render output | CLI/render tests | Owner | Existing V0 render remains |
 | Operations | `NOT_APPLICABLE` | Foreground local process only | No hosted operation | Timeout and visible failure only | Local operator | No SLO/support promise | Failure trace | Owner | Explicit new run |
 
@@ -73,12 +76,12 @@ Routes below make that non-adoption and each project-owned seam explicit.
 
 | Capability | Required public contract | Requirements | Acceptance evidence |
 |---|---|---|---|
-| Input/output contracts | Versioned strict Pydantic schemas and stable JSON artifacts | Existing IDs only; bounded lists/text; extra fields forbidden | Contract examples and invalid fixtures |
-| Source adapters and lineage | Read-only manifest/segments adapter and deterministic binder | Exact ID/time/source propagation | Source accounting and replay |
-| Tasks, state, and recovery | Sequential local FSM with terminal failure/cancel states | No successful partial output or in-run retry | Transition, cancellation, duplicate-ID tests |
+| Input/output contracts | Versioned shallow raw v2 schemas, normalization ledger, canonical Pydantic/V0 schemas and stable JSON artifacts | Existing IDs only; provider extras discarded visibly; final lists/text bounded | Contract examples, normalization rules and invalid fixtures |
+| Source adapters and lineage | Read-only manifest/segments adapter and deterministic Topic Resolver/compiler | Exact final ID/time/source propagation plus overlap/uncovered diagnostics | Source-resolution and replay |
+| Tasks, state, and recovery | Sequential local FSM with terminal failure/cancel states | No successful partial output; at most one eligible identical technical retry per run, with both attempts retained | Transition, retry eligibility/exhaustion, cancellation and duplicate-ID tests |
 | Policy, permissions, and approval | Owner phase gates plus local CLI scope | No publish/deploy/V1-B/C; model has no actions | Task/status and protected-diff review |
 | Memory and artifacts | Current-run contexts and unique local artifact directory | No conversation/vector/database memory; retain failures | Layout and retention tests |
-| Evaluation and versioning | Frozen prompts/model/source/compiler/cards and six declared runs | New revision after any material change | Revision manifest and denominator audit |
+| Evaluation and versioning | Frozen prompts/model/source/compiler/cards and three declared product runs | New complete three-video revision after any material change | Product manifest, artifact inventory and review audit |
 | Observability and operations | Non-secret config, stage, call, usage, latency, and error records | Cost `unavailable` unless authoritative; no uptime claim | Trace/failure inspection |
 | Tenant/customer lifecycle | Not applicable | One Owner/local prototype | Scope review |
 
@@ -86,17 +89,19 @@ Routes below make that non-adoption and each project-owned seam explicit.
 
 | Decision | Class | Decision owner | Allowed envelope | Prohibited | Acceptance evidence |
 |---|---|---|---|---|---|
-| Grade, stage, fixtures, two roles/calls | fixed constraint | Owner | G1 V1-A Development measurement | Merge calls or broaden stages | User evidence and call trace |
+| Grade, stage, fixtures, two semantic roles | fixed constraint | Owner | G1 V1-A product prototype over three videos | Merge roles, broaden stages, or present it as a stability measurement | User evidence and call trace |
 | Full transcript external processing | fixed constraint | Owner | Three named transcripts to configured text provider | Media upload or public redistribution | Source/run manifest |
 | Source IDs/timestamps/lineage | required invariant | Owner | Model selects existing IDs; code binds canonical values | Model-created IDs/times or unknown refs | Binder/contract tests |
 | Renderer/layout authority | required invariant | Owner | Existing typed semantic blocks and deterministic renderer | Model HTML/CSS/SVG/style/layout/assets | Schema and render tests |
-| Failure/evidence behavior | required invariant | Owner | Unique runs, terminal state, all failures retained | Hidden retry/repair/fallback/overwrite | Failure/replay evidence |
+| Failure/evidence behavior | required invariant | Owner | Unique runs, terminal state, all attempts and every allowed normalization retained; one explicit identical technical retry per run | Hidden/additional retry, valid-semantic regeneration, semantic repair, fallback, or overwrite | Raw-normalized-final attempt/replay evidence |
 | Exact model identity | implementation-delegated | Owner sets envelope; implementer selects | Explicit compatible text model, frozen and recorded | Implicit default, insufficient context, fallback | `DEC-VR1A-048` + run snapshot |
 | Internal module/function names | implementation-delegated | Implementer | Small project-owned code within approved paths | Framework/service abstraction | Code review and tests |
-| Prompt wording before freeze | implementation-delegated | Implementer | One versioned prompt per role satisfying contracts | Role merge or post-freeze selective tuning | Prompt snapshot and measurement revision |
-| Six-run thresholds/protocol | fixed constraint | Owner | Values in `09-test-acceptance.md` | Implementer self-approval or selective rerun | `DEC-VR1A-049` + frozen measurement |
+| Prompt wording before freeze | implementation-delegated | Implementer | One versioned prompt per role satisfying contracts | Role merge or post-freeze selective tuning | Prompt snapshot and product revision |
+| Historical six-run thresholds/protocol | closed historical constraint; not current prototype acceptance | None | Preserve prior requirements and evidence unchanged | Reuse it as the current denominator or overwrite it | `DEC-VR1A-049` plus historical manifests |
 | Historical Goal recovery after v3 failure | closed historical authority | None | Preserve its 22 candidates, 20 failed runs, and 36/36 calls | Continue or relabel the exhausted loop | `DEC-VR1A-051/052`, frozen commit `4ba28bf1b3288a6fb77bcc27378a45a69cd2b895` |
-| Canonical provider-conformance continuation | implementation-delegated within fixed constraints | Implementer | Restore canonical variable content contract; predeclare at most two native-schema strategies; one full three-video canary each; first passing strategy gets one six-run formal revision; at most 24 calls | JSON-object-only admission, prompt micro-version, per-video tuning, post-freeze repair/rerun, second formal revision | `DEC-VR1A-053/054`, strategy registry, manifests, call ledger, exact terminal |
+| Canonical provider-conformance continuation | closed historical authority | None | Preserve the completed two-strategy no-go and its artifacts | Continue calls, mutate results, or treat it as current product acceptance | `DEC-VR1A-053/054`, strategy registry, manifests, call ledger and terminal |
+| Strict-boundary isolation | rejected/cancelled | None | Retain card as never-executed design evidence | Official OpenAI credential/call or use as current authority | `DEC-VR1A-058`, cancelled task/status |
+| Current semantic-v2 product prototype | Owner-confirmed contract; execution not authorized by this design session | Implementer after separate Owner execution instruction | Two independent semantic stages; existing DeepSeek JSON-object tuple; Mapper spans and Planner content units; logged non-semantic normalization; one product run per video; one shared technical retry per run; 9-call max; six screenshots | Semantic rewrite/merge/split, valid-semantic retry, fallback/provider comparison, per-video tuning, canary/formal loop | `DEC-VR1A-061`, task card, product manifest, attempt ledger and Owner content/visual review |
 | V1-B/C, G2, production, publishing | prohibited | Owner | Separate future requirements and authorization | Automatic continuation | New Owner decision |
 
 All implementation-facing decisions now have a fixed, invariant,
@@ -109,15 +114,16 @@ validator remains the sole readiness authority.
 - Project/repository root: `/Users/tristana/Develop/video-evidence-agent`.
 - Branch: `visual-report`.
 - Original requirements baseline: `6576d1e8a0df3aa7288a6b9c84b6615114d9decc`.
-- Current frozen code/evidence baseline for
+- Current frozen code/evidence baseline after
   `VR-V1A-PROVIDER-CONFORMANCE-004`:
-  `4ba28bf1b3288a6fb77bcc27378a45a69cd2b895`.
+  `e72503f5b20831c1e86a1b72c93fb4c4f7debe2a`.
 - Dependency/lock baseline: `pyproject.toml` with Python
   `>=3.12,<3.13`, `openai>=3.3.1`, `pydantic>=2.13.4`; existing `uv.lock`.
-- Source status after the failed-experiment freeze: branch `visual-report` was
-  clean at commit `4ba28bf1b3288a6fb77bcc27378a45a69cd2b895`. The current requirements/task
-  edits are documentation-only handoff work and may remain uncommitted when the
-  next Goal begins; preserve them rather than resetting or reinitializing.
+- Source status at the start of the current requirements redesign: branch
+  `visual-report` was clean at commit
+  `e72503f5b20831c1e86a1b72c93fb4c4f7debe2a`. The current requirements/task
+  edits are documentation-only work; preserve them rather than resetting or
+  reinitializing.
 
 ## Supplied asset locations and implementation change permissions
 
@@ -128,8 +134,8 @@ validator remains the sole readiness authority.
 | `ASSET-VR1A-WUYI-TRANSCRIPT` | `artifacts/p0b-ingest/p0b-wuyi-goals/{manifest.json,segments.jsonl}` | Existing P0-B / available | Read and snapshot only | No rewrite, relabel, publish, or media upload | 38 segments; manifest match |
 | `ASSET-VR1A-V0-CONTRACTS` | `src/video_evidence_agent/visual_report/{models.py,renderer.py,__main__.py}` | V0 / current baseline | Import/reuse public contracts; modify only for an observed regression that cannot be handled in the new adapter and is separately evidenced | No aesthetic redesign, new template, image automation, or schema reinterpretation | Existing visual-report tests and required render command |
 | `ASSET-VR1A-PROVIDER-PATTERN` | `src/video_evidence_agent/answering.py` | P0 / current baseline | Reuse SDK/config/trace lessons, not module semantics | Do not alter answer path or reuse P0 model variable implicitly | P0 tests unchanged |
-| `ASSET-VR1A-REVIEW-CARDS` | Existing `eval/visual-report-v1a/review-cards/` | Implementer-created; Owner review pending | Reuse and snapshot exact version for a new formal revision | No post-run target editing inside revision | Existing card validation plus new revision snapshot |
-| `ASSET-VR1A-RUNS` | Existing ignored `artifacts/visual-report/v1a/<run-id>/` | Historical implementation/recovery plus future Goal | Create only new unique directories and derived artifacts | Never overwrite or selectively delete any historical or new failure | Run inventory/denominator audit |
+| `ASSET-VR1A-REVIEW-CARDS` | Existing `eval/visual-report-v1a/review-cards/` | Implementer-created; Owner review pending | Derive and snapshot an explicit semantic-v2 product card covering content, grounding, cross-video fit and both viewports | No post-run target editing inside the product revision; no auto-filled Owner score | Existing card validation plus new product revision snapshot |
+| `ASSET-VR1A-RUNS` | Existing ignored `artifacts/visual-report/v1a/<run-id>/` | Historical implementation/recovery plus future Goal | Create only three new unique product directories and their derived artifacts | Never overwrite or selectively delete any historical or new attempt | Run inventory/product-set audit |
 
 ## Real entry points and runtime path
 
@@ -174,7 +180,7 @@ public command behavior, artifacts, calls, and states remain fixed.
 | Topic identity/time | Canonical Topic Map from deterministic binder | Proposal contains source IDs only | Binder output wins; unknown/missing IDs fail |
 | Report IDs/time/refs | Compiled V0 `report-plan.json` | Proposal is retained but non-canonical | Compiler output wins; compile failure means no success plan |
 | HTML completion | `run.json=RENDERED` plus current renderer success | File presence alone is insufficient | State and artifact completeness must agree or run fails |
-| Measurement quality | Versioned evaluator output + Owner rubric/decision | `RENDERED` is only execution success | Owner acceptance evidence wins |
+| Product quality | Versioned product-review output + Owner content/visual rubric and decision | `RENDERED` or schema success is only execution evidence | Owner acceptance evidence wins |
 | Package readiness | Validator-generated `requirements-readiness.json` | Narrative docs cannot self-declare it | Generated report wins |
 
 ## Mocks, stubs, deprecated paths, duplicates, and contract drift
@@ -188,20 +194,20 @@ public command behavior, artifacts, calls, and states remain fixed.
 - The hand-authored V0 plan remains reference evidence, not a fallback/stub for
   a failed Planner.
 - Duplicate schemas or compatibility shims are not added. Contract drift
-  creates a new explicit schema/prompt/measurement revision.
+  creates a new explicit schema/prompt/product revision.
 
 ## Capability-fit matrix
 
 | Capability | State | Baseline evidence | Gap | Change layer | Owner | Acceptance |
 |---|---|---|---|---|---|---|
 | Timestamped transcript source | `SUPPORTED` | Three validated `VideoSegment` JSONL fixtures and implemented read-only loader | None in current scope | Reuse unchanged | Existing source owner | Contract/boundary tests |
-| OpenAI-compatible provider transport | `IMPLEMENTED_NOT_CONFORMANT` | Existing V1-A adapter records two stages with retry zero, but the exhausted path used JSON-object mode | Add exact native schema-constrained strategy transport and capability snapshot | Existing provider adapter | Implementer | Capability evidence, runtime request tests, cross-video canary |
-| Topic Mapper | `IMPLEMENTED_CONTRACT_DRIFT` | Strict schema/binder/coverage exist; frozen failed prompt/payload forces exactly four topics and empty subtopics | Restore canonical 4–12 topics and 0–5 content-derived subtopics; anti-overfit tests | Existing planning module | Implementer | Mapper contracts, prompt inspection, three-video canary |
-| Report Planner | `IMPLEMENTED_CONTRACT_DRIFT` | Strict proposal/compiler exist; frozen failed prompt/payload forces exact 3/8 structure, topic assignment, and block sequence | Restore canonical ranges and content-affordance/anti-template behavior | Existing planning module | Implementer | Planner/static tests, structure signatures, rubric |
-| Deterministic plan compiler | `SUPPORTED` | Existing binder/compiler enforces IDs, times, refs, budgets, metrics, empty assets, and V0 contracts | Preserve; repair only reproduced defects | Existing planning module | Implementer | Compile/replay/render tests |
+| DeepSeek provider transport | `PARTIAL` | Existing Responses JSON-Schema adapter and retained DeepSeek calls work as transport, but strict proposal conformance failed; official DeepSeek docs provide Chat Completions JSON Output and warn of occasional empty content | Add one frozen Chat Completions `json_object` v2 path using the existing credential and one run-scoped identical technical retry for eligible transport/JSON failures | Existing provider adapter | Implementer | Exact request, retry eligibility/exhaustion and three-product-run attempt evidence |
+| Topic Mapper | `PARTIAL` | V1 strict schema/binder and historical failures exist | Add v2 approximate topic spans/importance/representatives plus deterministic Topic Resolver and coverage diagnostics; preserve v1 | Existing planning module | Owner/implementer | V2 raw-normalized-canonical fixtures, replay and product evidence |
+| Report Planner | `PARTIAL` | V1 typed proposal/compiler exists; no DeepSeek conformance run rendered | Add v2 flat semantic content units/advisory types and observable non-semantic normalizer; preserve current V0 compiler/renderer authority | Existing planning module | Owner/implementer | V2 normalization, grounding, compile/render and three-report rubric evidence |
+| Deterministic plan compiler | `PARTIAL` | Existing compiler owns IDs, times, refs, metrics, empty assets, and V0 contracts | Extend with closed non-semantic v2 normalization rules and ledger; never rewrite, merge or split semantic units | Existing planning module | Implementer | Raw-normalized-final diff, 0/0 replay, V0 regression |
 | V0 renderer and typed plan | `SUPPORTED` | Current models/renderer/tests and local report | V1-A adapter only | Reuse unchanged | V0 module | Existing + integration regression |
-| Run evidence/state | `SUPPORTED` | Unique retained run directories, state/call traces, replay, and 20 historical failed canaries exist | New identities and strategy fields for the bounded continuation | Existing recorder/runtime | Implementer | State/failure/denominator tests and preservation audit |
-| Quality evaluation | `SUPPORTED_NO_VALID_FORMAL_RESULT` | Three versioned cards and evaluator exist; v3 aggregate is invalid and rubrics remain pending | One new gated formal revision and honest aggregate | Existing evaluator package | Owner/implementer | Six-run result or explicit no-go/failure |
+| Run evidence/state | `SUPPORTED` | Unique retained run directories, state/call traces, replay, and 20 historical failed canaries exist | Three new product identities, attempt ordinals/reasons and prototype revision fields | Existing recorder/runtime | Implementer | State/retry/product-set tests and preservation audit |
+| Quality evaluation | `SUPPORTED_NO_CURRENT_PRODUCT_RESULT` | Historical cards/evaluator exist; v3 aggregate is invalid and no automated report has reached Owner review | Versioned product review package centered on three reports, grounding, cross-video structure and six screenshots | Existing evaluator/review package | Owner/implementer | Three-report package or explicit technical-inconclusive/content-insufficient/contract-change stop |
 | Hosting/accounts/operations | `MISSING` but prohibited | No service | None in G1 | No change | Owner | Not applicable review |
 
 ## Business, project adapter/overlay, and shared platform boundaries
@@ -221,13 +227,14 @@ modify the few existing V1-A modules and avoid a new subsystem.
 
 - `src/video_evidence_agent/visual_report/planning.py` for canonical prompts,
   payloads, examples, schemas, binders, and compiler behavior.
-- `planning_runtime.py` for exact native schema transport, strategy snapshots,
-  and non-secret call evidence.
-- `evaluation.py` only for reproduced strategy/formal aggregation gaps.
-- `tests/test_visual_report_planning.py` for anti-overfit, exact transport,
-  replay, and regression coverage; split only if materially clearer.
-- Versioned strategy/canary/formal manifests and new ignored run outputs under
-  the existing V1-A eval/artifact roots.
+- `planning_runtime.py` for the frozen DeepSeek JSON-object transport, product
+  snapshots, explicit technical retry, raw/normalized artifacts, and non-secret
+  attempt evidence.
+- `evaluation.py` only for the current product-review artifact and rubric gaps.
+- `tests/test_visual_report_planning.py` for v2 normalization, anti-fabrication,
+  exact transport, replay, and regression coverage; split only if materially clearer.
+- One versioned three-video product manifest, review cards/screenshots and new
+  ignored run outputs under the existing V1-A eval/artifact roots.
 
 ### Modify
 
@@ -271,13 +278,13 @@ observed need, and keep `.venv` untracked; the default V1-A plan adds none.
 
 | Variable/resource name | Purpose | Required environments | Provisioning owner | Secret |
 |---|---|---|---|---|
-| `OPENAI_API_KEY` | Authenticate configured OpenAI-compatible provider | Real Development runs only | Local Owner | Yes; log presence only |
-| `OPENAI_BASE_URL` | Optional compatible endpoint override | Real Development runs when non-default | Local Owner | Treat query/embedded credentials as secret; log normalized label only |
-| `VISUAL_REPORT_MODEL` | Explicit V1-A model identity for one declared strategy | Every real V1-A run | Implementer selects inside `DEC-VR1A-048/053/054`; Owner provisions access | No, but operational metadata |
-| `VISUAL_REPORT_TIMEOUT_SECONDS` | Per-call timeout; proposed default 120 | Real and failure tests | Implementer | No |
+| `OPENAI_API_KEY` | Authenticate the existing DeepSeek endpoint through the installed compatible SDK; does not require an OpenAI account | Real Development runs only | Local Owner | Yes; log presence only |
+| `OPENAI_BASE_URL` | Exact DeepSeek endpoint | Semantic-v2 product runs | Local Owner | Treat query/embedded credentials as secret; log normalized label only |
+| `VISUAL_REPORT_MODEL` | One explicit accessible DeepSeek text model | Every semantic-v2 product run | Implementer selects inside `DEC-VR1A-048/058/061`; Owner provisions access | No, but operational metadata |
+| `VISUAL_REPORT_TIMEOUT_SECONDS` | Per-call timeout; current default 120 | Real and failure tests | Implementer | No |
 | Python 3.12 + project `.venv` | Source/tests/CLI | Local development | Existing project/Owner | No |
 | Local artifact root | Unique run/evidence output | All V1-A runs | Operator | No; may contain full transcript/model response |
-| Network | Two configured provider requests per successful run | Real Development runs only | Owner | Not applicable |
+| Network | Two base provider requests per successful run, with at most one eligible retry shared by that run | Real product runs only | Owner | Not applicable |
 
 No secret values belong in documentation, commands, status files, logs, or
 model prompts.
@@ -288,11 +295,12 @@ model prompts.
   `UV_CACHE_DIR` if the default cache is unavailable.
 - All source/schema/compiler/CLI/replay/failure tests run with a local fake
   adapter. Provider-free paths must prove `provider_calls/model_calls=0/0`.
-- A real provider strategy is admitted only after local tests pass,
-  credentials/config validate, official evidence proves the exact model/API
-  meets the fixed input and native schema-constrained boundary, both strategy
-  tuples/prompt bundles freeze, and all applicable canary identities are
-  predeclared. Six formal identities are declared only after a 3/3 canary pass.
+- The completed DeepSeek provider-conformance strategies are closed historical
+  evidence and the official-OpenAI isolation proposal is cancelled.
+- Current v2 may admit one existing DeepSeek Chat Completions JSON-object tuple
+  only after local normalization/replay/retry tests pass, configuration
+  validates, and all three product identities freeze. There is no canary-to-
+  formal loop in this G1 product prototype.
 - Diagnostics check credential presence only and never print/read secret values.
 
 ## Commands
@@ -308,19 +316,19 @@ requirements-only phase.
 | Build | Module import and CLI parser tests | Repository root | Exit 0; no packaging change |
 | Unit/contract | `UV_CACHE_DIR=/private/tmp/video-evidence-agent-uv-cache uv run pytest -q tests/test_visual_report_planning.py` | Repository root | Exit 0; fake call counts exact |
 | Integration | Same targeted suite plus synthetic `build-from-transcript` CLI case | Repository root | Plan/assets/HTML and terminal state |
-| Failure/recovery | Targeted malformed/ref/timeout/cancel/duplicate/replay cases | Repository root | Stable categories; no retry/overwrite |
+| Failure/recovery | Targeted malformed/ref/timeout/cancel/duplicate/replay and retry-budget cases | Repository root | Stable categories; exactly one eligible identical retry at most; no overwrite |
 | Replay/regression | `UV_CACHE_DIR=/private/tmp/video-evidence-agent-uv-cache uv run pytest -q` | Repository root | All tests pass; V0/P0 behavior preserved |
 | Diff hygiene | `git diff --check` and protected-path diff review | Repository root | No whitespace/protected changes |
-| Development measurement | Six explicit `build-from-transcript` invocations plus the implemented V1-A evaluation command | Repository root | Six retained terminal runs and aggregate evidence |
+| Product prototype | Three explicit `build-from-transcript` invocations plus product-review and screenshot commands | Repository root | Three retained runs, three HTML reports, six screenshots and pending Owner rubrics; or an exact non-success terminal |
 
 ## Migration, compatibility, feature flags, rollout, and rollback
 
 No migration, backfill, feature flag, deployment, or online rollout. The new
 subcommand is additive and local. Existing V0 plan/asset schema versions and
 render command remain stable. Roll back source/docs with version control while
-preserving historical measured run directories; after a prompt/model/source/
-compiler/evaluator change, issue a new measurement revision rather than mutate
-or selectively rerun the prior one.
+preserving historical and current run directories; after a prompt/model/source/
+compiler/reviewer change, issue a new complete three-video product revision
+rather than mutate or selectively replace the prior set.
 
 ## Baseline-preservation checks
 
@@ -333,44 +341,64 @@ or selectively rerun the prior one.
   asset manifest as applicable; confirm current HTML behavior.
 - Confirm no existing transcript, manifest, P0-B result/eval/history, V0 report
   artifact, dependency, or deployment configuration changed unexpectedly.
-- Verify test/replay paths made no provider call and measured paths reported
-  exactly one Mapper and one Planner call per admitted successful run.
+- Verify test/replay paths made no provider call and product paths reported one
+  accepted Mapper and one accepted Planner proposal per successful run, with
+  two base attempts and no more than one eligible retry across the run.
 
 ## External blockers and required shared-framework changes
 
-No shared-framework change or requirements blocker remains. Later
-implementation needs a configured compatible model/credential, but missing
-runtime credentials block only real Development execution, not code
-construction or provider-free verification.
+No shared-framework change is required. The official-OpenAI isolation is
+cancelled, so no new OpenAI credential or transcript-egress authority is
+needed. The semantic-v2 product contract is Owner-confirmed by
+`DEC-VR1A-061`; a separate instruction is still required to authorize the
+implementation/model-running session. Existing DeepSeek credential, balance,
+model access and network are execution dependencies, not documentation
+blockers.
 
-## Current post-implementation provider-conformance context
+## Current post-provider-conformance context
 
-The complete exhausted-recovery state is frozen on branch `visual-report` at
-`4ba28bf1b3288a6fb77bcc27378a45a69cd2b895`. It preserves all original formal
-revisions plus 22 recovery candidate manifests, 20 failed Kling canary runs,
-and `36/36` provider/model calls. No recovery canary rendered and no new formal
-revision was created. The final Planner response had two simultaneous strict
-schema errors: six source IDs in one block and only two sections.
+The exhausted recovery remains frozen historical `FAILED_EXPERIMENT /
+DO_NOT_PROMOTE` evidence: 22 candidate manifests, 20 failed Kling canaries, and
+`36/36` calls. The later provider-conformance Goal restored the canonical
+content/anti-template prompts, passed provider-free regression, and evaluated
+two DeepSeek Responses `json_schema` model strategies across all three videos.
+All six canaries failed, `8/8` calls were retained, and no formal measurement,
+evaluator aggregate, report, or rubric was created. The complete state is
+frozen at `e72503f5b20831c1e86a1b72c93fb4c4f7debe2a`.
 
-The same commit contains useful deterministic binders/compiler, lifecycle,
-replay, evaluator, strict schemas, and provider diagnostics, but its operative
-prompts/payloads force exactly four topics, empty subtopics, exactly three
-sections/eight blocks, fixed section/topic allocation, and a fixed block
-sequence. Therefore the commit is a historical `FAILED_EXPERIMENT /
-DO_NOT_PROMOTE` baseline, not the canonical V1-A prompt contract.
+Repository inspection and retained canaries show that v1 asks the model to
+satisfy exact topic limits, unique full-segment accounting, nested typed-block
+unions, section/block/source bounds, global budget and cross-field topic
+disposition in one response. Observed failures include 13 topics against the
+12-topic cap, duplicate segment assignment, non-JSON Planner output, five
+source IDs against a four-ID cap, and section/block-count validation. These are
+not evidence that final source binding or V0 validation should disappear; they
+show that the model-facing proposal carries too much canonical responsibility.
 
-`VR-V1A-PROVIDER-CONFORMANCE-004` is the active Owner-authorized continuation.
-It first restores the canonical variable content/anti-template behavior, then
-predeclares at most two exact native-schema provider/model/API strategies. Both
-strategy adapters and prompt bundles freeze before the first transcript call;
-each admitted strategy receives one full three-video canary set, never a
-per-video tuning loop. The first 3/3 pass immediately gates one new six-run
-formal revision. The maximum is 24 new transcript-bearing calls and one formal
-revision; all hard stops and terminal states are in the task card and
-`09-test-acceptance.md`.
+The Owner has no OpenAI API key and does not want to purchase one. Therefore
+`VR-V1A-BOUNDARY-ISOLATION-005` is cancelled without execution. GLM/Qwen remain
+optional future providers, not current dependencies.
 
-Requirements-package edits made after the baseline commit are documentation
-handoff work. The next session must preserve them and may begin product changes
-only under the new task. The strict two-call/binder/compiler/renderer boundary,
-fixed fixtures and quality thresholds, historical evidence retention, and
-Owner-only acceptance remain unchanged.
+`DEC-VR1A-061` confirms `VR-V1A-CONTRACT-SIMPLIFICATION-006` as the next
+product-prototype Goal:
+
+```text
+provider-free semantic-v2 contracts and normalization/replay
+  -> freeze one existing DeepSeek JSON-object tuple, prompts, compiler and three identities
+  -> one product run per video, two semantic stages per complete run
+  -> at most one identical recorded technical retry shared by each run
+  -> compile/render three reports and capture 1080 px plus about 390 px screenshots
+  -> product review, full regression, Owner review
+```
+
+Mapper v2 provides approximate spans and representative IDs instead of exact
+partition; Planner v2 provides flat semantic content units instead of final V0
+typed objects. The Topic Resolver/normalizer may apply only the closed,
+observable non-semantic rules in the task card. It never invents or rewrites
+content, merges or splits semantic units, and every final Hero/block retains a
+valid model-selected source ID. The product set has six base calls and a
+nine-call absolute maximum. Schema-first-hit and retry counts are diagnostics;
+content, grounding, cross-video structure fit and real desktop/mobile visual
+results determine the Owner review. The current edits are documentation-only;
+implementation and provider execution remain `NOT_STARTED` until a separate
+Owner instruction starts the Goal session.

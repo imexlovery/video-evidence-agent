@@ -2,57 +2,57 @@
   "schemaVersion": "1.0",
   "areas": {
     "outcome_and_success": {
-      "decision_ids": ["DEC-VR1A-002", "DEC-VR1A-049", "DEC-VR1A-047", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-002", "DEC-VR1A-049", "DEC-VR1A-047", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-061"]
     },
     "users_and_scenarios": {
-      "decision_ids": ["DEC-VR1A-002", "DEC-VR1A-012", "DEC-VR1A-016"]
+      "decision_ids": ["DEC-VR1A-002", "DEC-VR1A-012", "DEC-VR1A-016", "DEC-VR1A-061"]
     },
     "scope_and_non_goals": {
-      "decision_ids": ["DEC-VR1A-001", "DEC-VR1A-003", "DEC-VR1A-024", "DEC-VR1A-053"]
+      "decision_ids": ["DEC-VR1A-001", "DEC-VR1A-003", "DEC-VR1A-024", "DEC-VR1A-053", "DEC-VR1A-058", "DEC-VR1A-061"]
     },
     "input_contracts": {
       "decision_ids": ["DEC-VR1A-005", "DEC-VR1A-009", "DEC-VR1A-014", "DEC-VR1A-038"]
     },
     "output_contracts": {
-      "decision_ids": ["DEC-VR1A-006", "DEC-VR1A-008", "DEC-VR1A-011", "DEC-VR1A-015"]
+      "decision_ids": ["DEC-VR1A-006", "DEC-VR1A-008", "DEC-VR1A-011", "DEC-VR1A-015", "DEC-VR1A-061"]
     },
     "surface_and_workflow": {
       "decision_ids": ["DEC-VR1A-004", "DEC-VR1A-012", "DEC-VR1A-013"]
     },
     "functional_rules_and_edge_cases": {
-      "decision_ids": ["DEC-VR1A-004", "DEC-VR1A-007", "DEC-VR1A-011", "DEC-VR1A-013", "DEC-VR1A-022", "DEC-VR1A-044", "DEC-VR1A-051", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-004", "DEC-VR1A-007", "DEC-VR1A-011", "DEC-VR1A-013", "DEC-VR1A-022", "DEC-VR1A-044", "DEC-VR1A-051", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-061"]
     },
     "data_sources_state_and_memory": {
       "decision_ids": ["DEC-VR1A-009", "DEC-VR1A-010", "DEC-VR1A-027", "DEC-VR1A-028", "DEC-VR1A-029", "DEC-VR1A-038", "DEC-VR1A-046"]
     },
     "agent_ai_behavior_and_authority": {
-      "decision_ids": ["DEC-VR1A-004", "DEC-VR1A-006", "DEC-VR1A-007", "DEC-VR1A-020", "DEC-VR1A-021", "DEC-VR1A-036", "DEC-VR1A-037", "DEC-VR1A-039", "DEC-VR1A-040", "DEC-VR1A-044", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-004", "DEC-VR1A-006", "DEC-VR1A-007", "DEC-VR1A-020", "DEC-VR1A-021", "DEC-VR1A-036", "DEC-VR1A-037", "DEC-VR1A-039", "DEC-VR1A-040", "DEC-VR1A-044", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-061"]
     },
     "interfaces_and_integrations": {
-      "decision_ids": ["DEC-VR1A-005", "DEC-VR1A-019", "DEC-VR1A-048", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-005", "DEC-VR1A-019", "DEC-VR1A-048", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-058", "DEC-VR1A-061"]
     },
     "identity_security_privacy_compliance": {
       "decision_ids": ["DEC-VR1A-016", "DEC-VR1A-017", "DEC-VR1A-018", "DEC-VR1A-021", "DEC-VR1A-028", "DEC-VR1A-045"]
     },
     "load_performance_reliability_cost": {
-      "decision_ids": ["DEC-VR1A-019", "DEC-VR1A-022", "DEC-VR1A-023", "DEC-VR1A-030", "DEC-VR1A-031", "DEC-VR1A-044", "DEC-VR1A-052", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-019", "DEC-VR1A-022", "DEC-VR1A-023", "DEC-VR1A-030", "DEC-VR1A-031", "DEC-VR1A-044", "DEC-VR1A-052", "DEC-VR1A-054", "DEC-VR1A-061"]
     },
     "deployment_operations_and_commercial_readiness": {
       "decision_ids": ["DEC-VR1A-024", "DEC-VR1A-027", "DEC-VR1A-032", "DEC-VR1A-033", "DEC-VR1A-034"]
     },
     "existing_system_and_engineering_context": {
-      "decision_ids": ["DEC-VR1A-008", "DEC-VR1A-020", "DEC-VR1A-048", "DEC-VR1A-035", "DEC-VR1A-046", "DEC-VR1A-051", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-008", "DEC-VR1A-020", "DEC-VR1A-048", "DEC-VR1A-035", "DEC-VR1A-046", "DEC-VR1A-051", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-058", "DEC-VR1A-061"]
     },
     "acceptance_and_delivery_constraints": {
-      "decision_ids": ["DEC-VR1A-024", "DEC-VR1A-049", "DEC-VR1A-042", "DEC-VR1A-043", "DEC-VR1A-047", "DEC-VR1A-050", "DEC-VR1A-051", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-024", "DEC-VR1A-049", "DEC-VR1A-042", "DEC-VR1A-043", "DEC-VR1A-047", "DEC-VR1A-050", "DEC-VR1A-051", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-061"]
     }
   },
   "critical_gates": {
     "target_implementation_grade_allowed_use_and_promotion_path": {
-      "decision_ids": ["DEC-VR1A-001", "DEC-VR1A-024"]
+      "decision_ids": ["DEC-VR1A-001", "DEC-VR1A-024", "DEC-VR1A-061"]
     },
     "primary_user_and_target_outcome": {
-      "decision_ids": ["DEC-VR1A-002"]
+      "decision_ids": ["DEC-VR1A-002", "DEC-VR1A-061"]
     },
     "first_release_scope_and_non_goals": {
       "decision_ids": ["DEC-VR1A-003", "DEC-VR1A-024"]
@@ -61,13 +61,13 @@
       "decision_ids": ["DEC-VR1A-012"]
     },
     "happy_failure_and_recovery_paths": {
-      "decision_ids": ["DEC-VR1A-007", "DEC-VR1A-013", "DEC-VR1A-022", "DEC-VR1A-044", "DEC-VR1A-051", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-007", "DEC-VR1A-013", "DEC-VR1A-022", "DEC-VR1A-044", "DEC-VR1A-051", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-061"]
     },
     "input_contracts_validation_and_limits": {
       "decision_ids": ["DEC-VR1A-005", "DEC-VR1A-009", "DEC-VR1A-014"]
     },
     "output_contracts_consumers_quality_and_errors": {
-      "decision_ids": ["DEC-VR1A-006", "DEC-VR1A-008", "DEC-VR1A-011", "DEC-VR1A-015"]
+      "decision_ids": ["DEC-VR1A-006", "DEC-VR1A-008", "DEC-VR1A-011", "DEC-VR1A-015", "DEC-VR1A-061"]
     },
     "canonical_state_authority_and_status_vocabulary": {
       "decision_ids": ["DEC-VR1A-013"]
@@ -79,7 +79,7 @@
       "decision_ids": ["DEC-VR1A-009", "DEC-VR1A-046"]
     },
     "mutation_lifecycle_versioning_and_undo": {
-      "decision_ids": ["DEC-VR1A-029", "DEC-VR1A-043", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-029", "DEC-VR1A-043", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-061"]
     },
     "data_source_authority_rights_quality_lineage_and_freshness": {
       "decision_ids": ["DEC-VR1A-005", "DEC-VR1A-028"]
@@ -94,16 +94,16 @@
       "decision_ids": ["DEC-VR1A-018", "DEC-VR1A-045"]
     },
     "external_dependencies_credentials_and_outage": {
-      "decision_ids": ["DEC-VR1A-019", "DEC-VR1A-048", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-019", "DEC-VR1A-048", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-058", "DEC-VR1A-061"]
     },
     "long_running_partial_and_degraded_behavior": {
-      "decision_ids": ["DEC-VR1A-022", "DEC-VR1A-041"]
+      "decision_ids": ["DEC-VR1A-022", "DEC-VR1A-041", "DEC-VR1A-061"]
     },
     "peak_load_and_traffic_volume": {
       "decision_ids": ["DEC-VR1A-030"]
     },
     "latency_and_reliability": {
-      "decision_ids": ["DEC-VR1A-019", "DEC-VR1A-031"]
+      "decision_ids": ["DEC-VR1A-019", "DEC-VR1A-031", "DEC-VR1A-061"]
     },
     "production_service_levels_support_and_incident_ownership": {
       "decision_ids": ["DEC-VR1A-032"]
@@ -112,31 +112,31 @@
       "decision_ids": ["DEC-VR1A-033"]
     },
     "system_lifecycle_admin_and_change_governance": {
-      "decision_ids": ["DEC-VR1A-024", "DEC-VR1A-034", "DEC-VR1A-051", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-024", "DEC-VR1A-034", "DEC-VR1A-051", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-058", "DEC-VR1A-061"]
     },
     "existing_system_baseline_and_change_boundary": {
       "decision_ids": ["DEC-VR1A-035", "DEC-VR1A-046", "DEC-VR1A-053"]
     },
     "downstream_framework_constraints_and_decision_authority": {
-      "decision_ids": ["DEC-VR1A-020", "DEC-VR1A-048", "DEC-VR1A-051", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-020", "DEC-VR1A-048", "DEC-VR1A-051", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-058", "DEC-VR1A-061"]
     },
     "development_base_and_hypha_recommendation_disposition": {
       "decision_ids": ["DEC-VR1A-020"]
     },
     "measurable_acceptance_and_go_live_evidence": {
-      "decision_ids": ["DEC-VR1A-049", "DEC-VR1A-047", "DEC-VR1A-050", "DEC-VR1A-051", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-049", "DEC-VR1A-047", "DEC-VR1A-050", "DEC-VR1A-051", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-061"]
     },
     "agent_module_routes_dependency_mode_availability_fallback_and_rollback": {
-      "decision_ids": ["DEC-VR1A-007", "DEC-VR1A-020", "DEC-VR1A-044", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-007", "DEC-VR1A-020", "DEC-VR1A-044", "DEC-VR1A-054", "DEC-VR1A-061"]
     },
     "intelligence_target_non_ai_baseline_and_autonomy": {
       "decision_ids": ["DEC-VR1A-036"]
     },
     "model_vs_deterministic_responsibility": {
-      "decision_ids": ["DEC-VR1A-004", "DEC-VR1A-006", "DEC-VR1A-011"]
+      "decision_ids": ["DEC-VR1A-004", "DEC-VR1A-006", "DEC-VR1A-011", "DEC-VR1A-061"]
     },
     "hard_constraints_and_safety_precedence": {
-      "decision_ids": ["DEC-VR1A-003", "DEC-VR1A-007", "DEC-VR1A-021", "DEC-VR1A-024", "DEC-VR1A-051", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-003", "DEC-VR1A-007", "DEC-VR1A-021", "DEC-VR1A-024", "DEC-VR1A-051", "DEC-VR1A-052", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-061"]
     },
     "tool_permissions_and_approvals": {
       "decision_ids": ["DEC-VR1A-037"]
@@ -154,16 +154,16 @@
       "decision_ids": ["DEC-VR1A-041"]
     },
     "representative_quality_evaluation_and_unacceptable_behavior": {
-      "decision_ids": ["DEC-VR1A-049", "DEC-VR1A-042", "DEC-VR1A-053", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-049", "DEC-VR1A-042", "DEC-VR1A-053", "DEC-VR1A-054", "DEC-VR1A-061"]
     },
     "production_quality_drift_feedback_promotion_and_rollback": {
-      "decision_ids": ["DEC-VR1A-029", "DEC-VR1A-043", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-029", "DEC-VR1A-043", "DEC-VR1A-054", "DEC-VR1A-061"]
     },
     "fallback_behavior": {
-      "decision_ids": ["DEC-VR1A-007", "DEC-VR1A-044", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-007", "DEC-VR1A-044", "DEC-VR1A-054", "DEC-VR1A-061"]
     },
     "cost_boundary": {
-      "decision_ids": ["DEC-VR1A-023", "DEC-VR1A-052", "DEC-VR1A-054"]
+      "decision_ids": ["DEC-VR1A-023", "DEC-VR1A-052", "DEC-VR1A-054", "DEC-VR1A-058", "DEC-VR1A-061"]
     }
   }
 }

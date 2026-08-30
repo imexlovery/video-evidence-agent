@@ -2,11 +2,17 @@
 
 ## Actors
 
-- **Owner/learner:** consumes the report and owns product/measurement acceptance.
+- **Owner/learner:** consumes the reports, owns current product-prototype
+  acceptance, and retains authority over historical measurement conclusions.
 - **Implementer/operator:** invokes the local command, inspects artifacts, and
-  may correct code/prompts only through a new versioned run.
-- **Configured provider:** returns structured Topic Map and Report Plan
+  may repair ordinary code defects inside the Goal; prompt/model/semantic
+  changes require a separately authorized complete product revision.
+- **Configured provider:** returns shallow semantic Topic Map and Report Plan
   proposals; it has no tool, file, renderer, or publication authority.
+
+Scenarios `SCN-VR1A-001` through `006` below describe the implemented and
+measured historical v1 contract. The current Owner-confirmed semantic-v2
+product prototype is described in `SCN-VR1A-009` through `013`.
 
 ## `SCN-VR1A-001` — Successful transcript-to-report run
 
@@ -100,7 +106,8 @@ or retry explicitly with a new run identity.
 - **Normal use:** one command, one transcript, one run directory.
 - **Administration/support:** not applicable — one local Owner and no service.
 - **Change/release:** prompt/schema/model changes create a new version and make
-  earlier measurement conclusions non-current, while retaining their evidence.
+  earlier product or measurement conclusions non-current, while retaining
+  their evidence; another product set requires Owner authority.
 - **Offboarding/deletion:** Owner may delete V1-A run directories; frozen source
   transcripts and historical design/evidence remain protected.
 
@@ -112,3 +119,48 @@ or retry explicitly with a new run identity.
 - Credentials never enter prompts, artifacts, or error messages.
 - The restricted source videos, frames, and rendered reports are not published
   merely because transcript processing was authorized.
+
+## Current semantic-v2 product scenarios
+
+### `SCN-VR1A-009` — Mapper proposes a global semantic map
+
+The Mapper emits content-derived topics with approximate start/end IDs and
+representative existing segment IDs. A deterministic Topic Resolver removes
+unknown/duplicate IDs, expands valid inclusive spans, assigns canonical IDs
+and timestamps, and exposes overlap/uncovered diagnostics. Exact partition and
+explicit exclusions are no longer provider-facing success conditions. No
+usable grounded topic still fails before Planner.
+
+### `SCN-VR1A-010` — Planner proposes semantic content units
+
+The Planner receives the complete transcript plus resolved Topic Map and emits
+Hero content, semantic sections, flat content units, advisory block types, and
+existing source IDs. Deterministic code chooses compatible current V0 block
+types, binds refs, computes topic omissions, enforces budgets, and renders only
+when at least three grounded usable units remain across 3–5 nonempty sections.
+
+### `SCN-VR1A-011` — Normalization is visible and non-semantic
+
+Known syntactic, reference, and structural mismatches may be governed without
+another semantic stage. Every ordered raw-to-final event is retained in
+`normalization.json`. A rule may trim whitespace, deduplicate IDs, bind refs,
+map complete supplied shapes to compatible V0 blocks, or omit a whole unusable
+unit. It may not rewrite, merge, split, shorten, expand, or synthesize semantic
+content.
+
+### `SCN-VR1A-012` — Three-video product prototype
+
+One frozen DeepSeek Chat Completions JSON-object tuple runs Kling, RLinf, and
+Wu Yi once each. Each successful run renders canonical HTML, then receives one
+1080 px desktop and one approximately 390 px mobile browser review. The Owner
+judges content, grounding, editorial usefulness, cross-video fit, and visual
+usability; no six-run formal measurement follows automatically.
+
+### `SCN-VR1A-013` — One technical retry does not decide product viability
+
+If a run encounters an eligible API/JSON technical anomaly, its current stage
+may retry exactly once with identical input/configuration. Both attempts and
+the trigger are retained. Valid but weak semantic content is never retried.
+Retry exhaustion yields `PROTOTYPE_EXECUTION_INCONCLUSIVE`, not a Visual Report
+product-route No-Go. A successful retry remains fully eligible for content and
+visual review.

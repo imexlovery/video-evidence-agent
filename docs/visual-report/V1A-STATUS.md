@@ -16,7 +16,26 @@ The Owner subsequently authorized
 anti-template contracts, then compare at most two predeclared provider/model/API
 strategies with native schema-constrained output. This Goal reached its exact
 provider-conformance no-go terminal; the historical recovery result remains
-unchanged.
+unchanged. The complete no-go state is now frozen at commit
+`e72503f5b20831c1e86a1b72c93fb4c4f7debe2a`.
+
+The later direct-official-OpenAI isolation proposal was never authorized or
+executed. The Owner does not have and does not want to purchase an OpenAI API
+key, explicitly cancelled Route A, and redirected requirements work to V1-A
+contract simplification using the already available DeepSeek boundary.
+`VR-V1A-BOUNDARY-ISOLATION-005` is therefore retained as
+`CANCELLED_BY_OWNER — NEVER_AUTHORIZED / NEVER_EXECUTED`.
+
+`VR-V1A-CONTRACT-SIMPLIFICATION-006` is now the Owner-confirmed semantic-v2
+product-prototype contract via `DEC-VR1A-061`. It keeps two independent
+full-transcript semantic stages but changes the model boundary to shallow
+semantic JSON followed by observable non-semantic normalization, source
+resolution, canonical compilation, and the existing V0 renderer. The current
+proof is three videos × one product run, with one explicit recorded technical
+retry available per run and a nine-call absolute ceiling. Content, grounding,
+cross-video structure fit and six desktop/mobile screenshots are primary;
+schema-first-hit is diagnostic. This requirements session authorizes no code or
+provider execution; a separate Owner execution instruction is still required.
 
 ## Current state
 
@@ -24,10 +43,12 @@ unchanged.
 |---|---|
 | Product stage | `V1-A — Automated Content Planning Prototype` |
 | Target grade | `G1 PROTOTYPE` |
-| Requirements status | `READY_FOR_ENGINEERING_HANDOFF` |
-| Independent confidence | `100.0` |
-| Requirements blockers/errors | `0 / 0` |
-| Owner checkpoint | Quality/model boundary confirmed via `DEC-VR1A-048/049`; historical Goal recovery via `DEC-VR1A-051/052`; canonical provider-conformance continuation via `DEC-VR1A-053/054` |
+| Original v1 requirements package status | `READY_FOR_ENGINEERING_HANDOFF` |
+| Original v1 independent confidence | `100.0` |
+| Original v1 requirements blockers/errors | `0 / 0` |
+| Current semantic-v2 requirements status | `READY_FOR_ENGINEERING_HANDOFF` — documentation readiness only |
+| Current semantic-v2 independent confidence | `100.0`; blockers/errors `0 / 0` |
+| Owner checkpoint | Current semantic-v2 product contract confirmed via `DEC-VR1A-061`, superseding unconfirmed recommendations `DEC-VR1A-059/060`; no product-contract checkpoint remains open |
 | Implementation task | `VR-V1A-PLANNING-001` |
 | Implementation authorization | `AUTHORIZED` — explicit Owner instruction on 2026-08-30 |
 | Latest completed execution | `READY_FOR_OWNER_V1A_REVIEW — MEASUREMENT_EXECUTION_FAILED` |
@@ -37,18 +58,23 @@ unchanged.
 | Goal recovery task | `VR-V1A-GOAL-RECOVERY-003` |
 | Goal recovery status | `READY_FOR_OWNER_V1A_REVIEW — GOAL_RECOVERY_EXHAUSTED` |
 | Frozen failed-experiment commit | `4ba28bf1b3288a6fb77bcc27378a45a69cd2b895` — `FAILED_EXPERIMENT / DO_NOT_PROMOTE` |
-| Active continuation task | `VR-V1A-PROVIDER-CONFORMANCE-004` |
-| Active continuation status | `READY_FOR_OWNER_V1A_REVIEW — V1A_PROVIDER_CONFORMANCE_NO_GO` |
+| Completed continuation task | `VR-V1A-PROVIDER-CONFORMANCE-004` |
+| Completed continuation status | `READY_FOR_OWNER_V1A_REVIEW — V1A_PROVIDER_CONFORMANCE_NO_GO` |
 | Current continuation evidence | Frozen two-strategy native Responses manifest; all six canaries executed once and failed with retained `8/8` provider/model calls; no formal measurement created |
-| Active continuation ceiling | At most two predeclared native-schema strategies, one complete three-video canary set each, one formal six-run revision after the first pass, and 24 new transcript-bearing calls |
+| Current frozen baseline | `e72503f5b20831c1e86a1b72c93fb4c4f7debe2a` — provider-conformance no-go package |
+| Cancelled diagnostic task | `VR-V1A-BOUNDARY-ISOLATION-005` |
+| Cancelled diagnostic status | `CANCELLED_BY_OWNER — NEVER_AUTHORIZED / NEVER_EXECUTED`; official OpenAI key/provider work is closed |
+| Current continuation task | `VR-V1A-CONTRACT-SIMPLIFICATION-006` |
+| Current continuation status | `PRODUCT_PROTOTYPE_CONTRACT_CONFIRMED — NOT_STARTED`; no code/model work authorized by the design session |
+| Current continuation boundary | Existing DeepSeek only; two semantic stages per complete run; semantic-v2 proposals plus non-semantic deterministic compiler; one product run per video; one technical retry maximum per run; six base and nine maximum calls; three reports plus six screenshots |
 | Product code/dependency/runtime changes in design phase | `0 / 0 / 0` |
 | Model calls in design phase | `0` |
 | V1-B/V1-C | `NOT_AUTHORIZED` |
-| Next gate | Owner review of the retained conformance no-go package; no formal measurement, self-acceptance, or V1-B/V1-C |
+| Next gate | Owner separately authorizes the bounded Goal implementation/execution session; GLM/Qwen, V1-B and V1-C remain unauthorized |
 
-## Authoritative result
+## Current requirements validator result
 
-The independent validator generated
+After `DEC-VR1A-061`, the independent validator regenerated
 `docs/requirements/visual-report-v1a/requirements-readiness.json` with:
 
 - status `READY_FOR_ENGINEERING_HANDOFF`;
@@ -56,10 +82,10 @@ The independent validator generated
 - confidence `100.0`;
 - no blocker and no error;
 - evaluated artifact hash
-  `7ca61b0075c20e6beb700def30769d88a5075d9fcb6b4d0caa3b4aa3d05d3192`.
+  `ce7fff058867da153d2c804e7a074e837b965b317fe6d0d13c097cf0f92e228a`.
 
-This result proves documentation readiness only. It is not V1-A quality
-acceptance. The previous blocked revision
+This result proves current semantic-v2 documentation readiness only. It is not
+implementation authorization or V1-A quality acceptance. The previous blocked revision
 `vr1a-dev-cecd6a62e6b2` remains immutable. The new frozen revision
 `vr1a-dev-10f4334c8026` admitted the configured provider, declared six new
 identities, and retained all six attempts: the first ended in
@@ -112,18 +138,25 @@ must preserve the frozen commit as failed evidence.
   canonical Topic Map.
 - Models emit semantic content and existing IDs only. Deterministic code owns
   canonical IDs, timestamps, `SourceRef`, budgets, state, and compilation.
-- Invalid output fails visibly. There is no semantic repair, third call, hidden
-  retry, alternate provider/model fallback, or successful degraded report.
-- Real V1-A provider runs use the frozen Responses API `text.format.json_schema`
-  boundary with the exact submitted proposal schema; Chat Completions
-  `json_object` is not an eligible V1-A strategy.
+- The historical v1 contract fails any invalid proposal and uses no semantic
+  repair, third call, hidden retry, or fallback. The current v2 contract keeps
+  two semantic stages and no provider fallback while allowing only versioned,
+  observable, non-semantic deterministic normalization plus one explicit,
+  identical and recorded technical retry shared by each run. It never retries
+  valid semantic output for quality and never rewrites, merges or splits
+  semantic units.
+- The completed provider-conformance runs used Responses JSON Schema. The
+  current v2 continuation instead uses the existing DeepSeek Chat Completions
+  JSON-object path; provider JSON validity is only a transport envelope, while
+  project code owns canonical normalization and validation.
 - V1-A compiles the current V0 `ReportPlan`, emits an empty current asset
   manifest, and calls the existing deterministic renderer.
-- Every run has a unique retained directory, including failures/cancellations.
-- Development measurement is three videos × two repeats: six pipeline runs and
-  twelve planned model calls under one frozen revision.
+- Every run and attempt has unique retained evidence, including failures and
+  cancellations.
+- The current G1 product set is three videos × one run: six base calls and at
+  most nine calls after eligible technical retries under one frozen revision.
 
-## Owner-confirmed quality gate
+## Historical owner-confirmed v1 quality gate
 
 - must-cover recall ≥90% per run with no must-cover item completely absent;
 - zero major unsupported claim or metric;
@@ -133,6 +166,16 @@ must preserve the frozen commit as failed evidence.
   with neither repeat below 3;
 - per-video rubric-category delta ≤1 between repeats;
 - the three reports must not all share one normalized structure signature.
+
+The current semantic-v2 product prototype reuses the historical coverage and
+grounding expectations as review guidance but does not claim repeat stability
+or run a six-run formal denominator. Its primary completion evidence is three
+automatically generated reports, valid source lineage, cross-video editorial
+fit, and real review at 1080 px plus about 390 px for every report. Whole
+semantic units may be omitted only by a declared non-semantic rule with an
+observable reason; they may not be rewritten, merged or split. Schema-first-hit,
+retry count and normalization count are diagnostic rather than acceptance
+headlines. Owner content/visual judgment remains the acceptance authority.
 
 ## Fixed exclusions
 
@@ -148,16 +191,18 @@ accounts, deployment, publishing, V1-B, or V1-C.
 4. `docs/requirements/visual-report-v1a/00-handoff.md`
 5. `docs/requirements/visual-report-v1a/01-product-requirements.md` through
    `12-engineering-context.md`
-6. `docs/tasks/VISUAL-REPORT-V1A-PROVIDER-CONFORMANCE.md`
-7. `docs/tasks/VISUAL-REPORT-V1A-PLANNING.md`
-8. `docs/tasks/VISUAL-REPORT-V1A-MEASUREMENT.md`
-9. `docs/tasks/VISUAL-REPORT-V1A-GOAL-RECOVERY.md`
-10. This resume page
+6. `docs/tasks/VISUAL-REPORT-V1A-CONTRACT-SIMPLIFICATION.md`
+7. `docs/tasks/VISUAL-REPORT-V1A-PROVIDER-CONFORMANCE.md`
+8. `docs/tasks/VISUAL-REPORT-V1A-BOUNDARY-ISOLATION.md`
+9. `docs/tasks/VISUAL-REPORT-V1A-PLANNING.md`
+10. `docs/tasks/VISUAL-REPORT-V1A-MEASUREMENT.md`
+11. `docs/tasks/VISUAL-REPORT-V1A-GOAL-RECOVERY.md`
+12. This resume page
 
 If artifacts conflict, preserve existing work and resolve the higher authority
 before any implementation or provider call.
 
-## Historical recovery and active continuation boundary
+## Historical recovery, completed continuation, and proposed isolation boundary
 
 The earlier external-network blocker is retained in the status history as a
 historical event. Its required authorization was subsequently provided and
@@ -175,6 +220,19 @@ micro-version is permitted. The first 3/3 pass gates one fresh formal revision;
 two failed strategies end at `V1A_PROVIDER_CONFORMANCE_NO_GO`. Credentials,
 billing/quota/access/network/source authority and contract changes remain hard
 stops.
+
+That continuation is now complete at
+`READY_FOR_OWNER_V1A_REVIEW — V1A_PROVIDER_CONFORMANCE_NO_GO`; its strategy and
+call authority are closed. The later `VR-V1A-BOUNDARY-ISOLATION-005` proposal
+did not reopen that authority and is now cancelled without execution.
+
+The current `VR-V1A-CONTRACT-SIMPLIFICATION-006` changes the future contract,
+not any historical conclusion. It retains DeepSeek as the sole provider and
+makes semantic-v2 proposals explicitly non-canonical. Deterministic code may
+govern syntax, known identifiers, ordering, typed-block compatibility and
+whole-unit omission only through a retained ledger; it may not invent,
+rewrite, merge or split semantic content. The single three-video product set is
+the prototype proof; there is no canary-to-formal continuation in this task.
 
 ## Status history
 
@@ -197,3 +255,57 @@ stops.
 | 2026-08-30 | `PROVIDER_CONFORMANCE_G0_COMPLETE` | G0 confirmed frozen HEAD `4ba28bf…`, documentation-only Owner work, 22 historical candidate manifests, 20 admitted failed canaries, the v3 one-provider/five-Mapper-failure inventory, and the p16 strict Planner errors. Safe configuration is available, but the old `json_object` adapter is not eligible; canonical restoration and native-schema provider-free admission remain before any new transcript call. |
 | 2026-08-30 | `PROVIDER_FREE_CANONICAL_READY` | Canonical content/anti-template prompts and payloads were restored; executable anti-overfit tests, native Responses JSON Schema request tests, full `69`-test/Ruff validation, saved-response replay `0/0`, V0 renderer regression, and protected-path checks passed. No transcript call occurred; strategy/canary freeze is next. |
 | 2026-08-30 | `READY_FOR_OWNER_V1A_REVIEW — V1A_PROVIDER_CONFORMANCE_NO_GO` | Frozen Strategy A and B used DeepSeek Responses `text.format.json_schema` with the canonical bundle and zero retry. All six predeclared canaries executed once, retained `8/8` provider/model calls, and failed before render; the append-only result records `V1A_PROVIDER_CONFORMANCE_NO_GO`. No formal measurement or human score was created; Owner review and V1-B/C remain unauthorized. |
+| 2026-08-30 | `BOUNDARY_ISOLATION_DESIGNED` | The Owner requested a minimal Goal-driven isolation design. `VR-V1A-BOUNDARY-ISOLATION-005` defines a four-request maximum: independent synthetic Mapper/Planner strict canaries, then at most one RLinf Mapper/Planner chain. Execution, new-provider transcript egress, formal measurement, and Route B/C implementation remain unauthorized pending the explicit two-item checkpoint. |
+| 2026-08-31 | `BOUNDARY_ISOLATION_CANCELLED` | The Owner stated that no OpenAI API key would be obtained or purchased and cancelled the official OpenAI Route A experiment. The isolation card was never authorized, no provider call occurred, and GLM/Qwen remain optional future alternatives only. |
+| 2026-08-31 | `CONTRACT_SIMPLIFICATION_DESIGNED` | `VR-V1A-CONTRACT-SIMPLIFICATION-006` proposes DeepSeek JSON-object semantic v2 Mapper/Planner contracts, observable deterministic normalization, a frozen three-video canary and gated six-run formal measurement. Product/provider execution remains unauthorized pending the exact two-item contract checkpoint. |
+| 2026-08-31 | `PRODUCT_PROTOTYPE_CONTRACT_CONFIRMED` | Owner confirmation `DEC-VR1A-061` supersedes the unconfirmed canary/formal recommendations without rewriting them: current V1-A validates `Semantic Proposal → Deterministic Compiler → V0 Renderer` on one frozen three-video product set. Normalization is non-semantic only, one identical recorded technical retry is available per run, and three reports plus six viewport screenshots drive Owner review. Implementation/provider execution remains `NOT_STARTED` pending a separate Goal instruction. |
+| 2026-08-31 | `PRODUCT_PROTOTYPE_REQUIREMENTS_READY` | Independent readiness validation returned `READY_FOR_ENGINEERING_HANDOFF`, confidence `100.0`, zero blockers/errors, artifact hash `ce7fff05…`. This closes documentation preparation only; product code/model execution and Owner acceptance remain unstarted. |
+
+## Current contract-simplification execution evidence — 2026-08-31
+
+The Owner then explicitly authorized one continuous implementation Goal. The
+semantic-v2 contract, deterministic normalization/Topic Resolver/compiler,
+shared one-retry trace, provider-free replay, product evaluator, and CLI were
+implemented within the allowed V1-A surface. The historical documentation,
+cancelled tasks, frozen P0-B inputs, and prior V1-A identities were preserved.
+
+The frozen product revision is `vr1a-semantic-v2-758187ce10bd` with DeepSeek
+`deepseek-v4-flash-vision-exp`, Chat Completions JSON object, temperature `0`,
+SDK retry `0`, and one identical technical retry per run. It declares three
+videos × one run, six base calls, maximum nine calls, and
+`formal_six_run_measurement=false`. The original manifest remains at
+`eval/visual-report-v1a/semantic-v2-product-manifest.json`; the current
+append-only evaluator review revision is
+`eval/visual-report-v1a/semantic-v2-product-review-manifest-003.json` and makes
+no new provider call.
+
+| Video | Runtime result | Calls | Deterministic evidence |
+|---|---|---:|---|
+| `p0b-kling-2024` | `FAILED` | `2/2` | Mapper output remained incomplete after its single eligible retry (`finish=length`); no report or screenshots |
+| `p0b-rlinf-2026` | `RENDERED` | `3/3` | 5 sections, 12 blocks, valid source lineage, empty assets, one recovered Mapper retry |
+| `p0b-wuyi-goals` | `RENDERED` | `3/3` | 5 sections, 11 blocks, valid source lineage, empty assets, one recovered Planner retry |
+
+Total observed calls are `8/9`; no identity was tuned or rerun. The two
+successful reports were inspected in the in-app browser at 1080 px desktop and
+390 px mobile viewports. Four screenshots are retained under their run
+directories, with no mobile horizontal overflow and five sections per report.
+Their content and visual rubrics remain pending Owner review. The Kling
+identity has no canonical report or screenshots, so the fixed set is not a
+complete three-report/six-screenshot product set.
+
+Provider-free replay evidence includes one accepted-proposal replay at
+`provider_calls/model_calls=0/0` and one malformed-proposal replay rejected as
+`TOPIC_MAP_SCHEMA_ERROR` at `provider_calls/model_calls=0/0`.
+
+The current review package is
+`artifacts/visual-report/v1a/evaluation-review-003/vr1a-semantic-v2-758187ce10bd-review/review-package.json`;
+`aggregate.json` records `technical_status=FAILED`,
+`content_quality=PENDING_OWNER_REVIEW`, and
+`stop_state=PROTOTYPE_EXECUTION_INCONCLUSIVE`, with conclusion
+`TECHNICAL_EXECUTION_FAILURE`. The status is therefore
+`READY_FOR_OWNER_V1A_REVIEW — PROTOTYPE_EXECUTION_INCONCLUSIVE`, not Owner
+acceptance. The earlier `evaluation-review-002` and initial freeze remain
+preserved as append-only evidence; `-003` is the current package after the
+deterministic evaluator terminal mapping correction. No formal six-run
+measurement, V1-B/V1-C work, commit, push, PR, deployment, or Owner acceptance
+was performed.

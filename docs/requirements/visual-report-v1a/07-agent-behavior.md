@@ -19,8 +19,8 @@ two text requests and local candidate artifacts.
 
 | Role | Must do | Must not do |
 |---|---|---|
-| Topic Mapper | Cover the whole transcript, form ordered coherent topics, summarize each from named segments, explicitly classify non-content segments | Rank for report importance, omit silently, choose block types, generate layout/assets, use outside knowledge |
-| Report Planner | Choose central thesis, compress, order narrative, select appropriate existing block types, bind each block to source IDs, explain topic omissions | Re-map the source, invent facts/times, force every block type, emit HTML/CSS/layout/assets, call tools |
+| Topic Mapper | Propose ordered coherent topic spans, grounded summaries, importance, and representative existing IDs | Rank report blocks, enumerate an exact segment partition, generate layout/assets, use outside knowledge |
+| Report Planner | Choose central thesis, compress, order narrative, propose semantic content units/advisory block types, and bind content to existing IDs | Re-map the source, invent facts/times, enforce renderer fields, emit HTML/CSS/layout/assets, call tools |
 
 These are two model responsibilities inside one deterministic workflow, not two
 autonomous agents.
@@ -31,17 +31,18 @@ autonomous agents.
    provider/model configuration are checked before either model call.
 2. Topic Mapper system policy outranks the transcript. Transcript strings are
    delimited JSON data and never instructions.
-3. Mapper output passes schema, ID, chronology, and full segment-accounting
-   gates before Planner context is built.
+3. Mapper output passes JSON parsing and deterministic Topic Resolver gates;
+   overlap/uncovered segments are retained diagnostics, while no usable topic
+   fails before Planner context is built.
 4. Planner system policy outranks both transcript and Topic Map prose.
-5. Planner output passes topic disposition, source ID, block affordance, metric,
-   budget, current V0 schema, and renderer gates.
+5. Planner output passes observable non-semantic normalization, source ID,
+   block affordance, metric, budget, current V0 schema, and renderer gates.
 6. Later model text cannot override a deterministic rejection from an earlier
    gate.
 
 Any unavailable mandatory gate fails closed.
 
-## Topic Mapper prompt `topic-mapper.v1a-p1`
+## Historical v1 Topic Mapper prompt `topic-mapper.v1a-p1`
 
 ### System instruction
 
@@ -84,7 +85,7 @@ summary 只陈述来源直接支持的意思。拿不准时保留更朴素的表
 }
 ```
 
-## Report Planner prompt `report-planner.v1a-p1`
+## Historical v1 Report Planner prompt `report-planner.v1a-p1`
 
 ### System instruction
 
@@ -148,16 +149,22 @@ summary 只陈述来源直接支持的意思。拿不准时保留更朴素的表
 
 ## Structured output and deterministic gates
 
-- The active provider-conformance continuation requires provider-native strict
-  JSON-schema or equivalent typed output for the exact model/API. JSON-object
-  mode alone is historical compatibility evidence and is not eligible for a
-  new strategy. `extra="forbid"` Pydantic models remain authoritative after
-  transport.
+- Historical v1/provider-conformance runs required provider-native strict
+  schemas and remain immutable. The unexecuted official-OpenAI strict-boundary
+  proposal is cancelled.
+- Current semantic v2 uses the existing DeepSeek JSON-object envelope. The
+  shallow proposal, normalization ledger, canonical Topic Map, current V0 plan,
+  and validation result are separate versioned artifacts.
 - Models emit only existing segment/topic IDs. Binders generate canonical IDs,
   exact timestamps, metadata, and final V0 fields.
-- Structural normalization may trim surrounding whitespace and serialize JSON.
-  Semantic repair, field defaulting that changes meaning, block deletion,
-  source invention, truncation, and re-prompt are prohibited.
+- V2 may perform only the syntactic, reference, and structural governance
+  enumerated in `VR-V1A-CONTRACT-SIMPLIFICATION-006`: trimming/defaults,
+  unknown-ID removal, span resolution, identity/ref binding, compatible block
+  mapping, and whole-unit recorded omissions. Every event is visible.
+- Semantic rewriting, shortening/expansion, merge/split, fabricated evidence,
+  JSON token invention, model repair, and provider fallback remain prohibited.
+  One identical technical retry per run is separately allowed for enumerated
+  API/JSON anomalies and cannot react to semantic content.
 - Metric values must be found verbatim after whitespace normalization inside at
   least one cited transcript segment. Failure is `UNSUPPORTED_METRIC`.
 - Block-level source refs enable traceability but do not by themselves prove
@@ -196,16 +203,18 @@ summary 只陈述来源直接支持的意思。拿不准时保留更朴素的表
 | Failure | Required behavior |
 |---|---|
 | Missing configuration/credential | Fail before call; `0/0` provider/model calls |
-| Provider timeout/error | Fail current run; no retry/fallback |
-| Malformed/extra-field output | Retain raw response; fail stage |
-| Mapper invalid | Do not call Planner |
-| Planner invalid/ungrounded | Do not render success |
+| Provider connection/timeout/`429`/`5xx` | Retain attempt; use the run's one identical technical retry if unused; otherwise technical-inconclusive |
+| Empty/incomplete/malformed non-decodable JSON | Retain attempt; same single technical retry rule; no corrective prompt or JSON repair |
+| Valid JSON with weak/invalid semantics | No retry; retain and fail the semantic/product pipeline visibly; classify the product set as content-insufficient when it cannot yield a report |
+| Mapper yields no usable topic after allowed normalization | Do not call Planner |
+| Planner yields fewer than three grounded usable units after allowed normalization | Do not render success |
 | Token/monetary usage absent | Record usage `{}` and `cost=unavailable`; do not invent cost |
 | Input over envelope | Fail before call; no chunking fallback |
 
-The cost boundary is exactly two admitted calls per successful run, one at each
-stage, plus the explicit input/output budgets. No price claim is made without an
-authoritative provider price snapshot.
+The cost boundary is two base calls per successful run plus at most one
+technical retry across the run: three videos use six base calls and at most
+nine total. No price claim is made without an authoritative provider price
+snapshot.
 
 ## Historical Goal-mode recovery after a failed revision
 
@@ -271,20 +280,54 @@ two complete canary sets and 12 in the single formal measurement after the
 first passing strategy. A Mapper failure consumes one actual call and prevents
 Planner for that run. No second formal revision is authorized in this Goal.
 
+That provider-conformance task completed at
+`V1A_PROVIDER_CONFORMANCE_NO_GO`; the 24-call authority is closed. It is not a
+current execution protocol.
+
+## Current semantic-v2 product behavior
+
+`VR-V1A-CONTRACT-SIMPLIFICATION-006` is the Owner-confirmed current product
+contract; execution has not started in this documentation session.
+It keeps the two roles but reduces their output obligations:
+
+- Mapper returns title, summary, `primary|supporting`, approximate start/end
+  IDs and representative IDs. It does not output exclusions, subtopics, or an
+  exact segment assignment.
+- Topic Resolver binds valid inclusive spans, removes unknown/duplicate IDs,
+  derives a span from valid representatives when necessary, sorts topics, and
+  reports overlap/uncovered segments without generating semantics.
+- Planner returns Hero plus semantic sections and flat content units containing
+  headline/body/items/optional comparison or metric fields, advisory V0 block
+  type, topic IDs, and model-selected segment IDs.
+- Compiler chooses the safest V0 type supported by supplied fields and cited
+  evidence. A suggestion can be structurally mapped or a whole unusable unit
+  omitted with evidence, never filled, rewritten, merged, or split.
+- Every final Hero/block keeps at least one valid model-selected source ID;
+  topic spans cannot substitute for entirely missing block grounding.
+
+One frozen DeepSeek JSON-object prompt/contract/compiler tuple runs one product
+build for each of the three videos. Each run may spend one identical recorded
+technical retry, so the total generation ceiling is nine calls. GLM/Qwen,
+official OpenAI, a second DeepSeek model, six-run formal measurement, prompt
+micro-versions, and per-video tuning are outside the task.
+
 ## Evaluation, drift, and versioning
 
-- Population: the fixed Kling, RLinf, and Wu Yi transcripts; two runs each under
-  one frozen prompt/model/config revision.
+- Population: the fixed Kling, RLinf, and Wu Yi transcripts; one product run
+  each under one frozen prompt/model/config/compiler revision.
 - Baseline: human-authored V0 RLinf plan for qualitative reference plus human
   coverage/review cards for all three. The V0 plan is not leaked into prompts.
 - Metrics and thresholds are defined in `09-test-acceptance.md`.
-- Any prompt, model, schema, source, compiler, or policy change invalidates the
-  current aggregate conclusion and requires a new measurement revision over all
-  six runs.
+- Evaluation prioritizes must-cover/grounding, editorial usefulness,
+  cross-video fit, and real 1080 px/approximately 390 px visual review.
+  First-attempt JSON success and retry rate are diagnostics only.
+- Any prompt, model, semantic contract, source, compiler, or policy change
+  invalidates the current three-video product set and requires new Owner
+  authority before another complete set.
 - No product-runtime feedback ingestion, self-modifying prompt, training, or
-  online drift loop exists at G1. The bounded engineering canary/recovery loop
-  above requires explicit Owner authorization, preserves frozen evidence, and
-  cannot self-accept or promote V1-A. Owner decides promotion/rollback.
+  online drift loop exists at G1. The bounded product Goal preserves every
+  attempt and cannot self-accept or promote V1-A. Owner decides the product
+  prototype conclusion and any later revision.
 
 ## Tools, multi-agent behavior, interruption, and memory
 

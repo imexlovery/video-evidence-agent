@@ -12,7 +12,7 @@ approximately the quality of the hand-authored V0 plan.
 
 `G1 PROTOTYPE`, confirmed by the Owner. One local user may run the three
 authorized transcripts through the configured external OpenAI-compatible text
-model. The results are local candidates and Development measurement evidence,
+model. The results are local product-prototype candidates and review evidence,
 not production, public, or commercially reliable outputs.
 
 ## Users and service model
@@ -20,8 +20,8 @@ not production, public, or commercially reliable outputs.
 | Actor | Situation | Need | Access/authority |
 |---|---|---|---|
 | Owner/learner | Wants a report without hand-authoring JSON | Accurate structure, prioritization, traceability, useful rendered result | Local files; accepts/rejects quality |
-| Implementer | Builds and evaluates V1-A | Fixed schemas, prompts, deterministic gates, bounded test population | Local repository; cannot self-promote |
-| External text provider | Executes exactly two configured calls per successful run | Bounded transcript/task payload | Receives authorized transcript text; no media or credentials in prompts |
+| Implementer | Builds and evaluates V1-A | Versioned semantic contracts, prompts, deterministic compiler, bounded test population | Local repository; cannot self-promote |
+| External text provider | Executes two semantic stages and, only on an eligible anomaly, at most one additional identical attempt per run | Bounded transcript/task payload | Receives authorized transcript text; no media or credentials in prompts |
 
 There are no customers, tenants, accounts, hosted users, entitlements, billing,
 support promises, or service-level commitments.
@@ -30,27 +30,31 @@ support promises, or service-level commitments.
 
 | ID | Goal | Measure | Owner-confirmed G1 target |
 |---|---|---|---|
-| `GOAL-VR1A-001` | Map the whole transcript before selection | Human coverage card and deterministic segment accounting | Every segment accounted for; ≥90% required-topic recall; no must-cover miss |
+| `GOAL-VR1A-001` | Build a global semantic map before selection | Human coverage card plus Topic Resolver coverage diagnostics | ≥90% required-topic recall and no must-cover miss; current v2 exposes uncovered/overlap segments rather than requiring exact partition |
 | `GOAL-VR1A-002` | Produce a useful compressed Report Plan | Owner prioritization and narrative rubric | 3–5 sections, 8–14 blocks, ≥4/5 prioritization per video |
 | `GOAL-VR1A-003` | Prevent hallucination/overclaim | Source validation and human entailment review | 100% block refs valid; zero major unsupported claim/metric |
 | `GOAL-VR1A-004` | Avoid a generic fixed template | Cross-video structural signature and block-affordance review | Not all three plans share one normalized structure; every special block is justified |
 | `GOAL-VR1A-005` | Preserve the V0 rendering contract | Existing `ReportPlan` validation and renderer | All accepted plans render without V0 schema/renderer change |
-| `GOAL-VR1A-006` | Make the experiment auditable | Run manifests, call traces, retained failures | Two repeat runs per video; all attempts remain in evidence |
+| `GOAL-VR1A-006` | Make the prototype auditable | Run/attempt manifests, call traces, normalization and screenshots | One run per video; any single technical retry and all failures remain in evidence |
 
-The Owner confirmed these targets through `DEC-VR1A-049`; changes require a new
-append-only decision and a new measurement revision.
+The content thresholds originated in `DEC-VR1A-049`; `DEC-VR1A-061` now makes
+content and visual prototype quality primary and retires the six-run/first-hit
+measurement as the current V1-A goal.
 
 ## First-release scope
 
 ### Included
 
 - Input: one existing ingest manifest and ordered `VideoSegment` JSONL.
-- Topic Mapper: one full-transcript, coverage-oriented model call.
+- Topic Mapper: one accepted full-transcript, coverage-oriented proposal;
+  eligible technical failure may consume the run's single retry.
 - Deterministic Topic Map validation, segment accounting, and timestamp binding.
-- Report Planner: one full-transcript + Topic Map, compression-oriented model call.
+- Report Planner: one accepted full-transcript + Topic Map,
+  compression-oriented proposal under the same run retry budget.
 - Deterministic proposal validation and compilation into the existing V0 plan.
 - Text-only report output using an empty `assets.json`; no `image_caption` block.
-- Append-only local run artifacts and a three-video Development measurement.
+- Append-only local run/attempt artifacts, three reports, desktop/mobile
+  screenshots, and one three-video product review package.
 
 ### Explicit non-goals
 
@@ -59,7 +63,7 @@ multi-agent execution, database/cache/queue, background processing, API/UI,
 URL download, multi-video synthesis, free layout, new renderer/template,
 publishing, production hardening, online learning, or prompt self-modification.
 
-## Product requirements
+## Historical implemented v1 requirements
 
 | ID | Requirement | Rationale | Priority | Evidence | Acceptance |
 |---|---|---|---|---|---|
@@ -80,6 +84,20 @@ publishing, production hardening, online learning, or prompt self-modification.
 | `REQ-VR1A-015` | The implementation must preserve V0 renderer behavior and frozen P0-B inputs/evaluation history | Avoids experiment contamination | P0 | Repository contract | `TEST-VR1A-015` |
 | `REQ-VR1A-016` | Implementation must stop for Owner review and must not start V1-B/C | Maintains phase authority | P0 | Owner scope | `TEST-VR1A-016` |
 
+## Current semantic-v2 product requirements
+
+Requirements `REQ-VR1A-003`, `005`, `008`, and `009` above define historical
+v1 behavior. `DEC-VR1A-061` confirms the current product-prototype amendments:
+
+| ID | Current requirement | Rationale | Priority | Evidence | Acceptance |
+|---|---|---|---|---|---|
+| `REQ-VR1A-017` | Mapper v2 must propose grounded approximate topic spans and representative existing IDs; it must not enumerate an exact partition, exclusions, subtopics, report priority, or block types | Preserve global semantics without treating the model as a strict state machine | P0 | `DEC-VR1A-061` | `TEST-VR1A-023` |
+| `REQ-VR1A-018` | A deterministic Topic Resolver must bind usable spans/refs, remove unknown/duplicate IDs, report uncovered/overlap diagnostics, and fail when no usable topic remains without creating semantics | Program owns identity/structure without inventing meaning | P0 | `DEC-VR1A-061` | `TEST-VR1A-023` |
+| `REQ-VR1A-019` | Planner v2 must emit Hero plus grounded semantic sections/content units and advisory block types; deterministic code owns canonical IDs, refs, block compatibility and V0 validation | Avoid provider-facing typed unions while preserving editorial judgment | P0 | `DEC-VR1A-061` | `TEST-VR1A-024` |
+| `REQ-VR1A-020` | The compiler must apply only closed, recorded non-semantic governance; it must not rewrite, merge, split, shorten, expand, or synthesize semantic content | Prevent hidden authorship by the normalizer | P0 | `DEC-VR1A-061` | `TEST-VR1A-024`, `025` |
+| `REQ-VR1A-021` | Each of the three frozen product runs may use at most one identical, explicit, recorded retry for an eligible API/JSON technical anomaly; no semantic-quality retry, prompt change, or provider fallback is allowed | Avoid treating incidental transport faults as product failure without enabling tuning | P0 | `DEC-VR1A-061` | `TEST-VR1A-026` |
+| `REQ-VR1A-022` | V1-A must produce and review one report per video at desktop and mobile viewports; content, grounding, cross-video fit, and visual usability are primary, while schema-first-hit and retry rates are diagnostic | Test the actual product hypothesis | P0 | `DEC-VR1A-061` | `TEST-VR1A-027` |
+
 ## Constraints and dependencies
 
 - Existing Python `>=3.12,<3.13`, uv, Pydantic, OpenAI SDK, V0 models/renderer.
@@ -92,15 +110,16 @@ publishing, production hardening, online learning, or prompt self-modification.
 
 ## Glossary
 
-- **Topic Map:** coverage-oriented, ordered source structure in which every
-  transcript segment is accounted for.
+- **Topic Map:** coverage-oriented, ordered semantic source structure with
+  explicit span/representative coverage, uncovered, and overlap diagnostics.
 - **Report Plan Proposal:** model output containing semantic content and source
   segment IDs; not yet a renderer contract.
 - **Canonical binding:** deterministic replacement of selected segment IDs with
   exact stored timestamps and generated stable IDs.
 - **Compilation:** deterministic conversion from validated proposal to current
   V0 `ReportPlan`.
-- **Development measurement:** versioned local experimental evidence; not
-  Freeze, Locked Eval, release, or production acceptance.
+- **Product prototype set:** one frozen run for each of three videos, with
+  content/visual review evidence; not formal Development measurement, Freeze,
+  Locked Eval, release, or production acceptance.
 - **Major overclaim:** a central, numeric, causal, comparative, or evaluative
   assertion not supported by its cited transcript segments.

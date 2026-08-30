@@ -20,6 +20,7 @@ from urllib.parse import urlsplit
 from dotenv import load_dotenv
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
+from .models import AssetManifest, ReportPlan
 from .planning import (
     CALL_SCHEMA_VERSION,
     COMPILER_VERSION,
@@ -30,12 +31,25 @@ from .planning import (
     PLANNER_PROMPT_VERSION,
     PLANNER_SYSTEM_INSTRUCTION,
     REVIEW_CARD_SCHEMA_VERSION,
+    SEMANTIC_V2_CALL_SCHEMA_VERSION,
+    SEMANTIC_V2_COMPILER_VERSION,
+    SEMANTIC_V2_MAPPER_PROMPT_VERSION,
+    SEMANTIC_V2_MAPPER_SYSTEM_INSTRUCTION,
+    SEMANTIC_V2_NORMALIZATION_SCHEMA_VERSION,
+    SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
+    SEMANTIC_V2_PLANNER_PROMPT_VERSION,
+    SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION,
+    SEMANTIC_V2_TOPIC_MAP_SCHEMA_VERSION,
+    SEMANTIC_V2_TOPIC_PROPOSAL_SCHEMA_VERSION,
     THINKING_MODE,
     TOPIC_MAP_SCHEMA_VERSION,
     TOPIC_PROPOSAL_SCHEMA_VERSION,
     PlanningError,
     ReportPlanProposal,
     ReviewCard,
+    SemanticV2ReportPlanProposal,
+    SemanticV2TopicMap,
+    SemanticV2TopicMapProposal,
     TopicMap,
     TopicMapProposal,
     stable_json,
@@ -45,6 +59,9 @@ from .planning_runtime import (
     REASONING_EFFORT,
     RESPONSE_MODE,
     SCHEMA_MECHANISM,
+    SEMANTIC_V2_API_SURFACE,
+    SEMANTIC_V2_RESPONSE_MODE,
+    SEMANTIC_V2_SCHEMA_MECHANISM,
     SourceSnapshot,
     load_source,
 )
@@ -57,6 +74,15 @@ EVALUATOR_VERSION = "visual-report-v1a-evaluator.v1"
 PROVIDER_CONFORMANCE_SCHEMA_VERSION = "visual-report-provider-conformance.v1a"
 PROVIDER_CONFORMANCE_RESULT_SCHEMA_VERSION = "visual-report-provider-conformance-result.v1a"
 PROVIDER_CONFORMANCE_ADAPTER_ID = "openai.responses.text.json_schema.v1a"
+SEMANTIC_V2_PRODUCT_MANIFEST_SCHEMA_VERSION = (
+    "visual-report-semantic-v2-product-manifest.v1a"
+)
+SEMANTIC_V2_PRODUCT_EVALUATION_SCHEMA_VERSION = (
+    "visual-report-semantic-v2-product-evaluation.v1a"
+)
+SEMANTIC_V2_PRODUCT_RUBRIC_SCHEMA_VERSION = "visual-report-semantic-v2-product-rubric.v1a"
+SEMANTIC_V2_PRODUCT_PACKAGE_SCHEMA_VERSION = "visual-report-semantic-v2-review-package.v1a"
+SEMANTIC_V2_PRODUCT_EVALUATOR_VERSION = "visual-report-semantic-v2-product-evaluator.v1"
 DEEPSEEK_RESPONSES_DOC = "https://api-docs.deepseek.com/api/create-response/"
 DEEPSEEK_MODELS_DOC = (
     "https://api-docs.deepseek.com/quick_start/pricing/?article_id=article_1779470751466_8"
@@ -139,6 +165,49 @@ class MeasurementFreeze(StrictEvaluationModel):
             raise ValueError("measurement must declare exactly two repeats for each fixed video")
         if len(self.review_cards) != 3:
             raise ValueError("measurement must freeze three review cards")
+        return self
+
+
+class ProductRunDeclaration(StrictEvaluationModel):
+    run_id: str = Field(min_length=1, max_length=80)
+    video_id: str = Field(min_length=1, max_length=100)
+    planned_provider_calls: Literal[2] = 2
+    maximum_provider_calls: Literal[3] = 3
+
+
+class SemanticV2ProductFreeze(StrictEvaluationModel):
+    schema_version: Literal[SEMANTIC_V2_PRODUCT_MANIFEST_SCHEMA_VERSION]
+    revision_id: str = Field(min_length=1, max_length=100)
+    status: Literal["FROZEN", "FROZEN_PROVIDER_BLOCKED"]
+    frozen_at: str = Field(min_length=1)
+    repository_root: str = Field(min_length=1)
+    source_root: str = Field(min_length=1)
+    artifact_root: str = Field(min_length=1)
+    sources: tuple[dict[str, object], ...] = Field(min_length=3, max_length=3)
+    provider: dict[str, object]
+    contract: dict[str, object]
+    prompts: dict[str, object]
+    schemas: dict[str, object]
+    review_cards: tuple[dict[str, object], ...] = Field(min_length=3, max_length=3)
+    evaluator: dict[str, object]
+    runtime: dict[str, object]
+    limits: dict[str, object]
+    runs: tuple[ProductRunDeclaration, ...] = Field(min_length=3, max_length=3)
+    derived_from_manifest: str | None = None
+    derived_at: str | None = None
+    derivation_reason: str | None = None
+
+    @model_validator(mode="after")
+    def validate_product_set(self) -> "SemanticV2ProductFreeze":
+        expected = {video_id for video_id, _, _ in FIXED_SOURCES}
+        actual = {run.video_id for run in self.runs}
+        if actual != expected:
+            raise ValueError("semantic-v2 product freeze must contain the three fixed videos")
+        ids = [run.run_id for run in self.runs]
+        if len(ids) != len(set(ids)):
+            raise ValueError("semantic-v2 product run IDs must be unique")
+        if len(self.review_cards) != 3:
+            raise ValueError("semantic-v2 product freeze must contain three review cards")
         return self
 
 
@@ -1563,6 +1632,746 @@ def finalize_provider_conformance(
     return result
 
 
+def _semantic_v2_product_source_rows(source_root: Path) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for video_id, manifest_rel, segments_rel in FIXED_SOURCES:
+        manifest_path = source_root / manifest_rel
+        segments_path = source_root / segments_rel
+        source = load_source(manifest_path, segments_path)
+        if source.video_id != video_id:
+            raise EvaluationError(
+                "SOURCE_SNAPSHOT_MISMATCH", f"unexpected source video_id: {video_id}"
+            )
+        rows.append(
+            {
+                "video_id": video_id,
+                "manifest_path": str(manifest_path.resolve()),
+                "segments_path": str(segments_path.resolve()),
+                "manifest_sha256": source.manifest_sha256,
+                "segments_sha256": source.segments_sha256,
+                "segment_count": len(source.segments),
+                "duration_ms": source.duration_ms,
+            }
+        )
+    return rows
+
+
+def _semantic_v2_provider_snapshot(repository_root: Path) -> dict[str, object]:
+    snapshot = environment_snapshot(repository_root)
+    blockers = list(snapshot.get("blockers", []))
+    provider = str(snapshot.get("provider", ""))
+    model = str(snapshot.get("model", ""))
+    if "deepseek" not in provider.lower() or not model.lower().startswith("deepseek"):
+        blockers.append("current product prototype requires the configured DeepSeek endpoint/model")
+    snapshot.update(
+        {
+            "provider_family": "DeepSeek",
+            "api_surface": SEMANTIC_V2_API_SURFACE,
+            "response_mode": SEMANTIC_V2_RESPONSE_MODE,
+            "schema_mechanism": SEMANTIC_V2_SCHEMA_MECHANISM,
+            "temperature": 0,
+            "thinking_mode": THINKING_MODE,
+            "reasoning_effort": "none",
+            "output_token_limit": MAX_OUTPUT_TOKENS,
+            "sdk_max_retries": 0,
+            "technical_retry_max_per_run": 1,
+            "blockers": blockers,
+            "admission": "READY" if not blockers else "BLOCKED_CONFIGURATION",
+        }
+    )
+    return snapshot
+
+
+def _semantic_v2_contract_snapshot() -> dict[str, object]:
+    return {
+        "prompts": {
+            "mapper": {
+                "version": SEMANTIC_V2_MAPPER_PROMPT_VERSION,
+                "sha256": _sha256_bytes(
+                    SEMANTIC_V2_MAPPER_SYSTEM_INSTRUCTION.encode("utf-8")
+                ),
+            },
+            "planner": {
+                "version": SEMANTIC_V2_PLANNER_PROMPT_VERSION,
+                "sha256": _sha256_bytes(
+                    SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION.encode("utf-8")
+                ),
+            },
+        },
+        "schemas": {
+            "topic_proposal": _schema_fingerprint(
+                "semantic_v2_topic_map_proposal",
+                SEMANTIC_V2_TOPIC_PROPOSAL_SCHEMA_VERSION,
+                SemanticV2TopicMapProposal.model_json_schema(),
+            ),
+            "topic_map": {
+                "name": "semantic_v2_topic_map",
+                "schema_version": SEMANTIC_V2_TOPIC_MAP_SCHEMA_VERSION,
+            },
+            "plan_proposal": _schema_fingerprint(
+                "semantic_v2_report_plan_proposal",
+                SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
+                SemanticV2ReportPlanProposal.model_json_schema(),
+            ),
+            "normalization": {
+                "name": "semantic_v2_normalization_ledger",
+                "schema_version": SEMANTIC_V2_NORMALIZATION_SCHEMA_VERSION,
+            },
+            "call": SEMANTIC_V2_CALL_SCHEMA_VERSION,
+            "compiler": SEMANTIC_V2_COMPILER_VERSION,
+        },
+        "pipeline": [
+            "topic_mapper",
+            "deterministic_topic_resolver",
+            "report_planner",
+            "deterministic_v0_compiler",
+            "v0_renderer",
+        ],
+    }
+
+
+def freeze_semantic_v2_product_prototype(
+    *,
+    repository_root: Path,
+    artifact_root: Path,
+    card_root: Path,
+    output_path: Path,
+    source_root: Path | None = None,
+) -> SemanticV2ProductFreeze:
+    """Freeze one current three-video semantic-v2 prototype set."""
+    repository_root = repository_root.resolve()
+    source_root = (source_root or repository_root).resolve()
+    artifact_root = artifact_root.resolve()
+    card_root = card_root.resolve()
+    source_rows = _semantic_v2_product_source_rows(source_root)
+    card_rows: list[dict[str, object]] = []
+    card_paths = _card_paths(card_root)
+    for video_id, _, _ in FIXED_SOURCES:
+        path = card_paths[video_id]
+        card = _card_payload(path)
+        source_row = next(row for row in source_rows if row["video_id"] == video_id)
+        source = load_source(
+            Path(str(source_row["manifest_path"])), Path(str(source_row["segments_path"]))
+        )
+        validate_review_card(card, source)
+        card_rows.append(
+            {
+                "video_id": video_id,
+                "path": str(path.resolve()),
+                "sha256": _sha256_file(path),
+                "schema_version": REVIEW_CARD_SCHEMA_VERSION,
+            }
+        )
+    provider = _semantic_v2_provider_snapshot(repository_root)
+    contract = _semantic_v2_contract_snapshot()
+    runtime_path = Path(__file__).with_name("planning_runtime.py").resolve()
+    evaluator_path = Path(__file__).resolve()
+    stable_payload = {
+        "schema_version": SEMANTIC_V2_PRODUCT_MANIFEST_SCHEMA_VERSION,
+        "repository_root": str(repository_root),
+        "source_root": str(source_root),
+        "artifact_root": str(artifact_root),
+        "sources": source_rows,
+        "provider": provider,
+        "contract": contract,
+        "review_cards": card_rows,
+        "evaluator": {
+            "version": SEMANTIC_V2_PRODUCT_EVALUATOR_VERSION,
+            "module": str(evaluator_path),
+            "sha256": _sha256_file(evaluator_path),
+        },
+        "runtime": {
+            "module": str(runtime_path),
+            "sha256": _sha256_file(runtime_path),
+        },
+        "limits": {
+            "videos": 3,
+            "base_provider_calls_per_run": 2,
+            "maximum_provider_calls_per_run": 3,
+            "maximum_total_provider_calls": 9,
+            "technical_retry_max_per_run": 1,
+            "formal_six_run_measurement": False,
+        },
+    }
+    revision_seed = _sha256_bytes(stable_json(stable_payload).encode("utf-8"))[:10]
+    runs = [
+        {
+            "run_id": f"{video_id}-semantic-v2-{revision_seed}",
+            "video_id": video_id,
+            "planned_provider_calls": 2,
+            "maximum_provider_calls": 3,
+        }
+        for video_id, _, _ in FIXED_SOURCES
+    ]
+    collisions = [
+        str(run["run_id"]) for run in runs if (artifact_root / str(run["run_id"])).exists()
+    ]
+    if collisions:
+        raise EvaluationError(
+            "EVALUATION_OUTPUT_EXISTS",
+            f"semantic-v2 product run directories already exist: {', '.join(collisions)}",
+        )
+    revision_hash = _sha256_bytes(
+        stable_json({**stable_payload, "runs": runs}).encode("utf-8")
+    )[:12]
+    payload = {
+        **stable_payload,
+        "revision_id": f"vr1a-semantic-v2-{revision_hash}",
+        "status": "FROZEN" if provider["admission"] == "READY" else "FROZEN_PROVIDER_BLOCKED",
+        "frozen_at": _now(),
+        "prompts": contract["prompts"],
+        "schemas": contract["schemas"],
+        "runs": runs,
+    }
+    _write_new_json(output_path, payload)
+    try:
+        return SemanticV2ProductFreeze.model_validate(payload)
+    except ValidationError as exc:
+        raise EvaluationError("SEMANTIC_V2_MANIFEST_SCHEMA_ERROR", str(exc)) from exc
+
+
+def load_semantic_v2_product_freeze(path: Path) -> SemanticV2ProductFreeze:
+    payload = _read_json(path)
+    if not isinstance(payload, dict):
+        raise EvaluationError(
+            "SEMANTIC_V2_MANIFEST_SCHEMA_ERROR", "product manifest must be an object"
+        )
+    try:
+        return SemanticV2ProductFreeze.model_validate(payload)
+    except ValidationError as exc:
+        raise EvaluationError("SEMANTIC_V2_MANIFEST_SCHEMA_ERROR", str(exc)) from exc
+
+
+def derive_semantic_v2_product_review_manifest(
+    *, source_manifest_path: Path, output_path: Path
+) -> SemanticV2ProductFreeze:
+    """Create an append-only review revision after a deterministic evaluator fix."""
+    source_payload = _read_json(source_manifest_path)
+    if not isinstance(source_payload, dict):
+        raise EvaluationError(
+            "SEMANTIC_V2_MANIFEST_SCHEMA_ERROR", "source manifest must be an object"
+        )
+    source_freeze = load_semantic_v2_product_freeze(source_manifest_path)
+    evaluator_path = Path(__file__).resolve()
+    payload = {
+        **source_payload,
+        "revision_id": f"{source_freeze.revision_id}-review",
+        "derived_from_manifest": str(source_manifest_path.resolve()),
+        "evaluator": {
+            "version": SEMANTIC_V2_PRODUCT_EVALUATOR_VERSION,
+            "module": str(evaluator_path),
+            "sha256": _sha256_file(evaluator_path),
+        },
+        "derived_at": _now(),
+        "derivation_reason": "deterministic evaluator accepts a recovered single technical retry",
+    }
+    # The review revision keeps the exact frozen sources, provider tuple, and
+    # run identities; it authorizes no new provider call.
+    _write_new_json(output_path, payload)
+    try:
+        return SemanticV2ProductFreeze.model_validate(payload)
+    except ValidationError as exc:
+        raise EvaluationError("SEMANTIC_V2_MANIFEST_SCHEMA_ERROR", str(exc)) from exc
+
+
+def _semantic_v2_pending_rubric(
+    *, revision_id: str, run_id: str, video_id: str, path: Path
+) -> dict[str, object]:
+    payload = {
+        "schema_version": SEMANTIC_V2_PRODUCT_RUBRIC_SCHEMA_VERSION,
+        "revision_id": revision_id,
+        "run_id": run_id,
+        "video_id": video_id,
+        "reviewer": "owner-or-designated-human",
+        "status": "PENDING_OWNER_REVIEW",
+        "categories": {
+            "content_coverage": None,
+            "grounding": None,
+            "cross_video_structure_fit": None,
+            "desktop_visual_quality": None,
+            "mobile_visual_quality": None,
+        },
+        "major_unsupported_claims": [],
+        "source_notes": [],
+    }
+    _write_new_json(path, payload)
+    return payload
+
+
+def _semantic_v2_product_run_row(
+    declaration: ProductRunDeclaration,
+    freeze: SemanticV2ProductFreeze,
+    source: SourceSnapshot,
+    card: ReviewCard,
+    run_dir: Path,
+    rubric_path: Path,
+) -> dict[str, object]:
+    row: dict[str, object] = {
+        "run_id": declaration.run_id,
+        "video_id": declaration.video_id,
+        "run_dir": str(run_dir),
+        "state": "MISSING",
+        "provider_calls": 0,
+        "model_calls": 0,
+        "technical_status": "FAILED",
+        "content_review_status": "PENDING_OWNER_REVIEW",
+        "visual_review_status": "PENDING_OWNER_REVIEW",
+        "deterministic": {
+            "execution_valid": False,
+            "source_snapshot_match": False,
+            "topic_map_valid": False,
+            "report_plan_valid": False,
+            "normalization_ledger_valid": False,
+            "assets_empty": False,
+            "report_present": False,
+            "desktop_screenshot_present": False,
+            "mobile_screenshot_present": False,
+            "structure_signature": None,
+            "must_cover_reference_recall": None,
+            "errors": ["run.json is missing"],
+        },
+        "review_artifacts": {
+            "run_json": str(run_dir / "run.json"),
+            "topic_map": str(run_dir / "topic-map.json"),
+            "report_plan": str(run_dir / "report-plan.json"),
+            "normalization": str(run_dir / "normalization.json"),
+            "report_html": str(run_dir / "report.html"),
+            "desktop_screenshot": str(run_dir / "screenshots" / "desktop.png"),
+            "mobile_screenshot": str(run_dir / "screenshots" / "mobile.png"),
+            "rubric": str(rubric_path),
+        },
+    }
+    run_payload = _read_run_json(run_dir)
+    if run_payload is None:
+        row["human_rubric"] = _semantic_v2_pending_rubric(
+            revision_id=freeze.revision_id,
+            run_id=declaration.run_id,
+            video_id=declaration.video_id,
+            path=rubric_path,
+        )
+        return row
+    row["state"] = run_payload.get("state", "UNKNOWN")
+    row["provider_calls"] = int(run_payload.get("provider_calls", 0))
+    row["model_calls"] = int(run_payload.get("model_calls", 0))
+    row["usage"] = run_payload.get("usage", {})
+    row["latency_ms_total"] = run_payload.get("latency_ms_total", 0)
+    row["cost"] = run_payload.get("cost", "unavailable")
+    calls_path = run_dir / "model-calls.jsonl"
+    calls = _read_jsonl(calls_path) if calls_path.is_file() else []
+    errors: list[str] = []
+    deterministic = row["deterministic"]
+    assert isinstance(deterministic, dict)
+    source_row = next(
+        (item for item in freeze.sources if item.get("video_id") == declaration.video_id),
+        {},
+    )
+    source_snapshot = run_payload.get("source")
+    source_match = (
+        isinstance(source_snapshot, dict)
+        and source_snapshot.get("video_id") == source.video_id
+        and source_snapshot.get("manifest_sha256") == source_row.get("manifest_sha256")
+        and source_snapshot.get("segments_sha256") == source_row.get("segments_sha256")
+        and source_snapshot.get("segment_count") == len(source.segments)
+    )
+    deterministic["source_snapshot_match"] = source_match
+    if not source_match:
+        errors.append("source snapshot differs from frozen product manifest")
+    expected_config = freeze.provider
+    config = run_payload.get("config")
+    if not isinstance(config, dict):
+        errors.append("run config snapshot is missing")
+    else:
+        for key in (
+            "provider",
+            "model",
+            "timeout_seconds",
+            "credential_present",
+            "api_surface",
+            "response_mode",
+            "schema_mechanism",
+            "temperature",
+            "thinking_mode",
+            "reasoning_effort",
+            "output_token_limit",
+            "sdk_max_retries",
+        ):
+            if expected_config.get(key) != config.get(key):
+                errors.append(f"run config differs from frozen product contract: {key}")
+    observed_calls = int(run_payload.get("provider_calls", 0))
+    calls_valid = observed_calls in {2, 3} and observed_calls == len(calls)
+    if not calls_valid:
+        errors.append("provider call count is outside the two-base/three-maximum contract")
+    call_stages = [str(call.get("stage")) for call in calls]
+    valid_call_stages = {
+        ("topic_mapper", "report_planner"),
+        ("topic_mapper", "topic_mapper", "report_planner"),
+        ("topic_mapper", "report_planner", "report_planner"),
+    }
+    if tuple(call_stages) not in valid_call_stages:
+        errors.append("semantic stage order is not mapper then planner with at most one retry")
+    call_errors = [str(call.get("error_category")) for call in calls if call.get("error_category")]
+    row["technical_failures"] = call_errors
+    recovered_retry = (
+        len(calls) == 3
+        and len(call_errors) == 1
+        and calls[-1].get("error_category") is None
+        and run_payload.get("retry_used") is True
+        and (
+            (
+                calls[0].get("request_sha256") == calls[1].get("request_sha256")
+                and calls[1].get("retry_of_attempt") == 1
+            )
+            or (
+                calls[1].get("request_sha256") == calls[2].get("request_sha256")
+                and calls[2].get("retry_of_attempt") == 1
+            )
+        )
+    )
+    if call_errors and not recovered_retry:
+        errors.append("provider call error was not recovered within the single retry contract")
+
+    segment_by_id = _segment_map(source)
+    topic_map: SemanticV2TopicMap | None = None
+    topic_path = run_dir / "topic-map.json"
+    if topic_path.is_file():
+        try:
+            topic_map = SemanticV2TopicMap.model_validate(_read_json(topic_path))
+        except ValidationError as exc:
+            errors.append(
+                "semantic-v2 Topic Map schema error: "
+                f"{exc.errors()[0].get('msg', 'invalid')}"
+            )
+    if topic_map is not None:
+        map_refs = [ref for topic in topic_map.topics for ref in topic.source_refs]
+        map_refs.extend(
+            ref for topic in topic_map.topics for ref in topic.representative_source_refs
+        )
+        map_valid = topic_map.video_id == source.video_id and all(
+            _valid_source_ref(ref, segment_by_id) for ref in map_refs
+        )
+        deterministic["topic_map_valid"] = map_valid
+        deterministic["must_cover_reference_recall"] = _card_recall(
+            card, {ref.segment_id for ref in map_refs}
+        )
+        if not map_valid:
+            errors.append("semantic-v2 Topic Map source refs are invalid")
+    else:
+        errors.append("semantic-v2 Topic Map artifact is missing or invalid")
+
+    plan: ReportPlan | None = None
+    plan_path = run_dir / "report-plan.json"
+    assets_path = run_dir / "assets.json"
+    if plan_path.is_file() and assets_path.is_file():
+        try:
+            plan = ReportPlan.model_validate(_read_json(plan_path))
+            assets = AssetManifest.model_validate(_read_json(assets_path))
+            deterministic["assets_empty"] = len(assets.assets) == 0
+        except ValidationError as exc:
+            errors.append(
+                "V0 report artifact schema error: "
+                f"{exc.errors()[0].get('msg', 'invalid')}"
+            )
+    else:
+        errors.append("report plan or assets artifact is missing")
+    if plan is not None:
+        report_refs = [
+            ref
+            for section in plan.sections
+            for block in section.blocks
+            for ref in block.source_refs
+        ]
+        report_refs_valid = all(_valid_source_ref(ref, segment_by_id) for ref in report_refs)
+        deterministic["report_plan_valid"] = report_refs_valid
+        deterministic["structure_signature"] = _structure_signature(plan)
+        if not report_refs_valid:
+            errors.append("report plan source refs are invalid")
+        if not deterministic["assets_empty"]:
+            errors.append("assets manifest is not empty")
+    normalization_path = run_dir / "normalization.json"
+    if normalization_path.is_file():
+        normalization = _read_json(normalization_path)
+        deterministic["normalization_ledger_valid"] = isinstance(normalization, dict) and (
+            normalization.get("schema_version") == SEMANTIC_V2_NORMALIZATION_SCHEMA_VERSION
+            and isinstance(normalization.get("summary"), dict)
+            and all(
+                int(normalization["summary"].get(key, -1)) == 0
+                for key in (
+                    "semantic_rewrite_count",
+                    "semantic_merge_count",
+                    "semantic_split_count",
+                    "semantic_synthesis_count",
+                )
+            )
+        )
+    if not deterministic["normalization_ledger_valid"]:
+        errors.append("normalization ledger is missing, invalid, or records semantic repair")
+    report_present = (run_dir / "report.html").is_file()
+    desktop_present = (run_dir / "screenshots" / "desktop.png").is_file()
+    mobile_present = (run_dir / "screenshots" / "mobile.png").is_file()
+    deterministic["report_present"] = report_present
+    deterministic["desktop_screenshot_present"] = desktop_present
+    deterministic["mobile_screenshot_present"] = mobile_present
+    if not report_present:
+        errors.append("report.html is missing")
+    deterministic["errors"] = errors
+    deterministic["execution_valid"] = bool(
+        run_payload.get("state") == "RENDERED"
+        and calls_valid
+        and source_match
+        and deterministic["topic_map_valid"]
+        and deterministic["report_plan_valid"]
+        and deterministic["normalization_ledger_valid"]
+        and deterministic["assets_empty"]
+        and report_present
+        and (not call_errors or recovered_retry)
+        and not errors
+    )
+    row["technical_status"] = "PASS" if deterministic["execution_valid"] else "FAILED"
+    row["content_review_status"] = (
+        "PENDING_OWNER_REVIEW" if report_present else "NOT_AVAILABLE"
+    )
+    row["visual_review_status"] = (
+        "PENDING_OWNER_REVIEW" if desktop_present and mobile_present else "NOT_AVAILABLE"
+    )
+    row["human_rubric"] = _semantic_v2_pending_rubric(
+        revision_id=freeze.revision_id,
+        run_id=declaration.run_id,
+        video_id=declaration.video_id,
+        path=rubric_path,
+    )
+    return row
+
+
+def review_semantic_v2_product_prototype(
+    *, manifest_path: Path, output_root: Path
+) -> dict[str, object]:
+    """Create the deterministic product review package and pending Owner gates."""
+    freeze = load_semantic_v2_product_freeze(manifest_path)
+    source_by_video: dict[str, SourceSnapshot] = {}
+    card_by_video: dict[str, ReviewCard] = {}
+    for source_row in freeze.sources:
+        source = load_source(
+            Path(str(source_row["manifest_path"])), Path(str(source_row["segments_path"]))
+        )
+        if (
+            source.manifest_sha256 != source_row.get("manifest_sha256")
+            or source.segments_sha256 != source_row.get("segments_sha256")
+            or len(source.segments) != source_row.get("segment_count")
+            or source.duration_ms != source_row.get("duration_ms")
+        ):
+            raise EvaluationError(
+                "SEMANTIC_V2_MANIFEST_STALE", f"source changed: {source.video_id}"
+            )
+        source_by_video[source.video_id] = source
+    for card_row in freeze.review_cards:
+        card_path = Path(str(card_row["path"]))
+        card = _card_payload(card_path)
+        source = source_by_video.get(card.video_id)
+        if source is None:
+            raise EvaluationError(
+                "REVIEW_CARD_SOURCE_MISMATCH", f"unknown card video: {card.video_id}"
+            )
+        validate_review_card(card, source)
+        if _sha256_file(card_path) != card_row.get("sha256"):
+            raise EvaluationError(
+                "SEMANTIC_V2_MANIFEST_STALE", f"review card changed: {card.video_id}"
+            )
+        card_by_video[card.video_id] = card
+    runtime_row = freeze.runtime
+    runtime_path = Path(str(runtime_row.get("module", "")))
+    if not runtime_path.is_file() or _sha256_file(runtime_path) != runtime_row.get("sha256"):
+        raise EvaluationError("SEMANTIC_V2_MANIFEST_STALE", "planning runtime changed after freeze")
+    evaluator_row = freeze.evaluator
+    evaluator_path = Path(str(evaluator_row.get("module", "")))
+    if not evaluator_path.is_file() or _sha256_file(evaluator_path) != evaluator_row.get("sha256"):
+        raise EvaluationError("SEMANTIC_V2_MANIFEST_STALE", "evaluator changed after freeze")
+
+    revision_root = output_root.resolve() / freeze.revision_id
+    try:
+        revision_root.mkdir(parents=True, exist_ok=False)
+    except FileExistsError as exc:
+        raise EvaluationError(
+            "EVALUATION_OUTPUT_EXISTS", f"product evaluation already exists: {revision_root}"
+        ) from exc
+    run_rows: list[dict[str, object]] = []
+    artifact_root = Path(freeze.artifact_root)
+    for declaration in freeze.runs:
+        source = source_by_video[declaration.video_id]
+        card = card_by_video[declaration.video_id]
+        rubric_path = revision_root / "rubrics" / f"{declaration.run_id}.json"
+        run_rows.append(
+            _semantic_v2_product_run_row(
+                declaration,
+                freeze,
+                source,
+                card,
+                artifact_root / declaration.run_id,
+                rubric_path,
+            )
+        )
+    for row in run_rows:
+        _write_new_json(revision_root / "runs" / f"{row['run_id']}.json", row)
+
+    structure_signatures = {
+        str(row["run_id"]): row["deterministic"]["structure_signature"]
+        for row in run_rows
+        if isinstance(row.get("deterministic"), dict)
+        and row["deterministic"].get("structure_signature") is not None
+    }
+    by_video = {
+        video_id: {
+            "run_id": next(row["run_id"] for row in run_rows if row["video_id"] == video_id),
+            "technical_status": next(
+                row["technical_status"] for row in run_rows if row["video_id"] == video_id
+            ),
+            "structure_signature": next(
+                row["deterministic"]["structure_signature"]
+                for row in run_rows
+                if row["video_id"] == video_id
+            ),
+            "report_present": next(
+                row["deterministic"]["report_present"]
+                for row in run_rows
+                if row["video_id"] == video_id
+            ),
+            "desktop_screenshot_present": next(
+                row["deterministic"]["desktop_screenshot_present"]
+                for row in run_rows
+                if row["video_id"] == video_id
+            ),
+            "mobile_screenshot_present": next(
+                row["deterministic"]["mobile_screenshot_present"]
+                for row in run_rows
+                if row["video_id"] == video_id
+            ),
+        }
+        for video_id, _, _ in FIXED_SOURCES
+    }
+    all_execution_valid = all(
+        bool(row["deterministic"]["execution_valid"]) for row in run_rows
+    )
+    all_screenshots = all(
+        bool(row["deterministic"]["desktop_screenshot_present"])
+        and bool(row["deterministic"]["mobile_screenshot_present"])
+        for row in run_rows
+    )
+    observed_calls = sum(int(row.get("provider_calls", 0)) for row in run_rows)
+    technical_status = "PASS" if all_execution_valid else "FAILED"
+    if all_execution_valid and all_screenshots:
+        stop_state = "READY_FOR_OWNER_V1A_REVIEW"
+        conclusion = "PROTOTYPE_REPORTS_READY"
+    elif all_execution_valid:
+        stop_state = "PROTOTYPE_EXECUTION_INCONCLUSIVE"
+        conclusion = "SCREENSHOT_EVIDENCE_PENDING"
+    else:
+        failed_rows = [
+            row for row in run_rows if row["technical_status"] != "PASS"
+        ]
+        transport_failure_categories = {
+            "PROVIDER_ERROR",
+            "MODEL_OUTPUT_INCOMPLETE",
+            "MODEL_OUTPUT_PARSE_ERROR",
+        }
+        has_transport_failure = any(
+            category in transport_failure_categories
+            for row in failed_rows
+            for category in row.get("technical_failures", [])
+        )
+        if has_transport_failure:
+            stop_state = "PROTOTYPE_EXECUTION_INCONCLUSIVE"
+        elif any(
+            "Topic Map" in error or "report plan" in error
+            for row in failed_rows
+            for error in row["deterministic"].get("errors", [])
+        ):
+            stop_state = "PROTOTYPE_CONTENT_INSUFFICIENT"
+        else:
+            stop_state = "PROTOTYPE_SET_INVALID"
+        conclusion = "TECHNICAL_EXECUTION_FAILURE"
+    cross_video = {
+        "schema_version": "visual-report-semantic-v2-cross-video-comparison.v1a",
+        "videos": by_video,
+        "structure_signatures": structure_signatures,
+        "all_structure_signatures_identical": (
+            len(set(structure_signatures.values())) == 1 if structure_signatures else None
+        ),
+        "comparison_status": "PENDING_OWNER_REVIEW",
+        "owner_questions": [
+            "Do topic boundaries and summaries capture each product video's actual narrative?",
+            "Does each report prioritize the right content for its video rather than "
+            "a shared template?",
+            "Are desktop and mobile layouts readable at the captured viewports?",
+        ],
+    }
+    cross_video_path = revision_root / "cross-video-comparison.json"
+    _write_new_json(cross_video_path, cross_video)
+    aggregate = {
+        "schema_version": SEMANTIC_V2_PRODUCT_EVALUATION_SCHEMA_VERSION,
+        "evaluator_version": SEMANTIC_V2_PRODUCT_EVALUATOR_VERSION,
+        "manifest_path": str(manifest_path.resolve()),
+        "manifest_revision_id": freeze.revision_id,
+        "technical_status": technical_status,
+        "stop_state": stop_state,
+        "conclusion": conclusion,
+        "quality_status": "PENDING_OWNER_REVIEW",
+        "denominator": {
+            "declared_videos": 3,
+            "declared_runs": 3,
+            "base_provider_calls": 6,
+            "maximum_provider_calls": 9,
+            "observed_provider_calls": observed_calls,
+            "observed_model_calls": sum(int(row.get("model_calls", 0)) for row in run_rows),
+            "formal_six_run_measurement": False,
+        },
+        "provider": freeze.provider,
+        "runs": run_rows,
+        "by_video": by_video,
+        "cross_video_comparison": str(cross_video_path),
+        "technical_vs_content": {
+            "technical_execution": technical_status,
+            "content_quality": "PENDING_OWNER_REVIEW",
+            "visual_quality": "PENDING_OWNER_REVIEW" if all_screenshots else "NOT_AVAILABLE",
+        },
+        "owner_action": (
+            "Owner must review the retained Topic Maps, plans, reports, screenshots, "
+            "and pending rubrics; "
+            "this artifact is not Owner acceptance."
+        ),
+        "generated_at": _now(),
+    }
+    aggregate_path = revision_root / "aggregate.json"
+    _write_new_json(aggregate_path, aggregate)
+    package = {
+        "schema_version": SEMANTIC_V2_PRODUCT_PACKAGE_SCHEMA_VERSION,
+        "manifest_path": str(manifest_path.resolve()),
+        "manifest_revision_id": freeze.revision_id,
+        "status": stop_state,
+        "conclusion": conclusion,
+        "review_status": "PENDING_OWNER_REVIEW",
+        "sources": list(freeze.sources),
+        "review_cards": list(freeze.review_cards),
+        "runs": [
+            {
+                "run_id": row["run_id"],
+                "video_id": row["video_id"],
+                "artifacts": row["review_artifacts"],
+                "technical_status": row["technical_status"],
+                "content_review_status": row["content_review_status"],
+                "visual_review_status": row["visual_review_status"],
+                "deterministic": row["deterministic"],
+                "rubric": row["human_rubric"],
+            }
+            for row in run_rows
+        ],
+        "cross_video_comparison": str(cross_video_path),
+        "aggregate": str(aggregate_path),
+        "owner_gate": "READY_FOR_OWNER_V1A_REVIEW only; no acceptance recorded",
+        "generated_at": _now(),
+    }
+    _write_new_json(revision_root / "review-package.json", package)
+    return aggregate
+
+
 __all__ = [
     "EVALUATOR_VERSION",
     "EVALUATION_SCHEMA_VERSION",
@@ -1572,6 +2381,10 @@ __all__ = [
     "evaluate_measurement",
     "environment_snapshot",
     "freeze_measurement",
+    "freeze_semantic_v2_product_prototype",
+    "derive_semantic_v2_product_review_manifest",
+    "load_semantic_v2_product_freeze",
     "load_measurement",
+    "review_semantic_v2_product_prototype",
     "validate_review_card",
 ]

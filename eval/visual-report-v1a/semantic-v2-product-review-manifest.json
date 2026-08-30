@@ -1,0 +1,190 @@
+{
+  "schema_version": "visual-report-semantic-v2-product-manifest.v1a",
+  "repository_root": "/Users/tristana/.codex/worktrees/9299/video-evidence-agent",
+  "source_root": "/Users/tristana/Develop/video-evidence-agent",
+  "artifact_root": "/Users/tristana/.codex/worktrees/9299/video-evidence-agent/artifacts/visual-report/v1a",
+  "sources": [
+    {
+      "video_id": "p0b-kling-2024",
+      "manifest_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-kling-2024/manifest.json",
+      "segments_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-kling-2024/segments.jsonl",
+      "manifest_sha256": "82487e503cb428f3987350c7cf3332e04b004ad332a3b05eec202dfbb4d6ed8a",
+      "segments_sha256": "c350e1c6a69ca13ae0349061dfa1436782704ef737a9a28092504b18eb75010b",
+      "segment_count": 43,
+      "duration_ms": 2022421
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "manifest_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-rlinf-2026/manifest.json",
+      "segments_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-rlinf-2026/segments.jsonl",
+      "manifest_sha256": "9e75a3bb97b93aeb97c5324f0031a1c67060d6f23a5c3e241cea81edd06ebb4e",
+      "segments_sha256": "d284cb127b4cdd2c56d556cdf80c8c77754b6e2bdec7a51bb6565976de1ae9c0",
+      "segment_count": 46,
+      "duration_ms": 2093120
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "manifest_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-wuyi-goals/manifest.json",
+      "segments_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-wuyi-goals/segments.jsonl",
+      "manifest_sha256": "1f58070ad91b67cf7c8dd080873aff35952956f17ccb2bf3569ba6003993475e",
+      "segments_sha256": "2abcaf3c8582c293d869bdd4af8284a641cc934275f00f40842abc560040d37f",
+      "segment_count": 38,
+      "duration_ms": 1763207
+    }
+  ],
+  "provider": {
+    "admission": "READY",
+    "blockers": [],
+    "provider": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash-vision-exp",
+    "credential_present": true,
+    "timeout_seconds": 120.0,
+    "api_surface": "chat_completions",
+    "response_mode": "json_object",
+    "schema_mechanism": "chat.completions.response_format.json_object",
+    "temperature": 0,
+    "thinking_mode": "disabled",
+    "reasoning_effort": "none",
+    "output_token_limit": 8192,
+    "sdk_max_retries": 0,
+    "sdk_version": "3.3.1",
+    "provider_family": "DeepSeek",
+    "technical_retry_max_per_run": 1
+  },
+  "contract": {
+    "prompts": {
+      "mapper": {
+        "version": "topic-mapper.v1a-semantic-v2-p1",
+        "sha256": "e5230a7ae65565ad3cc5ce145be17ebbd52de3fd230b9d310c3c8f46b357132c"
+      },
+      "planner": {
+        "version": "report-planner.v1a-semantic-v2-p1",
+        "sha256": "607f9bf70757c303c19c61ac817826d0503722fe4c6f5d6070c80960dfb187a8"
+      }
+    },
+    "schemas": {
+      "topic_proposal": {
+        "name": "semantic_v2_topic_map_proposal",
+        "schema_version": "visual-topic-map-proposal.v1a-semantic-v2",
+        "sha256": "c745c53994005bcd13f9dc7b6d7c55927f6d8f15d4bbdd11368a0a7adfe971bd"
+      },
+      "topic_map": {
+        "name": "semantic_v2_topic_map",
+        "schema_version": "visual-topic-map.v1a-semantic-v2"
+      },
+      "plan_proposal": {
+        "name": "semantic_v2_report_plan_proposal",
+        "schema_version": "visual-report-plan-proposal.v1a-semantic-v2",
+        "sha256": "526c5f100a0a5f4c926cff144e88cc01d0bd31c40a33cfacf88fdae3579a5f28"
+      },
+      "normalization": {
+        "name": "semantic_v2_normalization_ledger",
+        "schema_version": "visual-report-normalization.v1a-semantic-v2"
+      },
+      "call": "visual-report-model-call.v1a-semantic-v2",
+      "compiler": "visual-report-v1a-semantic-v2-compiler.v1"
+    },
+    "pipeline": [
+      "topic_mapper",
+      "deterministic_topic_resolver",
+      "report_planner",
+      "deterministic_v0_compiler",
+      "v0_renderer"
+    ]
+  },
+  "review_cards": [
+    {
+      "video_id": "p0b-kling-2024",
+      "path": "/Users/tristana/.codex/worktrees/9299/video-evidence-agent/eval/visual-report-v1a/review-cards/p0b-kling-2024.v1.json",
+      "sha256": "8d47dca1e52205bae10b7cf84f8d473edfbcceb2d98477091371f573405df324",
+      "schema_version": "visual-report-review-card.v1a-prototype"
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "path": "/Users/tristana/.codex/worktrees/9299/video-evidence-agent/eval/visual-report-v1a/review-cards/p0b-rlinf-2026.v1.json",
+      "sha256": "258194029f7b758a66edebdd4f590f72cf59f3f53e94b83b8c5190978b67c0e1",
+      "schema_version": "visual-report-review-card.v1a-prototype"
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "path": "/Users/tristana/.codex/worktrees/9299/video-evidence-agent/eval/visual-report-v1a/review-cards/p0b-wuyi-goals.v1.json",
+      "sha256": "dba3dde7e7c8c21973cc41564bcf6e674a9c8863b376efa54f74ba2d9dd9dd87",
+      "schema_version": "visual-report-review-card.v1a-prototype"
+    }
+  ],
+  "evaluator": {
+    "version": "visual-report-semantic-v2-product-evaluator.v1",
+    "module": "/Users/tristana/.codex/worktrees/9299/video-evidence-agent/src/video_evidence_agent/visual_report/evaluation.py",
+    "sha256": "75b50a2ffb8552d8a6c5507804fe094c0017cc36133966ee81bfc744bb04b480"
+  },
+  "runtime": {
+    "module": "/Users/tristana/.codex/worktrees/9299/video-evidence-agent/src/video_evidence_agent/visual_report/planning_runtime.py",
+    "sha256": "d66c2be989de99fbf0b12ffa14a6c0dd6dd80835a21ff85accd67031f1732faf"
+  },
+  "limits": {
+    "videos": 3,
+    "base_provider_calls_per_run": 2,
+    "maximum_provider_calls_per_run": 3,
+    "maximum_total_provider_calls": 9,
+    "technical_retry_max_per_run": 1,
+    "formal_six_run_measurement": false
+  },
+  "revision_id": "vr1a-semantic-v2-758187ce10bd-review",
+  "status": "FROZEN",
+  "frozen_at": "2026-08-30T17:43:20.894901+00:00",
+  "prompts": {
+    "mapper": {
+      "version": "topic-mapper.v1a-semantic-v2-p1",
+      "sha256": "e5230a7ae65565ad3cc5ce145be17ebbd52de3fd230b9d310c3c8f46b357132c"
+    },
+    "planner": {
+      "version": "report-planner.v1a-semantic-v2-p1",
+      "sha256": "607f9bf70757c303c19c61ac817826d0503722fe4c6f5d6070c80960dfb187a8"
+    }
+  },
+  "schemas": {
+    "topic_proposal": {
+      "name": "semantic_v2_topic_map_proposal",
+      "schema_version": "visual-topic-map-proposal.v1a-semantic-v2",
+      "sha256": "c745c53994005bcd13f9dc7b6d7c55927f6d8f15d4bbdd11368a0a7adfe971bd"
+    },
+    "topic_map": {
+      "name": "semantic_v2_topic_map",
+      "schema_version": "visual-topic-map.v1a-semantic-v2"
+    },
+    "plan_proposal": {
+      "name": "semantic_v2_report_plan_proposal",
+      "schema_version": "visual-report-plan-proposal.v1a-semantic-v2",
+      "sha256": "526c5f100a0a5f4c926cff144e88cc01d0bd31c40a33cfacf88fdae3579a5f28"
+    },
+    "normalization": {
+      "name": "semantic_v2_normalization_ledger",
+      "schema_version": "visual-report-normalization.v1a-semantic-v2"
+    },
+    "call": "visual-report-model-call.v1a-semantic-v2",
+    "compiler": "visual-report-v1a-semantic-v2-compiler.v1"
+  },
+  "runs": [
+    {
+      "run_id": "p0b-kling-2024-semantic-v2-02a1aecd92",
+      "video_id": "p0b-kling-2024",
+      "planned_provider_calls": 2,
+      "maximum_provider_calls": 3
+    },
+    {
+      "run_id": "p0b-rlinf-2026-semantic-v2-02a1aecd92",
+      "video_id": "p0b-rlinf-2026",
+      "planned_provider_calls": 2,
+      "maximum_provider_calls": 3
+    },
+    {
+      "run_id": "p0b-wuyi-goals-semantic-v2-02a1aecd92",
+      "video_id": "p0b-wuyi-goals",
+      "planned_provider_calls": 2,
+      "maximum_provider_calls": 3
+    }
+  ],
+  "derived_from_manifest": "/Users/tristana/.codex/worktrees/9299/video-evidence-agent/eval/visual-report-v1a/semantic-v2-product-manifest.json",
+  "derived_at": "2026-08-30T17:59:09.651864+00:00",
+  "derivation_reason": "deterministic evaluator accepts a recovered single technical retry"
+}

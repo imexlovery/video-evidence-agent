@@ -1,71 +1,71 @@
 {
   "schemaVersion": "1.0",
   "generatedBy": "agent-native-requirements/validate_readiness.py",
-  "generatedAt": "2026-08-30T13:15:12.835698+00:00",
+  "generatedAt": "2026-08-30T16:54:31.204782+00:00",
   "status": "READY_FOR_ENGINEERING_HANDOFF",
   "ready": true,
   "confidence": 100.0,
-  "evaluatedArtifactSha256": "7ca61b0075c20e6beb700def30769d88a5075d9fcb6b4d0caa3b4aa3d05d3192",
+  "evaluatedArtifactSha256": "ce7fff058867da153d2c804e7a074e837b965b317fe6d0d13c097cf0f92e228a",
   "evaluatedFiles": [
     {
       "path": "00-handoff.md",
-      "sha256": "93ba2e61902de4458db0d584e9838496b93b9c890ecacd9c42b5161b824cbe02"
+      "sha256": "0adda297aece73b2b81e80b2093f50c1cd522528bfb8749b58d67495d805b2d0"
     },
     {
       "path": "01-product-requirements.md",
-      "sha256": "6b2bec6a1fb31e838be735553b37a78cf8c61bfc1cdf7fe327a5e836ece93f35"
+      "sha256": "86a0ccf8978e7094eb7a752912fab561b6090d95aad958d155584b1452b16c9e"
     },
     {
       "path": "02-user-scenarios.md",
-      "sha256": "9cf0ad2425f68ee7885f691fb3060b56cdd2c776180201eb7997c2ba514355fc"
+      "sha256": "0bcdb508f152a5403e298d60892452840399e5005367e5f29165af249d1eb33a"
     },
     {
       "path": "03-functional-spec.md",
-      "sha256": "44925a70d5c98f2d19374c6b58b979912a63c14654fa82c8f3ab6bb0fdb5cdb2"
+      "sha256": "77e877a74b7ec52dc3fca53a21b184c54f6ea696a1369aed4bd60e4da5c25c55"
     },
     {
       "path": "04-system-design.md",
-      "sha256": "ade9036065bef367f4949706e87b624d58a4ea756c0cc5503cc6faa3b9993cf1"
+      "sha256": "975057a511606d2a862ea47cd3b6e969727d5bb11238404496c495fa5de4b02b"
     },
     {
       "path": "05-data-memory.md",
-      "sha256": "dd7a075f3e37fd476aa089603aba36c2a7117799ee1abff918c3a39eae2cc7dc"
+      "sha256": "846c02bb75e58cf7df7134cc7e0fcbf74fd89ee3223b2bbc1045a3b3907ef3d2"
     },
     {
       "path": "06-interfaces-integrations.md",
-      "sha256": "439072890d2472cb78888d79c2000d6ef784237dd99b78a810dae8d2e01b629a"
+      "sha256": "72aa5e273e5cbf1bfc8b9e4c72a7ce3b4b9d707b0df7bba7f99b2adfa8097cd4"
     },
     {
       "path": "07-agent-behavior.md",
-      "sha256": "b861d1fdecfe638fbd42bf5c524f43a5765c35a2128e9b4729ac4eb648455dc4"
+      "sha256": "c5585c629404e003b3506a88ddaeb3d2fd4f2689d86aa88e94469b88f7df5d37"
     },
     {
       "path": "08-quality-security-operations.md",
-      "sha256": "bb5924974e9933f4ebebdcc90105da475a0e69f9ddca5144d17c8c78245199db"
+      "sha256": "53615ebffb21fa27e37a33da97c972ac960fe2e4b3a1cc21650e8769c02e6ef5"
     },
     {
       "path": "09-test-acceptance.md",
-      "sha256": "b4d45120184ad8e21279e240c39311fe017f57b671a400cd27a862fd720c15ec"
+      "sha256": "807d3e53dc55ce61ce76c060904784f2039ed5bf118784b75c47d2428cb6f6f9"
     },
     {
       "path": "10-delivery-plan.md",
-      "sha256": "2d63572c7d97b847a7bcf6c7e7ba282a5e5eb9b4384dded715803a178e1cb190"
+      "sha256": "c09bc94419594376bd9287b237f24284fcf4b0ebe47697e937db23363a14b2d1"
     },
     {
       "path": "11-decisions-risks.md",
-      "sha256": "e20c5977f4a5f0a8399178f04f10efd44a2a72249aeb34a9543bad62fb84132c"
+      "sha256": "2a269fdcef1979336ef3ae5e822b5beabcfbe6628f26a97fe84323cd17efb97b"
     },
     {
       "path": "12-engineering-context.md",
-      "sha256": "a9be6e506fdb3fb18c17d51ec4ac00b9f1b6393180c7306a27e2db096d4fe7f9"
+      "sha256": "05a1e9627820a915c839756872ca779afcc8b2b4a6c02c9de39db44835ab13f0"
     },
     {
       "path": "coverage.json",
-      "sha256": "b67bf20f18117f1c65f883d3c51289a7755ce0c1122fced12b5a66af78080041"
+      "sha256": "2f7fcaf1f950fe69830090fb6107c90e358477d37acbb42c318952da7be42717"
     },
     {
       "path": "decision-evidence.jsonl",
-      "sha256": "2e144141ec910e023231d78b9fc557b9a4ce57db997856c01db70ecff9db3116"
+      "sha256": "5acc6607a915818a4b0f1ab14c7f28f96e3ed893c0cc8478792992afbe00a707"
     }
   ],
   "areaBreakdown": [
@@ -152,7 +152,8 @@
         "DEC-VR1A-007",
         "DEC-VR1A-020",
         "DEC-VR1A-044",
-        "DEC-VR1A-054"
+        "DEC-VR1A-054",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -184,7 +185,9 @@
       "decisionIds": [
         "DEC-VR1A-023",
         "DEC-VR1A-052",
-        "DEC-VR1A-054"
+        "DEC-VR1A-054",
+        "DEC-VR1A-058",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -232,7 +235,9 @@
         "DEC-VR1A-048",
         "DEC-VR1A-051",
         "DEC-VR1A-053",
-        "DEC-VR1A-054"
+        "DEC-VR1A-054",
+        "DEC-VR1A-058",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -259,7 +264,9 @@
         "DEC-VR1A-019",
         "DEC-VR1A-048",
         "DEC-VR1A-053",
-        "DEC-VR1A-054"
+        "DEC-VR1A-054",
+        "DEC-VR1A-058",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -268,7 +275,8 @@
       "decisionIds": [
         "DEC-VR1A-007",
         "DEC-VR1A-044",
-        "DEC-VR1A-054"
+        "DEC-VR1A-054",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -298,7 +306,8 @@
         "DEC-VR1A-051",
         "DEC-VR1A-052",
         "DEC-VR1A-053",
-        "DEC-VR1A-054"
+        "DEC-VR1A-054",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -312,7 +321,8 @@
         "DEC-VR1A-051",
         "DEC-VR1A-052",
         "DEC-VR1A-053",
-        "DEC-VR1A-054"
+        "DEC-VR1A-054",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -358,7 +368,8 @@
       "gate": "latency_and_reliability",
       "decisionIds": [
         "DEC-VR1A-019",
-        "DEC-VR1A-031"
+        "DEC-VR1A-031",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -366,7 +377,8 @@
       "gate": "long_running_partial_and_degraded_behavior",
       "decisionIds": [
         "DEC-VR1A-022",
-        "DEC-VR1A-041"
+        "DEC-VR1A-041",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -379,7 +391,8 @@
         "DEC-VR1A-051",
         "DEC-VR1A-052",
         "DEC-VR1A-053",
-        "DEC-VR1A-054"
+        "DEC-VR1A-054",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -388,7 +401,8 @@
       "decisionIds": [
         "DEC-VR1A-004",
         "DEC-VR1A-006",
-        "DEC-VR1A-011"
+        "DEC-VR1A-011",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -407,7 +421,8 @@
         "DEC-VR1A-043",
         "DEC-VR1A-052",
         "DEC-VR1A-053",
-        "DEC-VR1A-054"
+        "DEC-VR1A-054",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -417,7 +432,8 @@
         "DEC-VR1A-006",
         "DEC-VR1A-008",
         "DEC-VR1A-011",
-        "DEC-VR1A-015"
+        "DEC-VR1A-015",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -431,7 +447,8 @@
     {
       "gate": "primary_user_and_target_outcome",
       "decisionIds": [
-        "DEC-VR1A-002"
+        "DEC-VR1A-002",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -440,7 +457,8 @@
       "decisionIds": [
         "DEC-VR1A-029",
         "DEC-VR1A-043",
-        "DEC-VR1A-054"
+        "DEC-VR1A-054",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -457,7 +475,8 @@
         "DEC-VR1A-049",
         "DEC-VR1A-042",
         "DEC-VR1A-053",
-        "DEC-VR1A-054"
+        "DEC-VR1A-054",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -469,7 +488,9 @@
         "DEC-VR1A-051",
         "DEC-VR1A-052",
         "DEC-VR1A-053",
-        "DEC-VR1A-054"
+        "DEC-VR1A-054",
+        "DEC-VR1A-058",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },
@@ -477,7 +498,8 @@
       "gate": "target_implementation_grade_allowed_use_and_promotion_path",
       "decisionIds": [
         "DEC-VR1A-001",
-        "DEC-VR1A-024"
+        "DEC-VR1A-024",
+        "DEC-VR1A-061"
       ],
       "closed": true
     },

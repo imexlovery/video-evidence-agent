@@ -31,17 +31,34 @@ from .planning import (
     PLAN_PROPOSAL_SCHEMA_VERSION,
     PLANNER_PROMPT_VERSION,
     PLANNER_SYSTEM_INSTRUCTION,
+    SEMANTIC_V2_CALL_SCHEMA_VERSION,
+    SEMANTIC_V2_COMPILER_VERSION,
+    SEMANTIC_V2_MAPPER_PROMPT_VERSION,
+    SEMANTIC_V2_MAPPER_SYSTEM_INSTRUCTION,
+    SEMANTIC_V2_NORMALIZATION_SCHEMA_VERSION,
+    SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
+    SEMANTIC_V2_PLANNER_PROMPT_VERSION,
+    SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION,
+    SEMANTIC_V2_TOPIC_MAP_SCHEMA_VERSION,
+    SEMANTIC_V2_TOPIC_PROPOSAL_SCHEMA_VERSION,
     THINKING_MODE,
     TOPIC_MAP_SCHEMA_VERSION,
     TOPIC_PROPOSAL_SCHEMA_VERSION,
     PlanningError,
     ReportPlanProposal,
+    SemanticV2TopicMap,
     TopicMap,
     TopicMapProposal,
     bind_topic_map,
     compile_report_plan,
+    compile_semantic_v2_report_plan,
     mapper_payload,
+    normalize_semantic_v2_plan_proposal,
+    normalize_semantic_v2_topic_proposal,
     planner_payload,
+    resolve_semantic_v2_topic_map,
+    semantic_v2_mapper_payload,
+    semantic_v2_planner_payload,
     stable_json,
     validate_transcript_envelope,
 )
@@ -49,9 +66,14 @@ from .renderer import RenderError, render_report
 
 RUN_SCHEMA_VERSION = "visual-report-planning-run.v1a-prototype"
 EVENT_SCHEMA_VERSION = "visual-report-planning-event.v1a-prototype"
+SEMANTIC_V2_RUN_SCHEMA_VERSION = "visual-report-planning-run.v1a-semantic-v2"
+SEMANTIC_V2_EVENT_SCHEMA_VERSION = "visual-report-planning-event.v1a-semantic-v2"
 API_SURFACE = "responses"
 RESPONSE_MODE = "json_schema"
 SCHEMA_MECHANISM = "responses.text.format.json_schema"
+SEMANTIC_V2_API_SURFACE = "chat_completions"
+SEMANTIC_V2_RESPONSE_MODE = "json_object"
+SEMANTIC_V2_SCHEMA_MECHANISM = "chat.completions.response_format.json_object"
 REASONING_EFFORT = "none"
 TEMPERATURE = 0
 
@@ -205,6 +227,12 @@ class PlanningConfig:
     strategy_id: str | None = None
     strategy_manifest_sha256: str | None = None
     model_version: str | None = None
+    mapper_prompt_version: str = MAPPER_PROMPT_VERSION
+    planner_prompt_version: str = PLANNER_PROMPT_VERSION
+    topic_proposal_schema: str = TOPIC_PROPOSAL_SCHEMA_VERSION
+    topic_map_schema: str = TOPIC_MAP_SCHEMA_VERSION
+    plan_proposal_schema: str = PLAN_PROPOSAL_SCHEMA_VERSION
+    compiler_version: str = COMPILER_VERSION
 
     def public_snapshot(self) -> dict[str, object]:
         return {
@@ -224,12 +252,12 @@ class PlanningConfig:
             "strategy_id": self.strategy_id,
             "strategy_manifest_sha256": self.strategy_manifest_sha256,
             "model_version": self.model_version,
-            "mapper_prompt_version": MAPPER_PROMPT_VERSION,
-            "planner_prompt_version": PLANNER_PROMPT_VERSION,
-            "topic_proposal_schema": TOPIC_PROPOSAL_SCHEMA_VERSION,
-            "topic_map_schema": TOPIC_MAP_SCHEMA_VERSION,
-            "plan_proposal_schema": PLAN_PROPOSAL_SCHEMA_VERSION,
-            "compiler_version": COMPILER_VERSION,
+            "mapper_prompt_version": self.mapper_prompt_version,
+            "planner_prompt_version": self.planner_prompt_version,
+            "topic_proposal_schema": self.topic_proposal_schema,
+            "topic_map_schema": self.topic_map_schema,
+            "plan_proposal_schema": self.plan_proposal_schema,
+            "compiler_version": self.compiler_version,
         }
 
 
@@ -255,6 +283,7 @@ class ProviderCallError(RuntimeError):
         content_present: bool = False,
         content_bytes: int = 0,
         content_sha256: str | None = None,
+        retryable: bool = False,
     ) -> None:
         self.category = category
         self.latency_ms = latency_ms
@@ -263,6 +292,7 @@ class ProviderCallError(RuntimeError):
         self.content_present = content_present
         self.content_bytes = content_bytes
         self.content_sha256 = content_sha256
+        self.retryable = retryable
         super().__init__(message)
 
 
@@ -502,15 +532,179 @@ class OpenAIPlanningProvider:
         )
 
 
+class OpenAISemanticV2PlanningProvider:
+    """The current DeepSeek-compatible Chat Completions provider seam."""
+
+    def __init__(self, client: OpenAI, config: PlanningConfig) -> None:
+        self.client = client
+        self.config = config
+
+    @classmethod
+    def from_environment(cls) -> "OpenAISemanticV2PlanningProvider":
+        load_dotenv(Path(__file__).resolve().parents[3] / ".env", override=False)
+        api_key = os.getenv("OPENAI_API_KEY", "").strip()
+        base_url = os.getenv("OPENAI_BASE_URL", "").strip()
+        model = os.getenv("VISUAL_REPORT_MODEL", "").strip()
+        if not api_key:
+            raise PlanningError("CONFIGURATION_ERROR", "OPENAI_API_KEY is required")
+        if not model:
+            raise PlanningError("CONFIGURATION_ERROR", "VISUAL_REPORT_MODEL is required")
+        try:
+            timeout_seconds = float(os.getenv("VISUAL_REPORT_TIMEOUT_SECONDS", "120"))
+        except ValueError as exc:
+            raise PlanningError(
+                "CONFIGURATION_ERROR", "VISUAL_REPORT_TIMEOUT_SECONDS must be numeric"
+            ) from exc
+        if timeout_seconds <= 0:
+            raise PlanningError(
+                "CONFIGURATION_ERROR", "VISUAL_REPORT_TIMEOUT_SECONDS must be positive"
+            )
+        options: dict[str, Any] = {
+            "api_key": api_key,
+            "timeout": timeout_seconds,
+            "max_retries": 0,
+        }
+        if base_url:
+            options["base_url"] = base_url
+        config = PlanningConfig(
+            provider_label=_provider_label(base_url),
+            model=model,
+            timeout_seconds=timeout_seconds,
+            credential_present=True,
+            response_mode=SEMANTIC_V2_RESPONSE_MODE,
+            api_surface=SEMANTIC_V2_API_SURFACE,
+            schema_mechanism=SEMANTIC_V2_SCHEMA_MECHANISM,
+            reasoning_effort=REASONING_EFFORT,
+            mapper_prompt_version=SEMANTIC_V2_MAPPER_PROMPT_VERSION,
+            planner_prompt_version=SEMANTIC_V2_PLANNER_PROMPT_VERSION,
+            topic_proposal_schema=SEMANTIC_V2_TOPIC_PROPOSAL_SCHEMA_VERSION,
+            topic_map_schema=SEMANTIC_V2_TOPIC_MAP_SCHEMA_VERSION,
+            plan_proposal_schema=SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
+            compiler_version=SEMANTIC_V2_COMPILER_VERSION,
+            sdk_version=importlib.metadata.version("openai"),
+        )
+        return cls(OpenAI(**options), config)
+
+    @staticmethod
+    def _usage(response: object) -> dict[str, Any]:
+        usage = getattr(response, "usage", None)
+        if usage is None:
+            return {}
+        try:
+            candidate = usage.model_dump(mode="json")
+            if isinstance(candidate, dict):
+                return candidate
+        except (AttributeError, TypeError, ValueError):
+            pass
+        if isinstance(usage, dict):
+            return dict(usage)
+        return {}
+
+    @staticmethod
+    def _status_code(error: BaseException) -> int | None:
+        value = getattr(error, "status_code", None)
+        if isinstance(value, int):
+            return value
+        response = getattr(error, "response", None)
+        value = getattr(response, "status_code", None)
+        return value if isinstance(value, int) else None
+
+    @classmethod
+    def _retryable_transport_error(cls, error: BaseException) -> bool:
+        name = type(error).__name__.lower()
+        status_code = cls._status_code(error)
+        return (
+            isinstance(error, (TimeoutError, APITimeoutError))
+            or "connection" in name
+            or "timeout" in name
+            or "rate" in name
+            or status_code == 429
+            or (status_code is not None and status_code >= 500)
+        )
+
+    def complete(
+        self, stage: str, system_instruction: str, payload: dict[str, object]
+    ) -> ProviderResult:
+        if stage not in {"topic_mapper", "report_planner"}:
+            raise ProviderCallError("CONFIGURATION_ERROR", "unknown planning stage", 0)
+        started = perf_counter()
+        try:
+            response = self.client.chat.completions.create(
+                model=self.config.model,
+                messages=[
+                    {"role": "system", "content": system_instruction},
+                    {"role": "user", "content": stable_json(payload)},
+                ],
+                temperature=TEMPERATURE,
+                max_tokens=self.config.output_token_limit,
+                response_format={"type": SEMANTIC_V2_RESPONSE_MODE},
+            )
+        except Exception as exc:
+            latency_ms = round((perf_counter() - started) * 1000)
+            category = (
+                "PROVIDER_TIMEOUT"
+                if isinstance(exc, (TimeoutError, APITimeoutError))
+                else "PROVIDER_ERROR"
+            )
+            raise ProviderCallError(
+                category,
+                f"provider request failed: {type(exc).__name__}",
+                latency_ms,
+                retryable=self._retryable_transport_error(exc),
+            ) from exc
+        latency_ms = round((perf_counter() - started) * 1000)
+        usage = self._usage(response)
+        choices = getattr(response, "choices", None)
+        choice = choices[0] if isinstance(choices, list) and choices else None
+        message = getattr(choice, "message", None)
+        content = getattr(message, "content", None)
+        finish_reason = getattr(choice, "finish_reason", None)
+        if not isinstance(content, str):
+            content = None
+        content_bytes = len(content.encode("utf-8")) if content is not None else 0
+        content_sha256 = _sha256_bytes(content.encode("utf-8")) if content is not None else None
+        if not content:
+            raise ProviderCallError(
+                "PROVIDER_ERROR",
+                "provider returned no message content",
+                latency_ms,
+                usage=usage,
+                finish_reason=finish_reason if isinstance(finish_reason, str) else None,
+                content_present=False,
+                content_bytes=content_bytes,
+                content_sha256=content_sha256,
+                retryable=True,
+            )
+        return ProviderResult(
+            raw_text=content,
+            usage=usage,
+            latency_ms=latency_ms,
+            finish_reason=finish_reason if isinstance(finish_reason, str) else None,
+            content_present=True,
+            content_bytes=content_bytes,
+            content_sha256=content_sha256,
+        )
+
+
 class RunRecorder:
-    def __init__(self, run_id: str, run_dir: Path) -> None:
+    def __init__(
+        self,
+        run_id: str,
+        run_dir: Path,
+        *,
+        schema_version: str = RUN_SCHEMA_VERSION,
+        event_schema_version: str = EVENT_SCHEMA_VERSION,
+        call_schema_version: str = CALL_SCHEMA_VERSION,
+    ) -> None:
         self.run_id = run_id
         self.run_dir = run_dir
         self.run_path = run_dir / "run.json"
         self.events_path = run_dir / "events.jsonl"
         self.calls_path = run_dir / "model-calls.jsonl"
+        self.event_schema_version = event_schema_version
+        self.call_schema_version = call_schema_version
         self.payload: dict[str, Any] = {
-            "schema_version": RUN_SCHEMA_VERSION,
+            "schema_version": schema_version,
             "run_id": run_id,
             "state": "CREATED",
             "created_at": _now(),
@@ -528,7 +722,15 @@ class RunRecorder:
         self.event("CREATED")
 
     @classmethod
-    def create(cls, output_root: Path, run_id: str) -> "RunRecorder":
+    def create(
+        cls,
+        output_root: Path,
+        run_id: str,
+        *,
+        schema_version: str = RUN_SCHEMA_VERSION,
+        event_schema_version: str = EVENT_SCHEMA_VERSION,
+        call_schema_version: str = CALL_SCHEMA_VERSION,
+    ) -> "RunRecorder":
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,79}", run_id):
             raise PlanningError("CONFIGURATION_ERROR", "run_id must be a safe 1-80 character slug")
         run_dir = output_root.resolve() / run_id
@@ -540,7 +742,13 @@ class RunRecorder:
             ) from exc
         except OSError as exc:
             raise PlanningError("OUTPUT_IO_ERROR", "cannot create run directory") from exc
-        return cls(run_id, run_dir)
+        return cls(
+            run_id,
+            run_dir,
+            schema_version=schema_version,
+            event_schema_version=event_schema_version,
+            call_schema_version=call_schema_version,
+        )
 
     def save(self) -> None:
         self.payload["updated_at"] = _now()
@@ -549,7 +757,12 @@ class RunRecorder:
     def event(self, state: str, **detail: object) -> None:
         _append_jsonl(
             self.events_path,
-            {"schema_version": EVENT_SCHEMA_VERSION, "at": _now(), "state": state, **detail},
+            {
+                "schema_version": self.event_schema_version,
+                "at": _now(),
+                "state": state,
+                **detail,
+            },
         )
 
     def transition(self, state: str) -> None:
@@ -583,9 +796,21 @@ class RunRecorder:
             "segments_sha256": source.segments_sha256,
             "segment_count": len(source.segments),
         }
+        mapper_prompt_version = getattr(config, "mapper_prompt_version", MAPPER_PROMPT_VERSION)
+        planner_prompt_version = getattr(config, "planner_prompt_version", PLANNER_PROMPT_VERSION)
+        mapper_instruction = (
+            SEMANTIC_V2_MAPPER_SYSTEM_INSTRUCTION
+            if mapper_prompt_version == SEMANTIC_V2_MAPPER_PROMPT_VERSION
+            else MAPPER_SYSTEM_INSTRUCTION
+        )
+        planner_instruction = (
+            SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION
+            if planner_prompt_version == SEMANTIC_V2_PLANNER_PROMPT_VERSION
+            else PLANNER_SYSTEM_INSTRUCTION
+        )
         self.payload["prompt_sha256"] = {
-            MAPPER_PROMPT_VERSION: _sha256_bytes(MAPPER_SYSTEM_INSTRUCTION.encode("utf-8")),
-            PLANNER_PROMPT_VERSION: _sha256_bytes(PLANNER_SYSTEM_INSTRUCTION.encode("utf-8")),
+            mapper_prompt_version: _sha256_bytes(mapper_instruction.encode("utf-8")),
+            planner_prompt_version: _sha256_bytes(planner_instruction.encode("utf-8")),
         }
         self.save()
 
@@ -610,11 +835,14 @@ class RunRecorder:
         content_sha256: str | None = None,
         schema_name: str | None = None,
         schema_sha256: str | None = None,
+        attempt: int | None = None,
+        request_sha256: str | None = None,
+        retry_of_attempt: int | None = None,
+        retry_eligible: bool | None = None,
+        retry_used: bool | None = None,
     ) -> None:
-        _append_jsonl(
-            self.calls_path,
-            {
-                "schema_version": CALL_SCHEMA_VERSION,
+        call_payload: dict[str, object] = {
+            "schema_version": self.call_schema_version,
                 "at": _now(),
                 "stage": stage,
                 "provider": config.provider_label,
@@ -643,8 +871,18 @@ class RunRecorder:
                 "content_present": content_present,
                 "content_bytes": content_bytes,
                 "content_sha256": content_sha256,
-            },
-        )
+        }
+        if attempt is not None:
+            call_payload["attempt"] = attempt
+        if request_sha256 is not None:
+            call_payload["request_sha256"] = request_sha256
+        if retry_of_attempt is not None:
+            call_payload["retry_of_attempt"] = retry_of_attempt
+        if retry_eligible is not None:
+            call_payload["retry_eligible"] = retry_eligible
+        if retry_used is not None:
+            call_payload["retry_used"] = retry_used
+        _append_jsonl(self.calls_path, call_payload)
         aggregate = self.payload.setdefault("usage", {})
         for key, value in usage.items():
             if isinstance(value, int):
@@ -935,6 +1173,421 @@ def build_from_transcript(
         raise error from exc
 
 
+def _semantic_v2_request_sha256(
+    stage: str,
+    instruction: str,
+    payload: dict[str, object],
+    config: Any,
+) -> str:
+    request = {
+        "stage": stage,
+        "system_instruction": instruction,
+        "payload": payload,
+        "model": getattr(config, "model", None),
+        "temperature": getattr(config, "temperature", TEMPERATURE),
+        "response_mode": getattr(config, "response_mode", SEMANTIC_V2_RESPONSE_MODE),
+        "api_surface": getattr(config, "api_surface", SEMANTIC_V2_API_SURFACE),
+        "output_token_limit": getattr(config, "output_token_limit", MAX_OUTPUT_TOKENS),
+    }
+    return _sha256_bytes(stable_json(request).encode("utf-8"))
+
+
+def _semantic_v2_call_stage(
+    recorder: RunRecorder,
+    provider: Any,
+    *,
+    stage: str,
+    prompt_version: str,
+    instruction: str,
+    payload: dict[str, object],
+    raw_path: Path,
+    normalizer: Callable[[Mapping[str, object]], Any],
+    retry_state: dict[str, bool],
+) -> tuple[Any, list[dict[str, object]]]:
+    """Run one semantic stage with one shared, identical technical retry."""
+    request_sha256 = _semantic_v2_request_sha256(
+        stage, instruction, payload, provider.config
+    )
+    output_contract = payload.get("output_contract")
+    schema = output_contract.get("json_schema") if isinstance(output_contract, dict) else None
+    schema_sha256 = (
+        _sha256_bytes(stable_json(schema).encode("utf-8")) if isinstance(schema, dict) else None
+    )
+    schema_name = f"semantic_v2_{stage}"
+    for attempt in (1, 2):
+        if attempt == 2 and retry_state.get("used") is not True:
+            raise PlanningError("PROVIDER_ERROR", "semantic-v2 retry state is inconsistent")
+        recorder.admit_call()
+        retry_of_attempt = attempt - 1 if attempt > 1 else None
+        try:
+            result = provider.complete(stage, instruction, payload)
+        except KeyboardInterrupt:
+            recorder.record_call(
+                stage=stage,
+                prompt_version=prompt_version,
+                config=provider.config,
+                latency_ms=0,
+                usage={},
+                schema_valid=False,
+                error_category="CANCELLED",
+                schema_name=schema_name,
+                schema_sha256=schema_sha256,
+                attempt=attempt,
+                request_sha256=request_sha256,
+                retry_of_attempt=retry_of_attempt,
+                retry_eligible=False,
+                retry_used=retry_state.get("used", False),
+            )
+            raise
+        except ProviderCallError as exc:
+            eligible = bool(exc.retryable)
+            recorder.record_call(
+                stage=stage,
+                prompt_version=prompt_version,
+                config=provider.config,
+                latency_ms=exc.latency_ms,
+                usage=exc.usage,
+                schema_valid=False,
+                error_category=exc.category,
+                finish_reason=exc.finish_reason,
+                content_present=exc.content_present,
+                content_bytes=exc.content_bytes,
+                content_sha256=exc.content_sha256,
+                schema_name=schema_name,
+                schema_sha256=schema_sha256,
+                attempt=attempt,
+                request_sha256=request_sha256,
+                retry_of_attempt=retry_of_attempt,
+                retry_eligible=eligible,
+                retry_used=retry_state.get("used", False),
+            )
+            if eligible and not retry_state.get("used", False):
+                retry_state["used"] = True
+                recorder.event(
+                    "TECHNICAL_RETRY_ADMITTED",
+                    stage=stage,
+                    retry_of_attempt=attempt,
+                    request_sha256=request_sha256,
+                    reason=exc.category,
+                )
+                continue
+            raise PlanningError(exc.category, str(exc)) from exc
+        except Exception as exc:
+            recorder.record_call(
+                stage=stage,
+                prompt_version=prompt_version,
+                config=provider.config,
+                latency_ms=0,
+                usage={},
+                schema_valid=False,
+                error_category="PROVIDER_ERROR",
+                schema_name=schema_name,
+                schema_sha256=schema_sha256,
+                attempt=attempt,
+                request_sha256=request_sha256,
+                retry_of_attempt=retry_of_attempt,
+                retry_eligible=False,
+                retry_used=retry_state.get("used", False),
+            )
+            raise PlanningError(
+                "PROVIDER_ERROR", f"provider request failed: {type(exc).__name__}"
+            ) from exc
+
+        attempt_path = raw_path.parent / f"{raw_path.name}.attempt-{attempt:02d}.json"
+        _write_raw(attempt_path, result.raw_text)
+        recorder.artifact(f"{raw_path.stem}_attempt_{attempt:02d}", attempt_path)
+        if result.finish_reason not in {None, "stop", "completed"}:
+            error = PlanningError(
+                "MODEL_OUTPUT_INCOMPLETE",
+                f"{stage} response finished with {result.finish_reason}",
+            )
+            recorder.record_call(
+                stage=stage,
+                prompt_version=prompt_version,
+                config=provider.config,
+                latency_ms=result.latency_ms,
+                usage=result.usage,
+                schema_valid=False,
+                error_category=error.category,
+                finish_reason=result.finish_reason,
+                content_present=result.content_present,
+                content_bytes=result.content_bytes,
+                content_sha256=result.content_sha256,
+                schema_name=schema_name,
+                schema_sha256=schema_sha256,
+                attempt=attempt,
+                request_sha256=request_sha256,
+                retry_of_attempt=retry_of_attempt,
+                retry_eligible=True,
+                retry_used=retry_state.get("used", False),
+            )
+            if not retry_state.get("used", False):
+                retry_state["used"] = True
+                recorder.event(
+                    "TECHNICAL_RETRY_ADMITTED",
+                    stage=stage,
+                    retry_of_attempt=attempt,
+                    request_sha256=request_sha256,
+                    reason=error.category,
+                )
+                continue
+            raise error
+        try:
+            parsed = _parse_response(result.raw_text, stage)
+        except PlanningError as error:
+            recorder.record_call(
+                stage=stage,
+                prompt_version=prompt_version,
+                config=provider.config,
+                latency_ms=result.latency_ms,
+                usage=result.usage,
+                schema_valid=False,
+                error_category=error.category,
+                finish_reason=result.finish_reason,
+                content_present=result.content_present,
+                content_bytes=result.content_bytes,
+                content_sha256=result.content_sha256,
+                schema_name=schema_name,
+                schema_sha256=schema_sha256,
+                attempt=attempt,
+                request_sha256=request_sha256,
+                retry_of_attempt=retry_of_attempt,
+                retry_eligible=True,
+                retry_used=retry_state.get("used", False),
+            )
+            if not retry_state.get("used", False):
+                retry_state["used"] = True
+                recorder.event(
+                    "TECHNICAL_RETRY_ADMITTED",
+                    stage=stage,
+                    retry_of_attempt=attempt,
+                    request_sha256=request_sha256,
+                    reason=error.category,
+                )
+                continue
+            raise
+        try:
+            normalized = normalizer(parsed)
+        except PlanningError as error:
+            recorder.record_call(
+                stage=stage,
+                prompt_version=prompt_version,
+                config=provider.config,
+                latency_ms=result.latency_ms,
+                usage=result.usage,
+                schema_valid=False,
+                error_category=error.category,
+                finish_reason=result.finish_reason,
+                content_present=result.content_present,
+                content_bytes=result.content_bytes,
+                content_sha256=result.content_sha256,
+                schema_name=schema_name,
+                schema_sha256=schema_sha256,
+                attempt=attempt,
+                request_sha256=request_sha256,
+                retry_of_attempt=retry_of_attempt,
+                retry_eligible=False,
+                retry_used=retry_state.get("used", False),
+            )
+            raise
+        recorder.record_call(
+            stage=stage,
+            prompt_version=prompt_version,
+            config=provider.config,
+            latency_ms=result.latency_ms,
+            usage=result.usage,
+            schema_valid=True,
+            finish_reason=result.finish_reason,
+            content_present=result.content_present,
+            content_bytes=result.content_bytes,
+            content_sha256=result.content_sha256,
+            schema_name=schema_name,
+            schema_sha256=schema_sha256,
+            attempt=attempt,
+            request_sha256=request_sha256,
+            retry_of_attempt=retry_of_attempt,
+            retry_eligible=False,
+            retry_used=retry_state.get("used", False),
+        )
+        _write_raw(raw_path, result.raw_text)
+        recorder.artifact(raw_path.stem, raw_path)
+        return normalized.proposal, list(normalized.events)
+    raise PlanningError("PROVIDER_ERROR", "semantic-v2 call loop exhausted")
+
+
+def _semantic_v2_events_payload(
+    stage: str, events: list[dict[str, object]]
+) -> dict[str, object]:
+    return {
+        "schema_version": SEMANTIC_V2_NORMALIZATION_SCHEMA_VERSION,
+        "compiler_version": SEMANTIC_V2_COMPILER_VERSION,
+        "stage": stage,
+        "events": events,
+        "event_count": len(events),
+    }
+
+
+def build_from_transcript_v2(
+    *,
+    manifest_path: Path,
+    segments_path: Path,
+    run_id: str,
+    output_root: Path,
+    provider: Any | None = None,
+) -> PlanningRunSummary:
+    """Build one current semantic-v2 product prototype report."""
+    recorder = RunRecorder.create(
+        output_root,
+        run_id,
+        schema_version=SEMANTIC_V2_RUN_SCHEMA_VERSION,
+        event_schema_version=SEMANTIC_V2_EVENT_SCHEMA_VERSION,
+        call_schema_version=SEMANTIC_V2_CALL_SCHEMA_VERSION,
+    )
+    retry_state = {"used": False}
+    try:
+        active_provider = provider or OpenAISemanticV2PlanningProvider.from_environment()
+        source = load_source(manifest_path, segments_path)
+        recorder.configure(active_provider.config, source)
+        recorder.payload["pipeline"] = "semantic-v2-product-prototype"
+        recorder.payload["base_model_call_budget"] = 2
+        recorder.payload["maximum_model_call_budget"] = 3
+        recorder.payload["semantic_stages"] = ["topic_mapper", "report_planner"]
+        recorder.payload["technical_retry_policy"] = {
+            "max_retries_per_run": 1,
+            "identical_request": True,
+            "sdk_max_retries": 0,
+        }
+        recorder.save()
+        segments = list(source.segments)
+
+        recorder.transition("MAPPING")
+        topic_payload = semantic_v2_mapper_payload(source.video_payload, segments)
+        topic_proposal, topic_events = _semantic_v2_call_stage(
+            recorder,
+            active_provider,
+            stage="topic_mapper",
+            prompt_version=SEMANTIC_V2_MAPPER_PROMPT_VERSION,
+            instruction=SEMANTIC_V2_MAPPER_SYSTEM_INSTRUCTION,
+            payload=topic_payload,
+            raw_path=recorder.run_dir / "topic-map.raw.json",
+            normalizer=normalize_semantic_v2_topic_proposal,
+            retry_state=retry_state,
+        )
+        topic_map, topic_events = resolve_semantic_v2_topic_map(
+            topic_proposal, segments, events=topic_events
+        )
+        topic_path = recorder.run_dir / "topic-map.json"
+        _atomic_json(topic_path, topic_map.model_dump(mode="json"))
+        recorder.artifact("topic_map", topic_path)
+        topic_normalization_path = recorder.run_dir / "topic-normalization.json"
+        _atomic_json(
+            topic_normalization_path,
+            _semantic_v2_events_payload("topic_mapper", topic_events),
+        )
+        recorder.artifact("topic_normalization", topic_normalization_path)
+        recorder.transition("TOPIC_MAPPED")
+
+        recorder.transition("PLANNING")
+        plan_payload = semantic_v2_planner_payload(source.video_payload, segments, topic_map)
+        plan_proposal, plan_events = _semantic_v2_call_stage(
+            recorder,
+            active_provider,
+            stage="report_planner",
+            prompt_version=SEMANTIC_V2_PLANNER_PROMPT_VERSION,
+            instruction=SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION,
+            payload=plan_payload,
+            raw_path=recorder.run_dir / "report-plan.raw.json",
+            normalizer=normalize_semantic_v2_plan_proposal,
+            retry_state=retry_state,
+        )
+        plan, assets, ledger = compile_semantic_v2_report_plan(
+            plan_proposal,
+            topic_map,
+            segments,
+            title=source.title,
+            source_url=source.source_url,
+            attribution=source.attribution,
+            duration_ms=source.duration_ms,
+            normalization_events=plan_events,
+        )
+        planner_normalization_path = recorder.run_dir / "planner-normalization.json"
+        _atomic_json(
+            planner_normalization_path,
+            _semantic_v2_events_payload("report_planner", plan_events),
+        )
+        recorder.artifact("planner_normalization", planner_normalization_path)
+        plan_path = recorder.run_dir / "report-plan.json"
+        assets_path = recorder.run_dir / "assets.json"
+        normalization_path = recorder.run_dir / "normalization.json"
+        _atomic_json(plan_path, plan.model_dump(mode="json"))
+        _atomic_json(assets_path, assets.model_dump(mode="json"))
+        _atomic_json(normalization_path, ledger.model_dump(mode="json"))
+        recorder.artifact("report_plan", plan_path)
+        recorder.artifact("assets", assets_path)
+        recorder.artifact("normalization", normalization_path)
+        validation_path = recorder.run_dir / "validation.json"
+        _atomic_json(
+            validation_path,
+            {
+                "pipeline": "semantic-v2-product-prototype",
+                "video_id": topic_map.video_id,
+                "topic_count": len(topic_map.topics),
+                "span_covered_count": topic_map.coverage.span_covered_count,
+                "representative_covered_count": topic_map.coverage.representative_covered_count,
+                "uncovered_segment_ids": list(topic_map.coverage.uncovered_segment_ids),
+                "overlap_segment_ids": list(topic_map.coverage.overlap_segment_ids),
+                "section_count": len(plan.sections),
+                "block_count": sum(len(section.blocks) for section in plan.sections),
+                "source_ref_count": sum(
+                    len(block.source_refs) for section in plan.sections for block in section.blocks
+                ),
+                "hero_source_segment_ids": list(plan_proposal.hero.source_segment_ids),
+                "asset_count": len(assets.assets),
+                "normalization_summary": ledger.summary,
+            },
+        )
+        recorder.artifact("validation", validation_path)
+        recorder.transition("PLAN_VALIDATED")
+
+        report_path = recorder.run_dir / "report.html"
+        try:
+            render_summary = render_report(plan_path, assets_path, report_path)
+        except RenderError as exc:
+            raise PlanningError("RENDER_ERROR", str(exc)) from exc
+        recorder.artifact("report_html", report_path)
+        provider_calls = int(recorder.payload["provider_calls"])
+        if provider_calls not in {2, 3} or provider_calls > 3:
+            raise PlanningError(
+                "PROVIDER_ERROR", "successful semantic-v2 run must contain two or three calls"
+            )
+        recorder.payload["retry_used"] = retry_state["used"]
+        recorder.save()
+        recorder.transition("RENDERED")
+        return PlanningRunSummary(
+            run_id=run_id,
+            run_dir=recorder.run_dir,
+            state="RENDERED",
+            provider_calls=provider_calls,
+            model_calls=int(recorder.payload["model_calls"]),
+            section_count=render_summary.section_count,
+            block_count=render_summary.block_count,
+            report_path=report_path,
+        )
+    except KeyboardInterrupt as exc:
+        error = PlanningError("CANCELLED", "run cancelled by operator")
+        recorder.fail(error, state="CANCELLED")
+        raise error from exc
+    except PlanningError as exc:
+        recorder.payload["retry_used"] = retry_state["used"]
+        recorder.save()
+        recorder.fail(exc)
+        raise
+    except OSError as exc:
+        error = PlanningError("OUTPUT_IO_ERROR", type(exc).__name__)
+        recorder.fail(error)
+        raise error from exc
+
+
 @dataclass(frozen=True)
 class ReplaySummary:
     provider_calls: int
@@ -985,4 +1638,63 @@ def replay_proposals(
         topic_map=topic_map,
         report_plan_sha256=_sha256_file(plan_path),
         report_html_sha256=_sha256_file(report_path),
+    )
+
+
+@dataclass(frozen=True)
+class SemanticV2ReplaySummary:
+    provider_calls: int
+    model_calls: int
+    topic_map: SemanticV2TopicMap
+    report_plan_sha256: str
+    report_html_sha256: str
+    normalization_sha256: str
+
+
+def replay_semantic_v2_proposals(
+    *,
+    manifest_path: Path,
+    segments_path: Path,
+    topic_proposal_payload: dict[str, object],
+    plan_proposal_payload: dict[str, object],
+    output_dir: Path,
+) -> SemanticV2ReplaySummary:
+    """Replay accepted v2 proposal JSON locally with zero provider calls."""
+    source = load_source(manifest_path, segments_path)
+    segments = list(source.segments)
+    topic_result = normalize_semantic_v2_topic_proposal(topic_proposal_payload)
+    topic_events = list(topic_result.events)
+    topic_map, topic_events = resolve_semantic_v2_topic_map(
+        topic_result.proposal, segments, events=topic_events
+    )
+    plan_result = normalize_semantic_v2_plan_proposal(plan_proposal_payload)
+    plan_events = list(plan_result.events)
+    plan, assets, ledger = compile_semantic_v2_report_plan(
+        plan_result.proposal,
+        topic_map,
+        segments,
+        title=source.title,
+        source_url=source.source_url,
+        attribution=source.attribution,
+        duration_ms=source.duration_ms,
+        normalization_events=plan_events,
+    )
+    output_dir.mkdir(parents=True, exist_ok=True)
+    plan_path = output_dir / "report-plan.json"
+    assets_path = output_dir / "assets.json"
+    topic_path = output_dir / "topic-map.json"
+    normalization_path = output_dir / "normalization.json"
+    report_path = output_dir / "report.html"
+    _atomic_json(topic_path, topic_map.model_dump(mode="json"))
+    _atomic_json(plan_path, plan.model_dump(mode="json"))
+    _atomic_json(assets_path, assets.model_dump(mode="json"))
+    _atomic_json(normalization_path, ledger.model_dump(mode="json"))
+    render_report(plan_path, assets_path, report_path)
+    return SemanticV2ReplaySummary(
+        provider_calls=0,
+        model_calls=0,
+        topic_map=topic_map,
+        report_plan_sha256=_sha256_file(plan_path),
+        report_html_sha256=_sha256_file(report_path),
+        normalization_sha256=_sha256_file(normalization_path),
     )

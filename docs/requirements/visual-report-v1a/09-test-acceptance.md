@@ -2,10 +2,11 @@
 
 ## Evidence label and stop boundary
 
-All real-model results in this phase are `Development measurement`. They are not
-provider-free rehearsal, Freeze, Locked Eval, release, or production evidence.
-Implementation may stop at `READY_FOR_OWNER_V1A_REVIEW`; only the Owner may
-accept V1-A or authorize V1-B/C.
+Current real-model results are `G1 product-prototype evidence`. They are not a
+Provider/Schema conformance result, formal Development measurement, Freeze,
+Locked Eval, release, or production evidence. Implementation must stop at a
+declared `READY_FOR_OWNER_V1A_REVIEW` terminal; only the Owner may accept V1-A
+or authorize V1-B/C.
 
 ## Test levels and environments
 
@@ -14,12 +15,12 @@ accept V1-A or authorize V1-B/C.
 | Unit | Local fake adapter | Proposal models, binders, compiler, budgets, state transitions |
 | Contract | Synthetic Chinese transcripts | Valid/invalid Mapper and Planner schemas; exact source binding |
 | Integration | Current renderer + fake adapter | Complete transcript-to-HTML flow, exactly controlled calls |
-| Failure/recovery | Fake errors/malformed outputs/cancellation | Retained failed run; no next stage/overwrite/retry |
+| Failure/recovery | Fake errors/malformed outputs/cancellation | Retained attempts; exact one-retry eligibility/budget; no overwrite or hidden recovery |
 | Security | Prompt-injection and secret-redaction fixtures | Transcript remains data; extra executable/layout fields rejected |
 | Replay | Fixed synthetic raw responses | Same canonical Topic Map/plan/HTML for identical inputs |
 | Regression | Repository checks | Current V0 render and protected P0-B paths unchanged |
-| Real Development measurement | Configured provider; three fixed transcripts | Six runs plus three human review cards and aggregate report |
-| Performance/cost | Same six runs | Call/latency/usage/size evidence; no unsupported monetary cost |
+| Real product prototype | Configured provider; three fixed transcripts | Three runs/reports plus six viewport screenshots, three human review cards and cross-video review |
+| Performance/cost | Same three runs | Attempt/call/latency/usage/size evidence within the nine-call ceiling; no unsupported monetary cost |
 
 Spike, soak, backup-restore, service incident, customer lifecycle, migration, and
 commercial go-live tests are not applicable to one foreground G1 prototype.
@@ -33,7 +34,7 @@ commercial go-live tests are not applicable to one foreground G1 prototype.
 | `p0b-wuyi-goals` | New conversational/argument slice | Interview-style reasoning and fewer obvious system blocks | 38 segments, ~29:23 |
 
 The RLinf V0 plan may inform prompt development and qualitative comparison but
-must never enter model context. Before the measured revision, a reviewer creates
+must never enter model context. Before the product revision, a reviewer creates
 one source-linked card for each fixture:
 
 ```json
@@ -53,7 +54,10 @@ one source-linked card for each fixture:
 Cards name concepts and source refs, not preferred report block sequences. This
 avoids turning the evaluation into template matching.
 
-## Measurement protocol
+## Historical v1 measurement protocol
+
+The following seven-step protocol records the original v1 denominator and is
+not the current semantic-v2 execution authority.
 
 1. Finish fake/contract/integration tests before any measured provider call.
 2. Freeze source snapshots, review-card revisions, Mapper/Planner prompts,
@@ -107,10 +111,12 @@ pending Owner rubrics exist. Human quality acceptance remains Owner-only.
 20 failed Kling canaries, `36/36` calls, no rendered canary, and no new formal
 revision. The loop and its two-formal/36-call authority are closed.
 
-## Authorized canonical provider-conformance protocol
+## Completed canonical provider-conformance protocol
 
-`VR-V1A-PROVIDER-CONFORMANCE-004` replaces the exhausted recovery authority
-without changing the canonical product or quality contract.
+`VR-V1A-PROVIDER-CONFORMANCE-004` was authorized after the exhausted recovery
+without changing the canonical product or quality contract. It has now closed
+at `V1A_PROVIDER_CONFORMANCE_NO_GO`; the protocol below is frozen historical
+evidence, not reusable call authority.
 
 1. Preserve the frozen failed-experiment commit and all historical identities.
 2. Restore the 4–12-topic/0–5-subtopic Mapper and 3–5-section/8–14-block,
@@ -152,7 +158,39 @@ relabelled as conformance evidence. Canary reports are not inserted into the
 formal six-run denominator, and no human rubric score is inferred from canary
 or automated results.
 
-## Owner-confirmed quality rubric
+## Current semantic-v2 product-prototype protocol
+
+The Owner cancelled the unexecuted official-OpenAI isolation proposal and
+confirmed `VR-V1A-CONTRACT-SIMPLIFICATION-006` as a DeepSeek-backed product
+prototype in `DEC-VR1A-061`. Execution has not started in this documentation
+session.
+
+Provider-free acceptance must cover every v2 compiler rule using raw,
+normalized and final artifacts. Tests must prove that allowed rules never add,
+rewrite, merge, split, shorten, or expand semantic words/units; prohibited
+transformations fail; and identical raw/input/compiler versions replay to
+identical final artifacts with `0/0` calls.
+
+One frozen DeepSeek JSON-object tuple runs Kling, RLinf and Wu Yi once each.
+Each run has two base calls and may spend one identical, explicit, recorded
+technical retry for an eligible API/JSON anomaly, so the whole product set is
+capped at nine calls. Valid semantic output is never retried for quality. A
+technical failure after retry makes the set `PROTOTYPE_EXECUTION_INCONCLUSIVE`,
+not a product-route No-Go.
+
+If transport and JSON parsing succeed but the frozen non-semantic compiler
+cannot obtain a usable grounded map/report from the supplied semantics, the
+set is `PROTOTYPE_CONTENT_INSUFFICIENT`. This is product evidence, not a
+technical outage and not permission to rewrite, tune, or selectively rerun.
+
+The deliverable is three canonical reports plus one 1080 px desktop and one
+approximately 390 px mobile screenshot per report. Content/grounding,
+editorial usefulness, cross-video structure fit, and visual usability drive
+Owner review. First-attempt JSON success, retry rate, schema shape, and
+normalization count are diagnostics only. No six-run formal measurement is
+created in this prototype.
+
+## Owner-confirmed historical v1 quality rubric
 
 ### Topic Mapper
 
@@ -183,7 +221,23 @@ Human scores must cite the offending block/topic/source when below threshold.
 Source refs are necessary but not sufficient: a claim can cite a real segment
 and still overstate it.
 
+For current v2, replace the historical execution-oriented rows with:
+
+| Metric | Current v2 method | Current product threshold |
+|---|---|---|
+| Segment accounting | Topic Resolver span/representative diagnostics | Diagnostic only; at least one usable topic, with uncovered IDs/overlap exposed |
+| Exclusion validity | Not applicable to model-facing v2; no exclusion field | Must-cover/unsupported-topic review remains authoritative |
+| Product-path completion | Semantic proposals → non-semantic compiler → current V0 renderer | 3/3 canonical HTML reports; 2 base calls or 3 with one eligible retry per run |
+| Compiler authority | Raw-to-final event ledger | Zero semantic rewrite/merge/split/synthesis; every whole-unit omission visible and reviewed |
+| Source integrity | Final refs plus raw model-selected IDs | 100% final refs valid; every Hero/block retains ≥1 valid model-selected source ID |
+| Visual usability | Real-browser desktop/mobile review | Six screenshots; no critical clipping, overlap, unreadable source text, or horizontal overflow |
+| Schema/retry diagnostics | Attempt and parser ledger | Recorded, but never the primary product acceptance score |
+
 ## Acceptance cases
+
+`TEST-VR1A-001` through `022` retain the implemented/historical v1 and
+provider-conformance acceptance record. `TEST-VR1A-023` through `027` define
+the current Owner-confirmed semantic-v2 product prototype.
 
 | Test ID | Given | When | Then | Links |
 |---|---|---|---|---|
@@ -209,6 +263,11 @@ and still overstate it.
 | `TEST-VR1A-020` | Strategy A fails | Strategy B is considered | Only the already-frozen materially distinct tuple may run; no prompt learning/micro-version | `REQ-VR1A-009`, `014` |
 | `TEST-VR1A-021` | First strategy passes 3/3 | Formal manifest freezes and executes | Six fresh runs execute once, evaluator runs once, and calls remain within the 24-call ceiling | `REQ-VR1A-012`–`016` |
 | `TEST-VR1A-022` | No strategy passes or formal fails | Goal closes | Exact honest terminal is recorded without fake report, score, retry, or acceptance | `REQ-VR1A-009`, `013`, `014`, `016` |
+| `TEST-VR1A-023` | Valid/invalid v2 Mapper proposals | Topic Resolver runs | Valid spans bind; unknown/duplicate IDs and uncovered/overlap diagnostics are exact; no semantic text is created | `REQ-VR1A-017`, `018` |
+| `TEST-VR1A-024` | Flat v2 Planner content units | Compiler runs | Compatible V0 blocks/refs are deterministic; whole unusable units are visible; no text/unit is rewritten, merged, or split | `REQ-VR1A-019`, `020` |
+| `TEST-VR1A-025` | Eligible technical failure then success/failure | V2 stage runs | Exactly one identical retry is attempt-recorded; success remains reviewable; exhaustion is technical-inconclusive | `REQ-VR1A-021` |
+| `TEST-VR1A-026` | Valid JSON with weak semantics or V0 incompatibility | Compiler rejects it | No retry, model repair, fabricated content, provider fallback, or hidden new run occurs | `REQ-VR1A-020`, `021` |
+| `TEST-VR1A-027` | Frozen three-video product set renders | Browser/content review runs | Three HTML reports, six viewport screenshots, content/grounding/structure/visual evidence exist; total calls ≤9; schema-first-hit remains diagnostic | `REQ-VR1A-022` |
 
 ## Invalid, partial, stale, and adversarial cases
 
@@ -224,8 +283,10 @@ and still overstate it.
 - transcript text that says “ignore previous instructions” or imitates JSON
   policy; it must remain inert source content;
 - cancellation after Mapper and before/during Planner; no rendered success;
-- prior measurement after prompt/model/source/compiler change; it remains
+- prior product set after prompt/model/source/compiler change; it remains
   historical and is labeled stale for current conclusions.
+- automatic truncation, rewriting, semantic merge/split, or content movement to
+  satisfy V0 limits; these are prohibited rather than normalized.
 
 There is no successful partial/degraded report. Earlier-stage artifacts in a
 failed run are diagnostics, not a partial product result.
@@ -248,10 +309,10 @@ UV_CACHE_DIR=/private/tmp/video-evidence-agent-uv-cache uv run pytest -q
 git diff --check
 ```
 
-The implementation task must also run `build-from-transcript` twice for each
-fixed fixture under one frozen measurement revision and run the documented V1-A
-evaluation command selected by the implementation within this package's CLI
-and artifact contracts.
+The implementation task must run `build-from-transcript` once for each fixed
+fixture under one frozen product-set revision, permit only its one eligible
+technical retry per run, render all successful reports, capture both required
+viewports, and generate the documented prototype review package.
 
 ## Traceability
 
@@ -263,12 +324,16 @@ and artifact contracts.
 | `GOAL-VR1A-004` | `SCN-VR1A-006` | `REQ-VR1A-014` | Evaluation harness | `TEST-VR1A-014`; signatures/rubric |
 | `GOAL-VR1A-005` | `SCN-VR1A-001` | `REQ-VR1A-010`, `015` | Compiler/renderer | `TEST-VR1A-010`, `015` |
 | `GOAL-VR1A-006` | `SCN-VR1A-004`, `006` | `REQ-VR1A-012`–`014` | Run recorder/evaluator | `TEST-VR1A-012`–`014` |
+| `GOAL-VR1A-001` current v2 | `SCN-VR1A-009` | `REQ-VR1A-017`, `018` | Mapper/Topic Resolver | `TEST-VR1A-023`; coverage diagnostics/rubric |
+| `GOAL-VR1A-002/003` current v2 | `SCN-VR1A-010`, `011` | `REQ-VR1A-019`, `020` | Planner/compiler | `TEST-VR1A-024`, `026`; grounding/product-quality signals |
+| `GOAL-VR1A-006` current v2 | `SCN-VR1A-013` | `REQ-VR1A-021` | Model adapter/run recorder | `TEST-VR1A-025`; attempt/call ledger |
+| `GOAL-VR1A-004/005` current v2 | `SCN-VR1A-012` | `REQ-VR1A-022` | Renderer/prototype reviewer | `TEST-VR1A-027`; content/visual rubrics/screenshots |
 
 ## Acceptance ownership
 
 | Area | Owner | Required evidence |
 |---|---|---|
-| Product/content planning | Owner | Six reports, Topic Maps, rubrics, aggregate conclusion |
+| Product/content planning | Owner | Three reports, Topic Maps, content/visual rubrics, cross-video conclusion |
 | Data/source/rights | Owner + implementer | Authorized fixed sources, validated refs, no publication |
 | AI quality | Owner | Coverage, grounding, overclaim, prioritization, variation thresholds |
 | Contract/security | Implementer | Unit/failure/adversarial/replay tests |
