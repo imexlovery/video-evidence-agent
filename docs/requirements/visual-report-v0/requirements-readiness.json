@@ -1,0 +1,440 @@
+{
+  "schemaVersion": "1.0",
+  "generatedBy": "agent-native-requirements/validate_readiness.py",
+  "generatedAt": "2026-08-29T20:50:12.951684+00:00",
+  "status": "READY_FOR_ENGINEERING_HANDOFF",
+  "ready": true,
+  "confidence": 100.0,
+  "evaluatedArtifactSha256": "d24ae46e4ef4a1671c99d1c4b1faaf9a76861f2dec38a72cfb538c39c4351824",
+  "evaluatedFiles": [
+    {
+      "path": "00-handoff.md",
+      "sha256": "66b20f4202fbb38acb7072c34a45a68afea754874767fda91a23a02204e2d3d0"
+    },
+    {
+      "path": "01-product-requirements.md",
+      "sha256": "5741e2c7c8268db2af7c7511e19d595bdcf80ddeb8ebed0ad3a6a80ba748a744"
+    },
+    {
+      "path": "02-user-scenarios.md",
+      "sha256": "b2848a8fa6481f0a5fd5d5a953cede88ca0404741bffae3d4f8e3fa7c099a002"
+    },
+    {
+      "path": "03-functional-spec.md",
+      "sha256": "4a09d9e90fc5d9b8ee0397bab27b0f38288080bd99f99807a89681b677a2ba69"
+    },
+    {
+      "path": "04-system-design.md",
+      "sha256": "d20708d36309fab56a09f56e523abfd880c9f84064f7080ca4e2982c19a6fe9f"
+    },
+    {
+      "path": "05-data-memory.md",
+      "sha256": "3eada8373cb267a68b16a61c9086522e5d598e0864fb9ed420c2900bbe744922"
+    },
+    {
+      "path": "06-interfaces-integrations.md",
+      "sha256": "cc3cf2098d1100cdf9bca5bde00916e38b0a9a8f68e7e5bd9df567226edea1e3"
+    },
+    {
+      "path": "07-agent-behavior.md",
+      "sha256": "aba0424bce79b11600cb2862bb3bf4b7189033ab60a8f523c97d2690d95c34f7"
+    },
+    {
+      "path": "08-quality-security-operations.md",
+      "sha256": "f09628db835f9521cdf02ebd3695e34ee13fdc0c18f5762c5fa72a0009b7754f"
+    },
+    {
+      "path": "09-test-acceptance.md",
+      "sha256": "088a865f5d1fb0a62176f85ee2fb65e8c173875f0c37adfd5a059903dfbe5c14"
+    },
+    {
+      "path": "10-delivery-plan.md",
+      "sha256": "714f592907c0b216064faba69cdc155b0b928de0f1a8a5eed655f5106ce0b45e"
+    },
+    {
+      "path": "11-decisions-risks.md",
+      "sha256": "7488f7c66e5a72a829d18ee7c3ced0b1f27a8dff00a7df1daa06037bd8a9061c"
+    },
+    {
+      "path": "12-engineering-context.md",
+      "sha256": "cc111242c968fc06b4d2fd48e2b56066180719bbda2c2a9daa513195d23512fa"
+    },
+    {
+      "path": "coverage.json",
+      "sha256": "c1d0c6fa6ffe0a6f982613434e564a12da7380eaa70aee99c3ac92f9c86a2a47"
+    },
+    {
+      "path": "decision-evidence.jsonl",
+      "sha256": "7de24830302b5580ff13afc2dce4b052af48d162c5f5e0344e29de6bc77095dd"
+    }
+  ],
+  "areaBreakdown": [
+    {
+      "area": "outcome_and_success",
+      "weight": 5,
+      "coverage": 100.0
+    },
+    {
+      "area": "users_and_scenarios",
+      "weight": 6,
+      "coverage": 100.0
+    },
+    {
+      "area": "scope_and_non_goals",
+      "weight": 5,
+      "coverage": 100.0
+    },
+    {
+      "area": "input_contracts",
+      "weight": 7,
+      "coverage": 100.0
+    },
+    {
+      "area": "output_contracts",
+      "weight": 7,
+      "coverage": 100.0
+    },
+    {
+      "area": "surface_and_workflow",
+      "weight": 5,
+      "coverage": 100.0
+    },
+    {
+      "area": "functional_rules_and_edge_cases",
+      "weight": 9,
+      "coverage": 100.0
+    },
+    {
+      "area": "data_sources_state_and_memory",
+      "weight": 10,
+      "coverage": 100.0
+    },
+    {
+      "area": "agent_ai_behavior_and_authority",
+      "weight": 9,
+      "coverage": 100.0
+    },
+    {
+      "area": "interfaces_and_integrations",
+      "weight": 6,
+      "coverage": 100.0
+    },
+    {
+      "area": "identity_security_privacy_compliance",
+      "weight": 7,
+      "coverage": 100.0
+    },
+    {
+      "area": "load_performance_reliability_cost",
+      "weight": 7,
+      "coverage": 100.0
+    },
+    {
+      "area": "deployment_operations_and_commercial_readiness",
+      "weight": 7,
+      "coverage": 100.0
+    },
+    {
+      "area": "existing_system_and_engineering_context",
+      "weight": 5,
+      "coverage": 100.0
+    },
+    {
+      "area": "acceptance_and_delivery_constraints",
+      "weight": 5,
+      "coverage": 100.0
+    }
+  ],
+  "criticalGates": [
+    {
+      "gate": "agent_module_routes_dependency_mode_availability_fallback_and_rollback",
+      "decisionIds": [
+        "DEC-VR0-047"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "canonical_state_authority_and_status_vocabulary",
+      "decisionIds": [
+        "DEC-VR0-020"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "consent_and_revocation",
+      "decisionIds": [
+        "DEC-VR0-025"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "context_memory_access_and_lifecycle",
+      "decisionIds": [
+        "DEC-VR0-039"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "cost_boundary",
+      "decisionIds": [
+        "DEC-VR0-046"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "data_persistence_ownership_retention_and_deletion",
+      "decisionIds": [
+        "DEC-VR0-022"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "data_source_authority_rights_quality_lineage_and_freshness",
+      "decisionIds": [
+        "DEC-VR0-021",
+        "DEC-VR0-048"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "delivery_surface",
+      "decisionIds": [
+        "DEC-VR0-010",
+        "DEC-VR0-031"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "deployment_environment_and_operating_owner",
+      "decisionIds": [
+        "DEC-VR0-031"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "development_base_and_hypha_recommendation_disposition",
+      "decisionIds": [
+        "DEC-VR0-019",
+        "DEC-VR0-034"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "downstream_framework_constraints_and_decision_authority",
+      "decisionIds": [
+        "DEC-VR0-019",
+        "DEC-VR0-034"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "existing_data_database_and_creative_asset_inventory",
+      "decisionIds": [
+        "DEC-VR0-016",
+        "DEC-VR0-021",
+        "DEC-VR0-048"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "existing_system_baseline_and_change_boundary",
+      "decisionIds": [
+        "DEC-VR0-033"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "external_dependencies_credentials_and_outage",
+      "decisionIds": [
+        "DEC-VR0-026"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "fallback_behavior",
+      "decisionIds": [
+        "DEC-VR0-045"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "first_release_scope_and_non_goals",
+      "decisionIds": [
+        "DEC-VR0-003",
+        "DEC-VR0-004"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "grounding_uncertainty_abstention_and_escalation",
+      "decisionIds": [
+        "DEC-VR0-040"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "happy_failure_and_recovery_paths",
+      "decisionIds": [
+        "DEC-VR0-027",
+        "DEC-VR0-045"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "hard_constraints_and_safety_precedence",
+      "decisionIds": [
+        "DEC-VR0-052"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "high_impact_action_approvals",
+      "decisionIds": [
+        "DEC-VR0-024"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "high_priority_interrupt_and_late_output_handling",
+      "decisionIds": [
+        "DEC-VR0-042"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "identity_and_access",
+      "decisionIds": [
+        "DEC-VR0-023"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "input_contracts_validation_and_limits",
+      "decisionIds": [
+        "DEC-VR0-005",
+        "DEC-VR0-007",
+        "DEC-VR0-008"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "intelligence_target_non_ai_baseline_and_autonomy",
+      "decisionIds": [
+        "DEC-VR0-036"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "latency_and_reliability",
+      "decisionIds": [
+        "DEC-VR0-029"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "long_running_partial_and_degraded_behavior",
+      "decisionIds": [
+        "DEC-VR0-027"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "measurable_acceptance_and_go_live_evidence",
+      "decisionIds": [
+        "DEC-VR0-035"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "model_vs_deterministic_responsibility",
+      "decisionIds": [
+        "DEC-VR0-037"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "multi_agent_topology_and_partial_failure",
+      "decisionIds": [
+        "DEC-VR0-041"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "mutation_lifecycle_versioning_and_undo",
+      "decisionIds": [
+        "DEC-VR0-022",
+        "DEC-VR0-027",
+        "DEC-VR0-032"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "output_contracts_consumers_quality_and_errors",
+      "decisionIds": [
+        "DEC-VR0-049"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "peak_load_and_traffic_volume",
+      "decisionIds": [
+        "DEC-VR0-028"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "primary_user_and_target_outcome",
+      "decisionIds": [
+        "DEC-VR0-002"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "production_quality_drift_feedback_promotion_and_rollback",
+      "decisionIds": [
+        "DEC-VR0-044",
+        "DEC-VR0-050"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "production_service_levels_support_and_incident_ownership",
+      "decisionIds": [
+        "DEC-VR0-030"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "representative_quality_evaluation_and_unacceptable_behavior",
+      "decisionIds": [
+        "DEC-VR0-043"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "system_lifecycle_admin_and_change_governance",
+      "decisionIds": [
+        "DEC-VR0-032"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "target_implementation_grade_allowed_use_and_promotion_path",
+      "decisionIds": [
+        "DEC-VR0-001",
+        "DEC-VR0-021",
+        "DEC-VR0-050"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "tool_permissions_and_approvals",
+      "decisionIds": [
+        "DEC-VR0-038"
+      ],
+      "closed": true
+    }
+  ],
+  "blockers": [],
+  "errors": []
+}
