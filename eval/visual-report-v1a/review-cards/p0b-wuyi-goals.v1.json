@@ -1,0 +1,22 @@
+{
+  "schema_version": "visual-report-review-card.v1a-prototype",
+  "video_id": "p0b-wuyi-goals",
+  "must_cover": [
+    {"label":"对抗样本与输入空间缺陷","source_segment_ids":["p0b-wuyi-goals-seg-003","p0b-wuyi-goals-seg-004","p0b-wuyi-goals-seg-006","p0b-wuyi-goals-seg-007"]},
+    {"label":"偏见来自模型、数据和其他因素","source_segment_ids":["p0b-wuyi-goals-seg-008","p0b-wuyi-goals-seg-009","p0b-wuyi-goals-seg-010","p0b-wuyi-goals-seg-011"]},
+    {"label":"强化学习通过奖励函数学习不知道与纠正偏见","source_segment_ids":["p0b-wuyi-goals-seg-026","p0b-wuyi-goals-seg-027","p0b-wuyi-goals-seg-028"]},
+    {"label":"价值对齐、超级对齐与可扩展监督","source_segment_ids":["p0b-wuyi-goals-seg-029","p0b-wuyi-goals-seg-031","p0b-wuyi-goals-seg-032","p0b-wuyi-goals-seg-033"]},
+    {"label":"没有完美算法但安全研究持续推进","source_segment_ids":["p0b-wuyi-goals-seg-034","p0b-wuyi-goals-seg-035","p0b-wuyi-goals-seg-036"]}
+  ],
+  "optional": [
+    {"label":"AI 风险从技术问题展开的演讲框架","source_segment_ids":["p0b-wuyi-goals-seg-001","p0b-wuyi-goals-seg-002"]}
+  ],
+  "known_asr_traps": [
+    {"label":"专名和英文术语存在 ASR 误识别风险","source_segment_ids":["p0b-wuyi-goals-seg-004","p0b-wuyi-goals-seg-010","p0b-wuyi-goals-seg-036"]}
+  ],
+  "prohibited_overclaims": [
+    {"claim":"安全检测可以消除所有对抗样本、偏见或对齐风险","source_segment_ids":["p0b-wuyi-goals-seg-007","p0b-wuyi-goals-seg-009","p0b-wuyi-goals-seg-032"]},
+    {"claim":"把单个实验或游戏结果写成人类智能的普遍结论","source_segment_ids":["p0b-wuyi-goals-seg-028","p0b-wuyi-goals-seg-029"]}
+  ],
+  "reviewer":"owner-or-designated-human"
+}

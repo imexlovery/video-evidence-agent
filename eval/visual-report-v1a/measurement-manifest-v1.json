@@ -1,0 +1,143 @@
+{
+  "schema_version": "visual-report-measurement-freeze.v1a-prototype",
+  "repository_root": "/Users/tristana/Develop/video-evidence-agent",
+  "artifact_root": "/Users/tristana/Develop/video-evidence-agent/artifacts/visual-report/v1a",
+  "sources": [
+    {
+      "video_id": "p0b-kling-2024",
+      "manifest_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-kling-2024/manifest.json",
+      "segments_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-kling-2024/segments.jsonl",
+      "manifest_sha256": "82487e503cb428f3987350c7cf3332e04b004ad332a3b05eec202dfbb4d6ed8a",
+      "segments_sha256": "c350e1c6a69ca13ae0349061dfa1436782704ef737a9a28092504b18eb75010b",
+      "segment_count": 43,
+      "duration_ms": 2022421
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "manifest_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-rlinf-2026/manifest.json",
+      "segments_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-rlinf-2026/segments.jsonl",
+      "manifest_sha256": "9e75a3bb97b93aeb97c5324f0031a1c67060d6f23a5c3e241cea81edd06ebb4e",
+      "segments_sha256": "d284cb127b4cdd2c56d556cdf80c8c77754b6e2bdec7a51bb6565976de1ae9c0",
+      "segment_count": 46,
+      "duration_ms": 2093120
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "manifest_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-wuyi-goals/manifest.json",
+      "segments_path": "/Users/tristana/Develop/video-evidence-agent/artifacts/p0b-ingest/p0b-wuyi-goals/segments.jsonl",
+      "manifest_sha256": "1f58070ad91b67cf7c8dd080873aff35952956f17ccb2bf3569ba6003993475e",
+      "segments_sha256": "2abcaf3c8582c293d869bdd4af8284a641cc934275f00f40842abc560040d37f",
+      "segment_count": 38,
+      "duration_ms": 1763207
+    }
+  ],
+  "provider": {
+    "admission": "BLOCKED_CONFIGURATION",
+    "blockers": [
+      "VISUAL_REPORT_MODEL is not configured"
+    ],
+    "provider": "https://api.deepseek.com",
+    "model": "unavailable",
+    "credential_present": true,
+    "timeout_seconds": 120.0,
+    "response_mode": "json_object",
+    "temperature": 0,
+    "sdk_max_retries": 0,
+    "sdk_version": "3.3.1"
+  },
+  "prompts": {
+    "mapper_version": "topic-mapper.v1a-p1",
+    "mapper_sha256": "56869e31905bd170dcc7ae4c43fbcc9aff32b7cd9f18e57e31bf50642419ff2d",
+    "planner_version": "report-planner.v1a-p1",
+    "planner_sha256": "94cc72984812928152ad8af46bb48e1662752a6e93bd79c3170955e08a1966bb"
+  },
+  "schemas": {
+    "topic_proposal": "visual-topic-map-proposal.v1a-prototype",
+    "topic_map": "visual-topic-map.v1a-prototype",
+    "plan_proposal": "visual-report-plan-proposal.v1a-prototype",
+    "call": "visual-report-model-call.v1a-prototype",
+    "compiler": "visual-report-v1a-compiler.v1"
+  },
+  "review_cards": [
+    {
+      "video_id": "p0b-kling-2024",
+      "path": "/Users/tristana/Develop/video-evidence-agent/eval/visual-report-v1a/review-cards/p0b-kling-2024.v1.json",
+      "sha256": "8d47dca1e52205bae10b7cf84f8d473edfbcceb2d98477091371f573405df324",
+      "schema_version": "visual-report-review-card.v1a-prototype"
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "path": "/Users/tristana/Develop/video-evidence-agent/eval/visual-report-v1a/review-cards/p0b-rlinf-2026.v1.json",
+      "sha256": "258194029f7b758a66edebdd4f590f72cf59f3f53e94b83b8c5190978b67c0e1",
+      "schema_version": "visual-report-review-card.v1a-prototype"
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "path": "/Users/tristana/Develop/video-evidence-agent/eval/visual-report-v1a/review-cards/p0b-wuyi-goals.v1.json",
+      "sha256": "dba3dde7e7c8c21973cc41564bcf6e674a9c8863b376efa54f74ba2d9dd9dd87",
+      "schema_version": "visual-report-review-card.v1a-prototype"
+    }
+  ],
+  "evaluator": {
+    "version": "visual-report-v1a-evaluator.v1",
+    "module": "/Users/tristana/Develop/video-evidence-agent/src/video_evidence_agent/visual_report/evaluation.py",
+    "sha256": "7c63d27d1c19c11a395398faf996a76f12e89d17cbba1cba210815c57a5062d6"
+  },
+  "thresholds": {
+    "must_cover_recall_min": 0.9,
+    "major_unsupported_claims_max": 0,
+    "source_ref_validity": 1.0,
+    "first_pass_success_runs": 6,
+    "human_average_min": 4.0,
+    "human_repeat_min": 3,
+    "repeat_category_delta_max": 1,
+    "anti_template_all_identical": false
+  },
+  "runs": [
+    {
+      "run_id": "p0b-kling-2024-v1a-r1",
+      "video_id": "p0b-kling-2024",
+      "repeat": 1,
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "run_id": "p0b-kling-2024-v1a-r2",
+      "video_id": "p0b-kling-2024",
+      "repeat": 2,
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "run_id": "p0b-rlinf-2026-v1a-r1",
+      "video_id": "p0b-rlinf-2026",
+      "repeat": 1,
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "run_id": "p0b-rlinf-2026-v1a-r2",
+      "video_id": "p0b-rlinf-2026",
+      "repeat": 2,
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "run_id": "p0b-wuyi-goals-v1a-r1",
+      "video_id": "p0b-wuyi-goals",
+      "repeat": 1,
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "run_id": "p0b-wuyi-goals-v1a-r2",
+      "video_id": "p0b-wuyi-goals",
+      "repeat": 2,
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    }
+  ],
+  "revision_id": "vr1a-dev-896243b5ddf9",
+  "status": "FROZEN_PROVIDER_BLOCKED",
+  "frozen_at": "2026-08-30T07:32:53.385701+00:00"
+}

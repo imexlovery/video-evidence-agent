@@ -1,0 +1,8 @@
+{"video_id":"synthetic-v1a","segment_id":"synthetic-v1a-seg-000","ordinal":0,"start_ms":0,"end_ms":1000,"transcript_text":"第一部分解释问题背景。","source_asr_ordinals":[0]}
+{"video_id":"synthetic-v1a","segment_id":"synthetic-v1a-seg-001","ordinal":1,"start_ms":1000,"end_ms":2000,"transcript_text":"背景中的主要限制需要被明确记录。","source_asr_ordinals":[1]}
+{"video_id":"synthetic-v1a","segment_id":"synthetic-v1a-seg-002","ordinal":2,"start_ms":2000,"end_ms":3000,"transcript_text":"第二部分比较离线方案与在线方案。","source_asr_ordinals":[2]}
+{"video_id":"synthetic-v1a","segment_id":"synthetic-v1a-seg-003","ordinal":3,"start_ms":3000,"end_ms":4000,"transcript_text":"在线方案能够持续接收新的反馈。","source_asr_ordinals":[3]}
+{"video_id":"synthetic-v1a","segment_id":"synthetic-v1a-seg-004","ordinal":4,"start_ms":4000,"end_ms":5000,"transcript_text":"第三部分给出准备、执行、复盘三个步骤。","source_asr_ordinals":[4]}
+{"video_id":"synthetic-v1a","segment_id":"synthetic-v1a-seg-005","ordinal":5,"start_ms":5000,"end_ms":6000,"transcript_text":"每一步都保留来源和结果。","source_asr_ordinals":[5]}
+{"video_id":"synthetic-v1a","segment_id":"synthetic-v1a-seg-006","ordinal":6,"start_ms":6000,"end_ms":7000,"transcript_text":"最后总结可追溯和显式失败的重要性。","source_asr_ordinals":[6]}
+{"video_id":"synthetic-v1a","segment_id":"synthetic-v1a-seg-007","ordinal":7,"start_ms":7000,"end_ms":8000,"transcript_text":"报告应当让读者看见重点与省略。","source_asr_ordinals":[7]}

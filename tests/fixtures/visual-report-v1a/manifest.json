@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "pipeline_status": "SUCCEEDED",
+  "video_id": "synthetic-v1a",
+  "source": {
+    "duration_ms": 8000,
+    "origin_url": "https://example.test/synthetic-v1a",
+    "attribution": "合成测试；《V1-A 合同样例》。"
+  },
+  "segmenting": {
+    "segment_count": 8,
+    "path": "segments.jsonl"
+  }
+}

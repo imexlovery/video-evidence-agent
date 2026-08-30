@@ -18,6 +18,47 @@ Treat that package as the durable source of truth for V0. A later explicit user
 message overrides it; record any material override in the decision package and
 `V0-STATUS.md` before implementing the changed scope.
 
+## Visual Report V1-A context load
+
+Before any work whose scope includes V1-A, Topic Mapper, Report Planner,
+`build-from-transcript`, `visual-report-v1a`, or the three-video planning
+measurement, read these files in order:
+
+1. `docs/visual-report/V1A-STATUS.md`
+2. `docs/requirements/visual-report-v1a/requirements-readiness.json`
+3. `docs/requirements/visual-report-v1a/00-handoff.md`
+4. `docs/requirements/visual-report-v1a/12-engineering-context.md`
+5. The task-relevant canonical specifications, especially `03`, `06`, `07`,
+   `09`, `10`, and `11` in `docs/requirements/visual-report-v1a/`
+6. `docs/tasks/VISUAL-REPORT-V1A-PLANNING.md`
+
+The V1-A package is ready for engineering handoff, but readiness is not
+implementation authorization. Do not change product code or call a model until
+the Owner explicitly authorizes `VR-V1A-PLANNING-001`.
+
+## V1-A hard boundary
+
+- Keep Topic Mapper and Report Planner as two sequential independent calls;
+  both receive the full authorized transcript, and Planner also receives the
+  canonical Topic Map.
+- Models select existing IDs and semantic content only. Deterministic code owns
+  canonical IDs, timestamps, `SourceRef`, validation, budgets, compilation,
+  state, and renderer invocation.
+- Use one explicit compatible model, temperature zero, SDK retry disabled, no
+  alternate provider/model fallback, and record the exact run snapshot.
+- Do not semantically repair invalid output, make a third model call, truncate
+  or chunk as a hidden fallback, delete invalid blocks, or substitute a manual
+  plan inside a run.
+- Compile the current V0 plan, emit an empty current asset manifest, and reuse
+  the existing deterministic renderer. V1-A creates no image block or asset.
+- Give every run a unique directory and retain failures/cancellations. The
+  fixed Development measurement is three videos × two repeats under one frozen
+  revision; never tune selectively or remove a failure from the denominator.
+- Do not add MP4/ASR, keyframes, OCR/VLM, Agent, LangGraph, RAG, database,
+  queue, service/API/UI, deployment, V1-B, or V1-C.
+- Stop implementation at `READY_FOR_OWNER_V1A_REVIEW`. Only the Owner may
+  accept V1-A or authorize the next phase.
+
 ## V0 hard boundary
 
 - V0 is renderer-first: hand-authored structured content and manually selected

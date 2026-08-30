@@ -1,0 +1,21 @@
+{
+  "schema_version": "visual-report-review-card.v1a-prototype",
+  "video_id": "p0b-rlinf-2026",
+  "must_cover": [
+    {"label":"离线学习的分布偏差与在线交互的必要性","source_segment_ids":["p0b-rlinf-2026-seg-001","p0b-rlinf-2026-seg-002"]},
+    {"label":"强化学习相对 SFT 的泛化观察","source_segment_ids":["p0b-rlinf-2026-seg-004","p0b-rlinf-2026-seg-005"]},
+    {"label":"具身强化学习的多样流程与系统耦合挑战","source_segment_ids":["p0b-rlinf-2026-seg-007","p0b-rlinf-2026-seg-008","p0b-rlinf-2026-seg-009","p0b-rlinf-2026-seg-010"]},
+    {"label":"真机安全探索与系统落地问题","source_segment_ids":["p0b-rlinf-2026-seg-038","p0b-rlinf-2026-seg-041","p0b-rlinf-2026-seg-044"]}
+  ],
+  "optional": [
+    {"label":"世界模型与 Value Model 路线","source_segment_ids":["p0b-rlinf-2026-seg-035","p0b-rlinf-2026-seg-036","p0b-rlinf-2026-seg-037"]}
+  ],
+  "known_asr_traps": [
+    {"label":"算法、项目名与英文术语存在 ASR 误识别风险","source_segment_ids":["p0b-rlinf-2026-seg-004","p0b-rlinf-2026-seg-037","p0b-rlinf-2026-seg-038"]}
+  ],
+  "prohibited_overclaims": [
+    {"claim":"强化学习在所有泛化维度都优于 SFT","source_segment_ids":["p0b-rlinf-2026-seg-004","p0b-rlinf-2026-seg-005"]},
+    {"claim":"把演讲中的项目或用户描述扩展成行业唯一性结论","source_segment_ids":["p0b-rlinf-2026-seg-038","p0b-rlinf-2026-seg-039"]}
+  ],
+  "reviewer":"owner-or-designated-human"
+}

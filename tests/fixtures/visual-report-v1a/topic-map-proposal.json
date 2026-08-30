@@ -1,0 +1,30 @@
+{
+  "schema_version": "visual-topic-map-proposal.v1a-prototype",
+  "topics": [
+    {
+      "title": "问题背景",
+      "summary": "先说明问题与主要限制。",
+      "source_segment_ids": ["synthetic-v1a-seg-000", "synthetic-v1a-seg-001"],
+      "subtopics": []
+    },
+    {
+      "title": "方案比较",
+      "summary": "比较离线与在线方案的作用。",
+      "source_segment_ids": ["synthetic-v1a-seg-002", "synthetic-v1a-seg-003"],
+      "subtopics": []
+    },
+    {
+      "title": "执行步骤",
+      "summary": "按准备、执行和复盘推进。",
+      "source_segment_ids": ["synthetic-v1a-seg-004", "synthetic-v1a-seg-005"],
+      "subtopics": []
+    },
+    {
+      "title": "最终原则",
+      "summary": "强调可追溯、显式失败与可见省略。",
+      "source_segment_ids": ["synthetic-v1a-seg-006", "synthetic-v1a-seg-007"],
+      "subtopics": []
+    }
+  ],
+  "exclusions": []
+}

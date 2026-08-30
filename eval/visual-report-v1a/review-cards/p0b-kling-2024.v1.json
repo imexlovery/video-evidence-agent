@@ -1,0 +1,21 @@
+{
+  "schema_version": "visual-report-review-card.v1a-prototype",
+  "video_id": "p0b-kling-2024",
+  "must_cover": [
+    {"label":"视频生成的定义与多模态输入输出","source_segment_ids":["p0b-kling-2024-seg-003","p0b-kling-2024-seg-004"]},
+    {"label":"拍摄、图形渲染与视频生成的差异","source_segment_ids":["p0b-kling-2024-seg-005","p0b-kling-2024-seg-006","p0b-kling-2024-seg-007"]},
+    {"label":"扩散模型与 Transformer 技术路线","source_segment_ids":["p0b-kling-2024-seg-009","p0b-kling-2024-seg-010","p0b-kling-2024-seg-011"]},
+    {"label":"技术到产品与人机共创的距离","source_segment_ids":["p0b-kling-2024-seg-032","p0b-kling-2024-seg-033","p0b-kling-2024-seg-035","p0b-kling-2024-seg-036"]}
+  ],
+  "optional": [
+    {"label":"多模态可控输入与产品等待时间","source_segment_ids":["p0b-kling-2024-seg-031","p0b-kling-2024-seg-037"]}
+  ],
+  "known_asr_traps": [
+    {"label":"模型名、术语与数字存在 ASR 误识别风险","source_segment_ids":["p0b-kling-2024-seg-009","p0b-kling-2024-seg-010","p0b-kling-2024-seg-037"]}
+  ],
+  "prohibited_overclaims": [
+    {"claim":"模型在未来必然全面超过人类创作者","source_segment_ids":["p0b-kling-2024-seg-035","p0b-kling-2024-seg-036"]},
+    {"claim":"把提问中的未确认规模或成本数字写成官方指标","source_segment_ids":["p0b-kling-2024-seg-037"]}
+  ],
+  "reviewer":"owner-or-designated-human"
+}
