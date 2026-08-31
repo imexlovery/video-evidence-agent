@@ -1,0 +1,47 @@
+{
+  "schema_version": "visual-report-canary-candidate.v1a",
+  "candidate_revision": "vr1a-canary-73b6a5104201",
+  "supersedes_candidate_revision": "vr1a-canary-251171cb760b",
+  "status": "CANARY_PENDING",
+  "formal_denominator": "excluded",
+  "transport_diagnosis": "The prior canary was blocked by the sandbox proxy/DNS boundary; this candidate requires the approved external-network execution path.",
+  "provider": {
+    "admission": "READY",
+    "provider": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash-vision-exp",
+    "credential_present": true,
+    "timeout_seconds": 120.0,
+    "response_mode": "json_object",
+    "temperature": 0,
+    "thinking_mode": "disabled",
+    "output_token_limit": 8192,
+    "sdk_max_retries": 0,
+    "sdk_version": "3.3.1"
+  },
+  "prompts": {
+    "mapper_version": "topic-mapper.v1a-p1",
+    "mapper_sha256": "6678eb924c713b8dab142901d924eaf889784fcb1818455535c6e6c8bc740225",
+    "planner_version": "report-planner.v1a-p1",
+    "planner_sha256": "6c9884a9f8b8d28c6c7d6e58e36776e783ccbd919832eaade3b0ed1e1b63fce3"
+  },
+  "canaries": [
+    {
+      "video_id": "p0b-kling-2024",
+      "run_id": "p0b-kling-2024-v1a-73b6a5104201-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "run_id": "p0b-rlinf-2026-v1a-73b6a5104201-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "run_id": "p0b-wuyi-goals-v1a-73b6a5104201-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    }
+  ]
+}

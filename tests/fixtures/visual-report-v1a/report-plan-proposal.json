@@ -1,0 +1,37 @@
+{
+  "schema_version": "visual-report-plan-proposal.v1a-prototype",
+  "hero": {
+    "title": "从问题到可追溯报告",
+    "tldr": "先理解问题，再比较方案、执行步骤并总结可核查原则。",
+    "source_segment_ids": ["synthetic-v1a-seg-000", "synthetic-v1a-seg-006"]
+  },
+  "sections": [
+    {
+      "title": "为什么需要明确问题",
+      "topic_ids": ["topic-001"],
+      "blocks": [
+        {"type":"insight_card","headline":"先定义限制","body":"问题背景和限制决定后续方案。","source_segment_ids":["synthetic-v1a-seg-000","synthetic-v1a-seg-001"]},
+        {"type":"bullet_group","headline":"背景包含两层","items":["问题是什么","限制在哪里"],"source_segment_ids":["synthetic-v1a-seg-000","synthetic-v1a-seg-001"]}
+      ]
+    },
+    {
+      "title": "方案与执行",
+      "topic_ids": ["topic-002", "topic-003"],
+      "blocks": [
+        {"type":"comparison_card","headline":"离线与在线承担不同作用","left":{"label":"离线","items":["使用既有信息"]},"right":{"label":"在线","items":["持续接收反馈"]},"source_segment_ids":["synthetic-v1a-seg-002","synthetic-v1a-seg-003"]},
+        {"type":"process_flow","headline":"三步推进","steps":[{"title":"准备","body":"明确输入"},{"title":"执行","body":"完成任务"},{"title":"复盘","body":"保留结果"}],"source_segment_ids":["synthetic-v1a-seg-004","synthetic-v1a-seg-005"]},
+        {"type":"bullet_group","headline":"执行必须留下证据","items":["保留来源","保留结果"],"source_segment_ids":["synthetic-v1a-seg-005"]}
+      ]
+    },
+    {
+      "title": "读者最终带走什么",
+      "topic_ids": ["topic-004"],
+      "blocks": [
+        {"type":"insight_card","headline":"失败也要可见","body":"显式失败是可追溯的一部分。","source_segment_ids":["synthetic-v1a-seg-006"]},
+        {"type":"bullet_group","headline":"报告要同时呈现","items":["选择的重点","明确的省略"],"source_segment_ids":["synthetic-v1a-seg-007"]},
+        {"type":"takeaway_box","headline":"三个原则","takeaways":["来源可追溯","失败不隐藏","重点与省略都可见"],"source_segment_ids":["synthetic-v1a-seg-006","synthetic-v1a-seg-007"]}
+      ]
+    }
+  ],
+  "omitted_topics": []
+}

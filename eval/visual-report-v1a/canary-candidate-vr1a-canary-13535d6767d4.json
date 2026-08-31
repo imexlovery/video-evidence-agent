@@ -1,0 +1,47 @@
+{
+  "schema_version": "visual-report-canary-candidate.v1a",
+  "candidate_revision": "vr1a-canary-13535d6767d4",
+  "supersedes_candidate_revision": "vr1a-canary-f546c3c31ccf",
+  "status": "CANARY_PENDING",
+  "formal_denominator": "excluded",
+  "repair": "Mapper p3 requires exactly four broad top-level topics and mapper_payload carries the same operational budget; Planner p2 requires exactly three sections and eight blocks, 1-4 source IDs per block, and 2-5 items per bullet group.",
+  "provider": {
+    "admission": "READY",
+    "provider": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash-vision-exp",
+    "credential_present": true,
+    "timeout_seconds": 120.0,
+    "response_mode": "json_object",
+    "temperature": 0,
+    "thinking_mode": "disabled",
+    "output_token_limit": 8192,
+    "sdk_max_retries": 0,
+    "sdk_version": "3.3.1"
+  },
+  "prompts": {
+    "mapper_version": "topic-mapper.v1a-p3",
+    "mapper_sha256": "48833f5fe53e94f30185983ec22df4632171c08cfe3da1d5117bd47ca6892276",
+    "planner_version": "report-planner.v1a-p2",
+    "planner_sha256": "62ec9fc87b5210e9c3b2631b205aef5698c809e25dbfdcf1a9a09471de6d63a4"
+  },
+  "canaries": [
+    {
+      "video_id": "p0b-kling-2024",
+      "run_id": "p0b-kling-2024-v1a-13535d6767d4-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "run_id": "p0b-rlinf-2026-v1a-13535d6767d4-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "run_id": "p0b-wuyi-goals-v1a-13535d6767d4-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    }
+  ]
+}

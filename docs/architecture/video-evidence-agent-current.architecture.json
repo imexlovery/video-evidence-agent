@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Video Evidence Agent：当前项目架构",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "viewBox": [1280, 760],
+    "views": [
+      {
+        "id": "p0b-evidence",
+        "label": "P0-B 证据链",
+        "focus": ["video", "ingest", "segments", "artifacts", "retrieval", "provider", "gate", "evaluation"],
+        "note": "本地媒体经中文 ASR 与 TF-IDF 检索后，进入受限回答和 Evidence Gate。"
+      },
+      {
+        "id": "v0-renderer",
+        "label": "V0 报告链",
+        "focus": ["plan", "renderer", "report", "owner"],
+        "note": "V0 从手工计划和人工选帧生成离线 HTML，当前停在 Owner Visual Review。"
+      },
+      {
+        "id": "boundaries",
+        "label": "边界与停止点",
+        "focus": ["artifacts", "gate", "renderer", "report", "excluded"],
+        "note": "P0-B 历史证据保持隔离；OCR、VLM、Agent、服务和 V1 自动化不在当前实现内。"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "video",
+      "type": "external",
+      "label": "中文技术 MP4",
+      "sublabel": "本地合法媒体",
+      "tag": "INPUT",
+      "pos": [32, 280],
+      "size": [130, 78]
+    },
+    {
+      "id": "ingest",
+      "type": "backend",
+      "label": "媒体与 ASR",
+      "sublabel": "FFmpeg + MLX",
+      "tag": "LOCAL",
+      "pos": [190, 280],
+      "size": [130, 78]
+    },
+    {
+      "id": "segments",
+      "type": "backend",
+      "label": "VideoSegment",
+      "sublabel": "时间戳与段落不变量",
+      "tag": "CONTRACT",
+      "pos": [348, 280],
+      "size": [130, 78]
+    },
+    {
+      "id": "artifacts",
+      "type": "database",
+      "label": "文件工件",
+      "sublabel": "JSONL + 元数据",
+      "tag": "FILE-BACKED",
+      "pos": [506, 280],
+      "size": [130, 78]
+    },
+    {
+      "id": "retrieval",
+      "type": "backend",
+      "label": "证据检索",
+      "sublabel": "字符 2–4 gram · TF-IDF",
+      "tag": "TOP-K = 5",
+      "pos": [664, 280],
+      "size": [130, 78]
+    },
+    {
+      "id": "provider",
+      "type": "external",
+      "label": "回答 Provider",
+      "sublabel": "问题 + 当前 Top-K",
+      "tag": "TEXT ONLY",
+      "pos": [822, 280],
+      "size": [150, 78]
+    },
+    {
+      "id": "gate",
+      "type": "security",
+      "label": "Evidence Gate",
+      "sublabel": "引用必须来自当前 Top-K",
+      "tag": "FAIL CLOSED",
+      "pos": [1002, 280],
+      "size": [130, 78]
+    },
+    {
+      "id": "evaluation",
+      "type": "backend",
+      "label": "P0-B 评估",
+      "sublabel": "grade · report · audit",
+      "tag": "12 QUESTIONS",
+      "pos": [664, 470],
+      "size": [150, 78]
+    },
+    {
+      "id": "owner",
+      "type": "external",
+      "label": "Owner Review",
+      "sublabel": "语义审核与视觉验收",
+      "tag": "HUMAN GATE",
+      "pos": [852, 470],
+      "size": [150, 78]
+    },
+    {
+      "id": "plan",
+      "type": "external",
+      "label": "V0 手工输入",
+      "sublabel": "report-plan.json + assets.json",
+      "tag": "HAND-AUTHORED",
+      "pos": [32, 610],
+      "size": [170, 78]
+    },
+    {
+      "id": "renderer",
+      "type": "backend",
+      "label": "确定性 Renderer",
+      "sublabel": "Pydantic + HTML/CSS/SVG",
+      "tag": "NO LLM",
+      "pos": [240, 610],
+      "size": [170, 78]
+    },
+    {
+      "id": "report",
+      "type": "frontend",
+      "label": "离线 report.html",
+      "sublabel": "1080 px desktop · responsive",
+      "tag": "V0 CANONICAL",
+      "pos": [448, 610],
+      "size": [170, 78]
+    },
+    {
+      "id": "excluded",
+      "type": "security",
+      "label": "当前停止边界",
+      "sublabel": "OCR · VLM · Agent · Web/API · V1",
+      "tag": "NOT AUTHORIZED",
+      "pos": [820, 610],
+      "size": [210, 78]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "P0-B：本地检索与评估边界",
+      "wraps": ["ingest", "segments", "artifacts", "retrieval", "gate", "evaluation"],
+      "pad": 26
+    },
+    {
+      "kind": "region",
+      "label": "V0：Renderer-first 离线报告边界",
+      "wraps": ["plan", "renderer", "report"],
+      "pad": 26
+    }
+  ],
+  "connections": [
+    { "id": "video-ingest", "from": "video", "to": "ingest", "label": "ingest", "variant": "emphasis", "labelDy": -90 },
+    { "id": "ingest-segments", "from": "ingest", "to": "segments", "label": "timestamped transcript", "labelDy": -90 },
+    { "id": "segments-artifacts", "from": "segments", "to": "artifacts", "label": "persist JSONL", "labelDy": -52 },
+    { "id": "artifacts-retrieval", "from": "artifacts", "to": "retrieval", "label": "same-video segments", "labelDy": -52 },
+    { "id": "retrieval-provider", "from": "retrieval", "to": "provider", "label": "question + Top-K", "variant": "emphasis", "labelDy": -52 },
+    { "id": "provider-gate", "from": "provider", "to": "gate", "label": "AnswerProposal", "labelDy": -52 },
+    { "id": "gate-evaluation", "from": "gate", "to": "evaluation", "label": "accepted / refusal", "fromSide": "bottom", "toSide": "top" },
+    { "id": "artifacts-evaluation", "from": "artifacts", "to": "evaluation", "label": "metrics inputs", "fromSide": "bottom", "toSide": "top" },
+    { "id": "evaluation-owner", "from": "evaluation", "to": "owner", "label": "review material", "variant": "dashed", "labelDy": -56 },
+    { "id": "owner-evaluation", "from": "owner", "to": "evaluation", "label": "semantic labels", "variant": "dashed", "labelDy": 56 },
+    { "id": "plan-renderer", "from": "plan", "to": "renderer", "label": "plan + selected frames", "variant": "emphasis", "labelDy": -90 },
+    { "id": "artifacts-renderer", "from": "artifacts", "to": "renderer", "label": "read-only transcript", "variant": "dashed", "fromSide": "bottom", "toSide": "top" },
+    { "id": "renderer-report", "from": "renderer", "to": "report", "label": "deterministic render", "labelDy": -52 },
+    { "id": "report-owner", "from": "report", "to": "owner", "label": "visual review", "variant": "emphasis", "fromSide": "right", "toSide": "bottom" },
+    { "id": "report-excluded", "from": "report", "to": "excluded", "label": "stop before automation", "variant": "security", "fromSide": "right", "toSide": "left" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "当前实现",
+      "items": ["P0-B：中文 MP4 → ASR → VideoSegment → TF-IDF Top-K → 受限回答", "V0：手工 plan/assets → 确定性 HTML/CSS/SVG → 本地 report.html"]
+    },
+    {
+      "dot": "amber",
+      "title": "证据边界",
+      "items": ["Provider 不接收视频或完整 transcript", "引用来源、时间戳、人工语义审核分别记录"]
+    },
+    {
+      "dot": "rose",
+      "title": "停止点",
+      "items": ["V0 当前状态：READY_FOR_OWNER_VISUAL_REVIEW", "V1 自动化、OCR、VLM、Agent、Web/API 与部署未授权"]
+    }
+  ]
+}

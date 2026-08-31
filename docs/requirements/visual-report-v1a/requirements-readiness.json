@@ -1,0 +1,603 @@
+{
+  "schemaVersion": "1.0",
+  "generatedBy": "agent-native-requirements/validate_readiness.py",
+  "generatedAt": "2026-08-31T07:02:06.471461+00:00",
+  "status": "READY_FOR_ENGINEERING_HANDOFF",
+  "ready": true,
+  "confidence": 100.0,
+  "evaluatedArtifactSha256": "ab411217c46307cfc7a1825402a01aecd871bbef4879abd1b5f66dee727fed06",
+  "evaluatedFiles": [
+    {
+      "path": "00-handoff.md",
+      "sha256": "5ee607be9e464c21e24c8c86755a50ee02ee686ce2f4039335fe1181fc3ad814"
+    },
+    {
+      "path": "01-product-requirements.md",
+      "sha256": "733414b2ba9f191ade2257e8df5b5f1a78b3538126adc612dd38e8266bda3975"
+    },
+    {
+      "path": "02-user-scenarios.md",
+      "sha256": "e505d4139641639cfb79464a3fd8c72505ae8b83a11cc9e529fef7de77429c12"
+    },
+    {
+      "path": "03-functional-spec.md",
+      "sha256": "b4ec47b2de6baafb0c00542d9858e7445c0d73f4a71cd538155ee18f0d38adfb"
+    },
+    {
+      "path": "04-system-design.md",
+      "sha256": "713abf237fb02b196df56b7f2ae882575b8864f2a7be8de24ce9a018db72542d"
+    },
+    {
+      "path": "05-data-memory.md",
+      "sha256": "3b37b1cb789e7c0c8c0f45fecb08271215bb3cc8c6bfb28695ec4cd95c7797bc"
+    },
+    {
+      "path": "06-interfaces-integrations.md",
+      "sha256": "8928bad85889a99db1efe5256b11e81e75161cd818406995fa069a9bb54dbac5"
+    },
+    {
+      "path": "07-agent-behavior.md",
+      "sha256": "2e439131e12df51064d17aa6a38903aabee2d9a987a3688bf7083f83c48956af"
+    },
+    {
+      "path": "08-quality-security-operations.md",
+      "sha256": "78012c1c351123ee65f61233916e5ee000f68a1ff2c618cabbb56c912e82ed39"
+    },
+    {
+      "path": "09-test-acceptance.md",
+      "sha256": "7167ac9f91e45737feaa15178265bcd029542face081b0594803e1d52cbf9007"
+    },
+    {
+      "path": "10-delivery-plan.md",
+      "sha256": "b6ad7c2f069a561f1f2be9befd2c729769d740ac0d60523e02b75f991325408c"
+    },
+    {
+      "path": "11-decisions-risks.md",
+      "sha256": "81882d6c2cfd45d68f48f94224d9f05261123b4a11c4420887ebc31a42b4a454"
+    },
+    {
+      "path": "12-engineering-context.md",
+      "sha256": "908bdf4c3e2d9fdade9dbd08b004f63fec335e01925fae40e394533455303ea4"
+    },
+    {
+      "path": "coverage.json",
+      "sha256": "a23bab898be0ec69ff77be30ce8c45296da7d2e1221a4ba02cf800c128315494"
+    },
+    {
+      "path": "decision-evidence.jsonl",
+      "sha256": "ddac2b12ce12da5f43b1233713d207e6c73876330b48a7e891006c403697f5a8"
+    }
+  ],
+  "areaBreakdown": [
+    {
+      "area": "outcome_and_success",
+      "weight": 5,
+      "coverage": 100.0
+    },
+    {
+      "area": "users_and_scenarios",
+      "weight": 6,
+      "coverage": 100.0
+    },
+    {
+      "area": "scope_and_non_goals",
+      "weight": 5,
+      "coverage": 100.0
+    },
+    {
+      "area": "input_contracts",
+      "weight": 7,
+      "coverage": 100.0
+    },
+    {
+      "area": "output_contracts",
+      "weight": 7,
+      "coverage": 100.0
+    },
+    {
+      "area": "surface_and_workflow",
+      "weight": 5,
+      "coverage": 100.0
+    },
+    {
+      "area": "functional_rules_and_edge_cases",
+      "weight": 9,
+      "coverage": 100.0
+    },
+    {
+      "area": "data_sources_state_and_memory",
+      "weight": 10,
+      "coverage": 100.0
+    },
+    {
+      "area": "agent_ai_behavior_and_authority",
+      "weight": 9,
+      "coverage": 100.0
+    },
+    {
+      "area": "interfaces_and_integrations",
+      "weight": 6,
+      "coverage": 100.0
+    },
+    {
+      "area": "identity_security_privacy_compliance",
+      "weight": 7,
+      "coverage": 100.0
+    },
+    {
+      "area": "load_performance_reliability_cost",
+      "weight": 7,
+      "coverage": 100.0
+    },
+    {
+      "area": "deployment_operations_and_commercial_readiness",
+      "weight": 7,
+      "coverage": 100.0
+    },
+    {
+      "area": "existing_system_and_engineering_context",
+      "weight": 5,
+      "coverage": 100.0
+    },
+    {
+      "area": "acceptance_and_delivery_constraints",
+      "weight": 5,
+      "coverage": 100.0
+    }
+  ],
+  "criticalGates": [
+    {
+      "gate": "agent_module_routes_dependency_mode_availability_fallback_and_rollback",
+      "decisionIds": [
+        "DEC-VR1A-007",
+        "DEC-VR1A-020",
+        "DEC-VR1A-044",
+        "DEC-VR1A-054",
+        "DEC-VR1A-061",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "canonical_state_authority_and_status_vocabulary",
+      "decisionIds": [
+        "DEC-VR1A-013",
+        "DEC-VR1A-064",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "consent_and_revocation",
+      "decisionIds": [
+        "DEC-VR1A-018",
+        "DEC-VR1A-045"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "context_memory_access_and_lifecycle",
+      "decisionIds": [
+        "DEC-VR1A-005",
+        "DEC-VR1A-038",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "cost_boundary",
+      "decisionIds": [
+        "DEC-VR1A-023",
+        "DEC-VR1A-052",
+        "DEC-VR1A-054",
+        "DEC-VR1A-058",
+        "DEC-VR1A-061",
+        "DEC-VR1A-062",
+        "DEC-VR1A-064",
+        "DEC-VR1A-065",
+        "DEC-VR1A-066",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "data_persistence_ownership_retention_and_deletion",
+      "decisionIds": [
+        "DEC-VR1A-010",
+        "DEC-VR1A-027",
+        "DEC-VR1A-064",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "data_source_authority_rights_quality_lineage_and_freshness",
+      "decisionIds": [
+        "DEC-VR1A-005",
+        "DEC-VR1A-028",
+        "DEC-VR1A-067"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "delivery_surface",
+      "decisionIds": [
+        "DEC-VR1A-012",
+        "DEC-VR1A-064",
+        "DEC-VR1A-066",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "deployment_environment_and_operating_owner",
+      "decisionIds": [
+        "DEC-VR1A-033",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "development_base_and_hypha_recommendation_disposition",
+      "decisionIds": [
+        "DEC-VR1A-020"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "downstream_framework_constraints_and_decision_authority",
+      "decisionIds": [
+        "DEC-VR1A-020",
+        "DEC-VR1A-048",
+        "DEC-VR1A-051",
+        "DEC-VR1A-053",
+        "DEC-VR1A-054",
+        "DEC-VR1A-058",
+        "DEC-VR1A-061",
+        "DEC-VR1A-062",
+        "DEC-VR1A-064",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "existing_data_database_and_creative_asset_inventory",
+      "decisionIds": [
+        "DEC-VR1A-009",
+        "DEC-VR1A-046",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "existing_system_baseline_and_change_boundary",
+      "decisionIds": [
+        "DEC-VR1A-035",
+        "DEC-VR1A-046",
+        "DEC-VR1A-053",
+        "DEC-VR1A-066",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "external_dependencies_credentials_and_outage",
+      "decisionIds": [
+        "DEC-VR1A-019",
+        "DEC-VR1A-048",
+        "DEC-VR1A-053",
+        "DEC-VR1A-054",
+        "DEC-VR1A-058",
+        "DEC-VR1A-061",
+        "DEC-VR1A-062",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "fallback_behavior",
+      "decisionIds": [
+        "DEC-VR1A-007",
+        "DEC-VR1A-044",
+        "DEC-VR1A-054",
+        "DEC-VR1A-061",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "first_release_scope_and_non_goals",
+      "decisionIds": [
+        "DEC-VR1A-003",
+        "DEC-VR1A-024",
+        "DEC-VR1A-063",
+        "DEC-VR1A-064",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "grounding_uncertainty_abstention_and_escalation",
+      "decisionIds": [
+        "DEC-VR1A-006",
+        "DEC-VR1A-039"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "happy_failure_and_recovery_paths",
+      "decisionIds": [
+        "DEC-VR1A-007",
+        "DEC-VR1A-013",
+        "DEC-VR1A-022",
+        "DEC-VR1A-044",
+        "DEC-VR1A-051",
+        "DEC-VR1A-052",
+        "DEC-VR1A-053",
+        "DEC-VR1A-054",
+        "DEC-VR1A-061",
+        "DEC-VR1A-062",
+        "DEC-VR1A-064",
+        "DEC-VR1A-065",
+        "DEC-VR1A-066",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "hard_constraints_and_safety_precedence",
+      "decisionIds": [
+        "DEC-VR1A-003",
+        "DEC-VR1A-007",
+        "DEC-VR1A-021",
+        "DEC-VR1A-024",
+        "DEC-VR1A-051",
+        "DEC-VR1A-052",
+        "DEC-VR1A-053",
+        "DEC-VR1A-054",
+        "DEC-VR1A-061",
+        "DEC-VR1A-065",
+        "DEC-VR1A-066",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "high_impact_action_approvals",
+      "decisionIds": [
+        "DEC-VR1A-017",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "high_priority_interrupt_and_late_output_handling",
+      "decisionIds": [
+        "DEC-VR1A-041"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "identity_and_access",
+      "decisionIds": [
+        "DEC-VR1A-016",
+        "DEC-VR1A-045",
+        "DEC-VR1A-067"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "input_contracts_validation_and_limits",
+      "decisionIds": [
+        "DEC-VR1A-005",
+        "DEC-VR1A-009",
+        "DEC-VR1A-014",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "intelligence_target_non_ai_baseline_and_autonomy",
+      "decisionIds": [
+        "DEC-VR1A-036"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "latency_and_reliability",
+      "decisionIds": [
+        "DEC-VR1A-019",
+        "DEC-VR1A-031",
+        "DEC-VR1A-061",
+        "DEC-VR1A-062",
+        "DEC-VR1A-064",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "long_running_partial_and_degraded_behavior",
+      "decisionIds": [
+        "DEC-VR1A-022",
+        "DEC-VR1A-041",
+        "DEC-VR1A-061",
+        "DEC-VR1A-062",
+        "DEC-VR1A-064",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "measurable_acceptance_and_go_live_evidence",
+      "decisionIds": [
+        "DEC-VR1A-049",
+        "DEC-VR1A-047",
+        "DEC-VR1A-050",
+        "DEC-VR1A-051",
+        "DEC-VR1A-052",
+        "DEC-VR1A-053",
+        "DEC-VR1A-054",
+        "DEC-VR1A-061",
+        "DEC-VR1A-062",
+        "DEC-VR1A-063",
+        "DEC-VR1A-064",
+        "DEC-VR1A-065",
+        "DEC-VR1A-066",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "model_vs_deterministic_responsibility",
+      "decisionIds": [
+        "DEC-VR1A-004",
+        "DEC-VR1A-006",
+        "DEC-VR1A-011",
+        "DEC-VR1A-061",
+        "DEC-VR1A-065",
+        "DEC-VR1A-066",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "multi_agent_topology_and_partial_failure",
+      "decisionIds": [
+        "DEC-VR1A-022",
+        "DEC-VR1A-040"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "mutation_lifecycle_versioning_and_undo",
+      "decisionIds": [
+        "DEC-VR1A-029",
+        "DEC-VR1A-043",
+        "DEC-VR1A-052",
+        "DEC-VR1A-053",
+        "DEC-VR1A-054",
+        "DEC-VR1A-061",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "output_contracts_consumers_quality_and_errors",
+      "decisionIds": [
+        "DEC-VR1A-006",
+        "DEC-VR1A-008",
+        "DEC-VR1A-011",
+        "DEC-VR1A-015",
+        "DEC-VR1A-061",
+        "DEC-VR1A-065",
+        "DEC-VR1A-066",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "peak_load_and_traffic_volume",
+      "decisionIds": [
+        "DEC-VR1A-030",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "primary_user_and_target_outcome",
+      "decisionIds": [
+        "DEC-VR1A-002",
+        "DEC-VR1A-061",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "production_quality_drift_feedback_promotion_and_rollback",
+      "decisionIds": [
+        "DEC-VR1A-029",
+        "DEC-VR1A-043",
+        "DEC-VR1A-054",
+        "DEC-VR1A-061",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "production_service_levels_support_and_incident_ownership",
+      "decisionIds": [
+        "DEC-VR1A-032",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "representative_quality_evaluation_and_unacceptable_behavior",
+      "decisionIds": [
+        "DEC-VR1A-049",
+        "DEC-VR1A-042",
+        "DEC-VR1A-053",
+        "DEC-VR1A-054",
+        "DEC-VR1A-061",
+        "DEC-VR1A-065",
+        "DEC-VR1A-066",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "system_lifecycle_admin_and_change_governance",
+      "decisionIds": [
+        "DEC-VR1A-024",
+        "DEC-VR1A-034",
+        "DEC-VR1A-051",
+        "DEC-VR1A-052",
+        "DEC-VR1A-053",
+        "DEC-VR1A-054",
+        "DEC-VR1A-058",
+        "DEC-VR1A-061",
+        "DEC-VR1A-063",
+        "DEC-VR1A-064",
+        "DEC-VR1A-067",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "target_implementation_grade_allowed_use_and_promotion_path",
+      "decisionIds": [
+        "DEC-VR1A-001",
+        "DEC-VR1A-024",
+        "DEC-VR1A-061",
+        "DEC-VR1A-063",
+        "DEC-VR1A-064",
+        "DEC-VR1A-065",
+        "DEC-VR1A-066",
+        "DEC-VR1A-068"
+      ],
+      "closed": true
+    },
+    {
+      "gate": "tool_permissions_and_approvals",
+      "decisionIds": [
+        "DEC-VR1A-037"
+      ],
+      "closed": true
+    }
+  ],
+  "blockers": [],
+  "errors": []
+}

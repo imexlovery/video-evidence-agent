@@ -1,0 +1,120 @@
+{
+  "schema_version": "visual-report-provider-conformance-result.v1a",
+  "manifest_path": "/Users/tristana/Develop/video-evidence-agent/eval/visual-report-v1a/provider-conformance-manifest.json",
+  "manifest_revision_id": "vr1a-provider-0335b314c0a1",
+  "manifest_sha256": "03c806a9622c5dd4ea86e3cef246f29680ea81b43898715412deb13aade5f654",
+  "artifact_root": "/Users/tristana/Develop/video-evidence-agent/artifacts/visual-report/v1a",
+  "terminal_status": "PENDING",
+  "conclusion": "AWAITING_REMAINING_ELIGIBLE_CANARIES",
+  "selected_strategy_id": null,
+  "comparison_stop": false,
+  "max_new_transcript_bearing_provider_model_calls": 24,
+  "observed_provider_calls": 5,
+  "observed_model_calls": 5,
+  "strategies": [
+    {
+      "strategy_id": "deepseek-v4-flash-vision-exp-responses-json-schema-a",
+      "eligibility": "ELIGIBLE",
+      "status": "FAIL",
+      "runs": [
+        {
+          "run_id": "p0b-kling-2024-v1a-candidate-a-canary",
+          "video_id": "p0b-kling-2024",
+          "state": "FAILED",
+          "provider_calls": 2,
+          "model_calls": 2,
+          "rendered": false,
+          "structure_signature": null,
+          "errors": [
+            "call 2 was not a successful first-pass call",
+            "report plan is missing"
+          ]
+        },
+        {
+          "run_id": "p0b-rlinf-2026-v1a-candidate-a-canary",
+          "video_id": "p0b-rlinf-2026",
+          "state": "FAILED",
+          "provider_calls": 1,
+          "model_calls": 1,
+          "rendered": false,
+          "structure_signature": null,
+          "errors": [
+            "model call trace is not exactly two calls",
+            "report plan is missing"
+          ]
+        },
+        {
+          "run_id": "p0b-wuyi-goals-v1a-candidate-a-canary",
+          "video_id": "p0b-wuyi-goals",
+          "state": "FAILED",
+          "provider_calls": 2,
+          "model_calls": 2,
+          "rendered": false,
+          "structure_signature": null,
+          "errors": [
+            "call 2 was not a successful first-pass call",
+            "report plan is missing"
+          ]
+        }
+      ],
+      "observed_provider_calls": 5,
+      "observed_model_calls": 5,
+      "rendered_count": 0,
+      "unique_rendered_signatures": 0
+    },
+    {
+      "strategy_id": "deepseek-v4-flash-responses-json-schema-b",
+      "eligibility": "ELIGIBLE",
+      "status": "INCOMPLETE",
+      "runs": [
+        {
+          "run_id": "p0b-kling-2024-v1a-candidate-b-canary",
+          "video_id": "p0b-kling-2024",
+          "state": "MISSING",
+          "provider_calls": 0,
+          "model_calls": 0,
+          "rendered": false,
+          "structure_signature": null,
+          "errors": [
+            "run.json is missing",
+            "model call trace is not exactly two calls",
+            "report plan is missing"
+          ]
+        },
+        {
+          "run_id": "p0b-rlinf-2026-v1a-candidate-b-canary",
+          "video_id": "p0b-rlinf-2026",
+          "state": "MISSING",
+          "provider_calls": 0,
+          "model_calls": 0,
+          "rendered": false,
+          "structure_signature": null,
+          "errors": [
+            "run.json is missing",
+            "model call trace is not exactly two calls",
+            "report plan is missing"
+          ]
+        },
+        {
+          "run_id": "p0b-wuyi-goals-v1a-candidate-b-canary",
+          "video_id": "p0b-wuyi-goals",
+          "state": "MISSING",
+          "provider_calls": 0,
+          "model_calls": 0,
+          "rendered": false,
+          "structure_signature": null,
+          "errors": [
+            "run.json is missing",
+            "model call trace is not exactly two calls",
+            "report plan is missing"
+          ]
+        }
+      ],
+      "observed_provider_calls": 0,
+      "observed_model_calls": 0,
+      "rendered_count": 0,
+      "unique_rendered_signatures": 0
+    }
+  ],
+  "generated_at": "2026-08-30T14:41:22.169490+00:00"
+}

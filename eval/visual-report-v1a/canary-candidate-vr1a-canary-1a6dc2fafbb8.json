@@ -1,0 +1,47 @@
+{
+  "schema_version": "visual-report-canary-candidate.v1a",
+  "candidate_revision": "vr1a-canary-1a6dc2fafbb8",
+  "supersedes_candidate_revision": "vr1a-canary-73b6a5104201",
+  "status": "CANARY_PENDING",
+  "formal_denominator": "excluded",
+  "repair": "Mapper prompt p2 adds an explicit pre-output cardinality check and requires merging adjacent or overlapping candidates when more than 12 topics are identified, while preserving all segment coverage.",
+  "provider": {
+    "admission": "READY",
+    "provider": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash-vision-exp",
+    "credential_present": true,
+    "timeout_seconds": 120.0,
+    "response_mode": "json_object",
+    "temperature": 0,
+    "thinking_mode": "disabled",
+    "output_token_limit": 8192,
+    "sdk_max_retries": 0,
+    "sdk_version": "3.3.1"
+  },
+  "prompts": {
+    "mapper_version": "topic-mapper.v1a-p2",
+    "mapper_sha256": "e03e2115a72d1891eb049492208ed79b591e0e7b0a517359b16f173704d90f75",
+    "planner_version": "report-planner.v1a-p1",
+    "planner_sha256": "6c9884a9f8b8d28c6c7d6e58e36776e783ccbd919832eaade3b0ed1e1b63fce3"
+  },
+  "canaries": [
+    {
+      "video_id": "p0b-kling-2024",
+      "run_id": "p0b-kling-2024-v1a-1a6dc2fafbb8-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "run_id": "p0b-rlinf-2026-v1a-1a6dc2fafbb8-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "run_id": "p0b-wuyi-goals-v1a-1a6dc2fafbb8-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    }
+  ]
+}

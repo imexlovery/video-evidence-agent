@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "1.0",
+  "areas": {
+    "outcome_and_success": {
+      "decision_ids": ["DEC-VR0-002", "DEC-VR0-035", "DEC-VR0-043"]
+    },
+    "users_and_scenarios": {
+      "decision_ids": ["DEC-VR0-002", "DEC-VR0-023"]
+    },
+    "scope_and_non_goals": {
+      "decision_ids": ["DEC-VR0-003", "DEC-VR0-004", "DEC-VR0-050"]
+    },
+    "input_contracts": {
+      "decision_ids": ["DEC-VR0-005", "DEC-VR0-007", "DEC-VR0-018"]
+    },
+    "output_contracts": {
+      "decision_ids": ["DEC-VR0-010", "DEC-VR0-011", "DEC-VR0-049"]
+    },
+    "surface_and_workflow": {
+      "decision_ids": ["DEC-VR0-010", "DEC-VR0-031", "DEC-VR0-051", "DEC-VR0-053"]
+    },
+    "functional_rules_and_edge_cases": {
+      "decision_ids": ["DEC-VR0-007", "DEC-VR0-008", "DEC-VR0-027", "DEC-VR0-045", "DEC-VR0-052", "DEC-VR0-053"]
+    },
+    "data_sources_state_and_memory": {
+      "decision_ids": ["DEC-VR0-021", "DEC-VR0-022", "DEC-VR0-039", "DEC-VR0-048"]
+    },
+    "agent_ai_behavior_and_authority": {
+      "decision_ids": ["DEC-VR0-006", "DEC-VR0-036", "DEC-VR0-037", "DEC-VR0-040", "DEC-VR0-041"]
+    },
+    "interfaces_and_integrations": {
+      "decision_ids": ["DEC-VR0-019", "DEC-VR0-026", "DEC-VR0-031", "DEC-VR0-049"]
+    },
+    "identity_security_privacy_compliance": {
+      "decision_ids": ["DEC-VR0-021", "DEC-VR0-023", "DEC-VR0-024", "DEC-VR0-025", "DEC-VR0-052"]
+    },
+    "load_performance_reliability_cost": {
+      "decision_ids": ["DEC-VR0-028", "DEC-VR0-029", "DEC-VR0-046"]
+    },
+    "deployment_operations_and_commercial_readiness": {
+      "decision_ids": ["DEC-VR0-030", "DEC-VR0-031", "DEC-VR0-032", "DEC-VR0-044"]
+    },
+    "existing_system_and_engineering_context": {
+      "decision_ids": ["DEC-VR0-019", "DEC-VR0-033", "DEC-VR0-034", "DEC-VR0-047"]
+    },
+    "acceptance_and_delivery_constraints": {
+      "decision_ids": ["DEC-VR0-014", "DEC-VR0-015", "DEC-VR0-035", "DEC-VR0-043", "DEC-VR0-050", "DEC-VR0-053"]
+    }
+  },
+  "critical_gates": {
+    "target_implementation_grade_allowed_use_and_promotion_path": {
+      "decision_ids": ["DEC-VR0-001", "DEC-VR0-021", "DEC-VR0-050"]
+    },
+    "primary_user_and_target_outcome": {
+      "decision_ids": ["DEC-VR0-002"]
+    },
+    "first_release_scope_and_non_goals": {
+      "decision_ids": ["DEC-VR0-003", "DEC-VR0-004"]
+    },
+    "delivery_surface": {
+      "decision_ids": ["DEC-VR0-010", "DEC-VR0-031", "DEC-VR0-053"]
+    },
+    "happy_failure_and_recovery_paths": {
+      "decision_ids": ["DEC-VR0-027", "DEC-VR0-045"]
+    },
+    "input_contracts_validation_and_limits": {
+      "decision_ids": ["DEC-VR0-005", "DEC-VR0-007", "DEC-VR0-008"]
+    },
+    "output_contracts_consumers_quality_and_errors": {
+      "decision_ids": ["DEC-VR0-049", "DEC-VR0-053"]
+    },
+    "canonical_state_authority_and_status_vocabulary": {
+      "decision_ids": ["DEC-VR0-020"]
+    },
+    "data_persistence_ownership_retention_and_deletion": {
+      "decision_ids": ["DEC-VR0-022"]
+    },
+    "existing_data_database_and_creative_asset_inventory": {
+      "decision_ids": ["DEC-VR0-016", "DEC-VR0-021", "DEC-VR0-048"]
+    },
+    "mutation_lifecycle_versioning_and_undo": {
+      "decision_ids": ["DEC-VR0-022", "DEC-VR0-027", "DEC-VR0-032"]
+    },
+    "data_source_authority_rights_quality_lineage_and_freshness": {
+      "decision_ids": ["DEC-VR0-021", "DEC-VR0-048"]
+    },
+    "identity_and_access": {
+      "decision_ids": ["DEC-VR0-023"]
+    },
+    "high_impact_action_approvals": {
+      "decision_ids": ["DEC-VR0-024"]
+    },
+    "consent_and_revocation": {
+      "decision_ids": ["DEC-VR0-025"]
+    },
+    "external_dependencies_credentials_and_outage": {
+      "decision_ids": ["DEC-VR0-026"]
+    },
+    "long_running_partial_and_degraded_behavior": {
+      "decision_ids": ["DEC-VR0-027"]
+    },
+    "peak_load_and_traffic_volume": {
+      "decision_ids": ["DEC-VR0-028"]
+    },
+    "latency_and_reliability": {
+      "decision_ids": ["DEC-VR0-029"]
+    },
+    "production_service_levels_support_and_incident_ownership": {
+      "decision_ids": ["DEC-VR0-030"]
+    },
+    "deployment_environment_and_operating_owner": {
+      "decision_ids": ["DEC-VR0-031"]
+    },
+    "system_lifecycle_admin_and_change_governance": {
+      "decision_ids": ["DEC-VR0-032"]
+    },
+    "existing_system_baseline_and_change_boundary": {
+      "decision_ids": ["DEC-VR0-033"]
+    },
+    "downstream_framework_constraints_and_decision_authority": {
+      "decision_ids": ["DEC-VR0-019", "DEC-VR0-034"]
+    },
+    "development_base_and_hypha_recommendation_disposition": {
+      "decision_ids": ["DEC-VR0-019", "DEC-VR0-034"]
+    },
+    "measurable_acceptance_and_go_live_evidence": {
+      "decision_ids": ["DEC-VR0-035", "DEC-VR0-053"]
+    },
+    "agent_module_routes_dependency_mode_availability_fallback_and_rollback": {
+      "decision_ids": ["DEC-VR0-047"]
+    },
+    "intelligence_target_non_ai_baseline_and_autonomy": {
+      "decision_ids": ["DEC-VR0-036"]
+    },
+    "model_vs_deterministic_responsibility": {
+      "decision_ids": ["DEC-VR0-037"]
+    },
+    "hard_constraints_and_safety_precedence": {
+      "decision_ids": ["DEC-VR0-052"]
+    },
+    "tool_permissions_and_approvals": {
+      "decision_ids": ["DEC-VR0-038"]
+    },
+    "context_memory_access_and_lifecycle": {
+      "decision_ids": ["DEC-VR0-039"]
+    },
+    "grounding_uncertainty_abstention_and_escalation": {
+      "decision_ids": ["DEC-VR0-040"]
+    },
+    "multi_agent_topology_and_partial_failure": {
+      "decision_ids": ["DEC-VR0-041"]
+    },
+    "high_priority_interrupt_and_late_output_handling": {
+      "decision_ids": ["DEC-VR0-042"]
+    },
+    "representative_quality_evaluation_and_unacceptable_behavior": {
+      "decision_ids": ["DEC-VR0-043", "DEC-VR0-053"]
+    },
+    "production_quality_drift_feedback_promotion_and_rollback": {
+      "decision_ids": ["DEC-VR0-044", "DEC-VR0-050"]
+    },
+    "fallback_behavior": {
+      "decision_ids": ["DEC-VR0-045"]
+    },
+    "cost_boundary": {
+      "decision_ids": ["DEC-VR0-046"]
+    }
+  }
+}

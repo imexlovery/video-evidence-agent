@@ -1,0 +1,12 @@
+{
+  "schema_version": "visual-report-review-card.v1a-prototype",
+  "video_id": "synthetic-v1a",
+  "must_cover": [
+    {"label":"问题与限制","source_segment_ids":["synthetic-v1a-seg-000","synthetic-v1a-seg-001"]},
+    {"label":"可追溯和显式失败","source_segment_ids":["synthetic-v1a-seg-006"]}
+  ],
+  "optional": [],
+  "known_asr_traps": [],
+  "prohibited_overclaims": [],
+  "reviewer": "synthetic-contract-reviewer"
+}

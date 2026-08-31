@@ -1,0 +1,47 @@
+{
+  "schema_version": "visual-report-canary-candidate.v1a",
+  "candidate_revision": "vr1a-canary-734ea5f6c0ac",
+  "supersedes_candidate_revision": "vr1a-canary-c2956d54be70",
+  "status": "CANARY_PENDING",
+  "formal_denominator": "excluded",
+  "repair": "Planner p11 assigns topic-001 to section 1, topic-002 to section 2, and topic-003 plus topic-004 to section 3 with the corresponding source union; omitted_topics is empty and block refs must come only from the assignment.",
+  "provider": {
+    "admission": "READY",
+    "provider": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash-vision-exp",
+    "credential_present": true,
+    "timeout_seconds": 120.0,
+    "response_mode": "json_object",
+    "temperature": 0,
+    "thinking_mode": "disabled",
+    "output_token_limit": 8192,
+    "sdk_max_retries": 0,
+    "sdk_version": "3.3.1"
+  },
+  "prompts": {
+    "mapper_version": "topic-mapper.v1a-p5",
+    "mapper_sha256": "4a6ea7f0082ddb97eeca3df96bd0b88e7450f2d98d3afc912629aebabc966f81",
+    "planner_version": "report-planner.v1a-p11",
+    "planner_sha256": "fd36b2998041f40b38b7683bede872dfbc65e295a4ff66ceeee0e16c9e306ff4"
+  },
+  "canaries": [
+    {
+      "video_id": "p0b-kling-2024",
+      "run_id": "p0b-kling-2024-v1a-734ea5f6c0ac-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-rlinf-2026",
+      "run_id": "p0b-rlinf-2026-v1a-734ea5f6c0ac-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    },
+    {
+      "video_id": "p0b-wuyi-goals",
+      "run_id": "p0b-wuyi-goals-v1a-734ea5f6c0ac-canary",
+      "planned_provider_calls": 2,
+      "planned_model_calls": 2
+    }
+  ]
+}
