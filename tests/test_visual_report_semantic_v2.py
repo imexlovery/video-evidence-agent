@@ -8,18 +8,27 @@ import pytest
 
 from video_evidence_agent.schemas import VideoSegment
 from video_evidence_agent.visual_report.planning import (
+    SEMANTIC_V2_MAX_OUTPUT_TOKENS,
+    SEMANTIC_V2_MODEL,
     SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
+    SEMANTIC_V2_REASONING_EFFORT,
+    SEMANTIC_V2_THINKING_MODE,
     SEMANTIC_V2_TOPIC_PROPOSAL_SCHEMA_VERSION,
     FakeSemanticV2PlanningProvider,
     PlanningError,
+    ProviderResult,
     normalize_semantic_v2_topic_proposal,
 )
 from video_evidence_agent.visual_report.planning_runtime import (
+    SEMANTIC_V2_RESPONSE_MODE,
+    SEMANTIC_V2_SCHEMA_MECHANISM,
     OpenAISemanticV2PlanningProvider,
     PlanningConfig,
     ProviderCallError,
+    _semantic_v2_request_sha256,
     build_from_transcript_v2,
     replay_semantic_v2_proposals,
+    semantic_v2_chat_completion_request,
 )
 
 FIXTURE_ROOT = Path("tests/fixtures/visual-report-v1a")
@@ -174,6 +183,15 @@ def test_semantic_v2_run_compiles_without_semantic_rewrite(tmp_path: Path) -> No
     assert ledger["summary"]["semantic_split_count"] == 0
     assert ledger["summary"]["semantic_synthesis_count"] == 0
     assert json.loads((summary.run_dir / "assets.json").read_text(encoding="utf-8"))["assets"] == []
+    run_payload = json.loads((summary.run_dir / "run.json").read_text(encoding="utf-8"))
+    assert run_payload["config"] == provider.config.public_snapshot()
+    assert run_payload["config"]["model"] == "fake-semantic-v2-model"
+    assert run_payload["config"]["thinking_mode"] == SEMANTIC_V2_THINKING_MODE
+    assert run_payload["config"]["reasoning_effort"] == SEMANTIC_V2_REASONING_EFFORT
+    assert run_payload["config"]["output_token_limit"] == SEMANTIC_V2_MAX_OUTPUT_TOKENS
+    assert run_payload["config"]["temperature_stability_evidence"] == (
+        "excluded_in_thinking_mode"
+    )
 
 
 def test_semantic_v2_allows_one_shared_identical_technical_retry(tmp_path: Path) -> None:
@@ -282,20 +300,136 @@ def test_semantic_v2_provider_uses_chat_json_object_request() -> None:
     client = SimpleNamespace(chat=SimpleNamespace(completions=Completions()))
     config = PlanningConfig(
         provider_label="https://api.deepseek.com",
-        model="deepseek-chat",
+        model=SEMANTIC_V2_MODEL,
         timeout_seconds=10,
         credential_present=True,
-        response_mode="json_object",
+        response_mode=SEMANTIC_V2_RESPONSE_MODE,
+        temperature_stability_evidence="excluded_in_thinking_mode",
+        thinking_mode=SEMANTIC_V2_THINKING_MODE,
+        output_token_limit=SEMANTIC_V2_MAX_OUTPUT_TOKENS,
+        reasoning_effort=SEMANTIC_V2_REASONING_EFFORT,
         api_surface="chat_completions",
-        schema_mechanism="chat.completions.response_format.json_object",
+        schema_mechanism=SEMANTIC_V2_SCHEMA_MECHANISM,
     )
     provider = OpenAISemanticV2PlanningProvider(client, config)  # type: ignore[arg-type]
     result = provider.complete("topic_mapper", "system", {"transcript_segments": ["full"]})
     assert result.raw_text == '{"ok":true}'
     assert captured["temperature"] == 0
-    assert captured["response_format"] == {"type": "json_object"}
+    assert captured["max_tokens"] == SEMANTIC_V2_MAX_OUTPUT_TOKENS
+    assert captured["response_format"] == {"type": SEMANTIC_V2_RESPONSE_MODE}
+    assert captured["reasoning_effort"] == SEMANTIC_V2_REASONING_EFFORT
+    assert captured["extra_body"] == {"thinking": {"type": SEMANTIC_V2_THINKING_MODE}}
     messages = captured["messages"]
     assert isinstance(messages, list)
     assert messages[0]["role"] == "system"
     assert messages[1]["role"] == "user"
     assert "full" in messages[1]["content"]
+
+
+def test_semantic_v2_request_shape_and_hash_are_stable() -> None:
+    config = PlanningConfig(
+        provider_label="https://api.deepseek.com",
+        model=SEMANTIC_V2_MODEL,
+        timeout_seconds=10,
+        credential_present=True,
+        response_mode=SEMANTIC_V2_RESPONSE_MODE,
+        temperature_stability_evidence="excluded_in_thinking_mode",
+        thinking_mode=SEMANTIC_V2_THINKING_MODE,
+        output_token_limit=SEMANTIC_V2_MAX_OUTPUT_TOKENS,
+        reasoning_effort=SEMANTIC_V2_REASONING_EFFORT,
+        api_surface="chat_completions",
+        schema_mechanism=SEMANTIC_V2_SCHEMA_MECHANISM,
+    )
+    payload = {"transcript_segments": ["full"], "output_contract": {"json_schema": {}}}
+    request = semantic_v2_chat_completion_request("topic_mapper", "system", payload, config)
+    assert request == {
+        "model": SEMANTIC_V2_MODEL,
+        "messages": [
+            {"role": "system", "content": "system"},
+            {
+                "role": "user",
+                "content": (
+                    '{"output_contract":{"json_schema":{}},'
+                    '"transcript_segments":["full"]}'
+                ),
+            },
+        ],
+        "temperature": 0,
+        "max_tokens": SEMANTIC_V2_MAX_OUTPUT_TOKENS,
+        "response_format": {"type": SEMANTIC_V2_RESPONSE_MODE},
+        "reasoning_effort": SEMANTIC_V2_REASONING_EFFORT,
+        "extra_body": {"thinking": {"type": SEMANTIC_V2_THINKING_MODE}},
+    }
+    first = _semantic_v2_request_sha256("topic_mapper", "system", payload, config)
+    second = _semantic_v2_request_sha256("topic_mapper", "system", payload, config)
+    changed = _semantic_v2_request_sha256(
+        "report_planner", "system", payload, config
+    )
+    assert first == second
+    assert first != changed
+
+
+@pytest.mark.parametrize("raw_response", ["not-json", "{"])
+def test_semantic_v2_malformed_outputs_retain_one_identical_retry(
+    tmp_path: Path, raw_response: str
+) -> None:
+    provider = FakeSemanticV2PlanningProvider([raw_response, raw_response])
+    with pytest.raises(PlanningError, match="MODEL_OUTPUT_PARSE_ERROR"):
+        build_from_transcript_v2(
+            manifest_path=FIXTURE_ROOT / "manifest.json",
+            segments_path=FIXTURE_ROOT / "segments.jsonl",
+            run_id="semantic-v2-malformed-output",
+            output_root=tmp_path,
+            provider=provider,
+        )
+    run_dir = tmp_path / "semantic-v2-malformed-output"
+    calls = [
+        json.loads(line)
+        for line in (run_dir / "model-calls.jsonl").read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    assert len(calls) == 2
+    assert calls[0]["retry_eligible"] is True
+    assert calls[1]["retry_eligible"] is True
+    assert calls[0]["request_sha256"] == calls[1]["request_sha256"]
+    assert calls[1]["retry_of_attempt"] == 1
+    assert json.loads((run_dir / "run.json").read_text(encoding="utf-8"))["provider_calls"] == 2
+
+
+def test_semantic_v2_incomplete_output_is_retained_with_one_retry(tmp_path: Path) -> None:
+    topic_map, _ = _v2_proposals()
+
+    class IncompleteProvider(FakeSemanticV2PlanningProvider):
+        def __init__(self) -> None:
+            super().__init__([topic_map, topic_map])
+
+        def complete(self, stage: str, system_instruction: str, payload: dict[str, object]):
+            result = super().complete(stage, system_instruction, payload)
+            return ProviderResult(
+                raw_text=result.raw_text,
+                usage=result.usage,
+                latency_ms=result.latency_ms,
+                finish_reason="length",
+                content_present=result.content_present,
+                content_bytes=result.content_bytes,
+                content_sha256=result.content_sha256,
+            )
+
+    provider = IncompleteProvider()
+    with pytest.raises(PlanningError, match="MODEL_OUTPUT_INCOMPLETE"):
+        build_from_transcript_v2(
+            manifest_path=FIXTURE_ROOT / "manifest.json",
+            segments_path=FIXTURE_ROOT / "segments.jsonl",
+            run_id="semantic-v2-incomplete-output",
+            output_root=tmp_path,
+            provider=provider,
+        )
+    run_dir = tmp_path / "semantic-v2-incomplete-output"
+    calls = [
+        json.loads(line)
+        for line in (run_dir / "model-calls.jsonl").read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    assert len(calls) == 2
+    assert all(call["error_category"] == "MODEL_OUTPUT_INCOMPLETE" for call in calls)
+    assert calls[0]["request_sha256"] == calls[1]["request_sha256"]

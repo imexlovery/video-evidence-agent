@@ -35,10 +35,14 @@ from .planning import (
     SEMANTIC_V2_COMPILER_VERSION,
     SEMANTIC_V2_MAPPER_PROMPT_VERSION,
     SEMANTIC_V2_MAPPER_SYSTEM_INSTRUCTION,
+    SEMANTIC_V2_MAX_OUTPUT_TOKENS,
+    SEMANTIC_V2_MODEL,
     SEMANTIC_V2_NORMALIZATION_SCHEMA_VERSION,
     SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
     SEMANTIC_V2_PLANNER_PROMPT_VERSION,
     SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION,
+    SEMANTIC_V2_REASONING_EFFORT,
+    SEMANTIC_V2_THINKING_MODE,
     SEMANTIC_V2_TOPIC_MAP_SCHEMA_VERSION,
     SEMANTIC_V2_TOPIC_PROPOSAL_SCHEMA_VERSION,
     THINKING_MODE,
@@ -74,6 +78,7 @@ SCHEMA_MECHANISM = "responses.text.format.json_schema"
 SEMANTIC_V2_API_SURFACE = "chat_completions"
 SEMANTIC_V2_RESPONSE_MODE = "json_object"
 SEMANTIC_V2_SCHEMA_MECHANISM = "chat.completions.response_format.json_object"
+SEMANTIC_V2_PROVIDER_ENDPOINT = "https://api.deepseek.com"
 REASONING_EFFORT = "none"
 TEMPERATURE = 0
 
@@ -217,6 +222,7 @@ class PlanningConfig:
     credential_present: bool
     response_mode: str = RESPONSE_MODE
     temperature: int = TEMPERATURE
+    temperature_stability_evidence: str = "not_applicable"
     thinking_mode: str = THINKING_MODE
     output_token_limit: int = MAX_OUTPUT_TOKENS
     sdk_max_retries: int = 0
@@ -244,6 +250,7 @@ class PlanningConfig:
             "api_surface": self.api_surface,
             "schema_mechanism": self.schema_mechanism,
             "temperature": self.temperature,
+            "temperature_stability_evidence": self.temperature_stability_evidence,
             "thinking_mode": self.thinking_mode,
             "reasoning_effort": self.reasoning_effort,
             "output_token_limit": self.output_token_limit,
@@ -532,6 +539,50 @@ class OpenAIPlanningProvider:
         )
 
 
+def semantic_v2_chat_completion_request(
+    stage: str,
+    system_instruction: str,
+    payload: dict[str, object],
+    config: PlanningConfig,
+) -> dict[str, object]:
+    """Build the exact non-secret Chat Completions request for semantic v2."""
+    return {
+        "model": config.model,
+        "messages": [
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": stable_json(payload)},
+        ],
+        "temperature": config.temperature,
+        "max_tokens": config.output_token_limit,
+        "response_format": {"type": config.response_mode},
+        "reasoning_effort": config.reasoning_effort,
+        "extra_body": {"thinking": {"type": config.thinking_mode}},
+    }
+
+
+def _validate_semantic_v2_request_config(config: PlanningConfig) -> None:
+    expected = {
+        "provider_label": SEMANTIC_V2_PROVIDER_ENDPOINT,
+        "model": SEMANTIC_V2_MODEL,
+        "response_mode": SEMANTIC_V2_RESPONSE_MODE,
+        "api_surface": SEMANTIC_V2_API_SURFACE,
+        "schema_mechanism": SEMANTIC_V2_SCHEMA_MECHANISM,
+        "temperature": TEMPERATURE,
+        "temperature_stability_evidence": "excluded_in_thinking_mode",
+        "thinking_mode": SEMANTIC_V2_THINKING_MODE,
+        "reasoning_effort": SEMANTIC_V2_REASONING_EFFORT,
+        "output_token_limit": SEMANTIC_V2_MAX_OUTPUT_TOKENS,
+        "sdk_max_retries": 0,
+    }
+    for field_name, expected_value in expected.items():
+        if getattr(config, field_name) != expected_value:
+            raise ProviderCallError(
+                "CONFIGURATION_ERROR",
+                f"semantic-v2 request config differs from frozen value: {field_name}",
+                0,
+            )
+
+
 class OpenAISemanticV2PlanningProvider:
     """The current DeepSeek-compatible Chat Completions provider seam."""
 
@@ -547,8 +598,18 @@ class OpenAISemanticV2PlanningProvider:
         model = os.getenv("VISUAL_REPORT_MODEL", "").strip()
         if not api_key:
             raise PlanningError("CONFIGURATION_ERROR", "OPENAI_API_KEY is required")
+        if base_url.rstrip("/") != SEMANTIC_V2_PROVIDER_ENDPOINT:
+            raise PlanningError(
+                "CONFIGURATION_ERROR",
+                "OPENAI_BASE_URL must be https://api.deepseek.com for semantic-v2",
+            )
         if not model:
             raise PlanningError("CONFIGURATION_ERROR", "VISUAL_REPORT_MODEL is required")
+        if model != SEMANTIC_V2_MODEL:
+            raise PlanningError(
+                "CONFIGURATION_ERROR",
+                f"VISUAL_REPORT_MODEL must be {SEMANTIC_V2_MODEL} for semantic-v2",
+            )
         try:
             timeout_seconds = float(os.getenv("VISUAL_REPORT_TIMEOUT_SECONDS", "120"))
         except ValueError as exc:
@@ -574,7 +635,10 @@ class OpenAISemanticV2PlanningProvider:
             response_mode=SEMANTIC_V2_RESPONSE_MODE,
             api_surface=SEMANTIC_V2_API_SURFACE,
             schema_mechanism=SEMANTIC_V2_SCHEMA_MECHANISM,
-            reasoning_effort=REASONING_EFFORT,
+            temperature_stability_evidence="excluded_in_thinking_mode",
+            thinking_mode=SEMANTIC_V2_THINKING_MODE,
+            output_token_limit=SEMANTIC_V2_MAX_OUTPUT_TOKENS,
+            reasoning_effort=SEMANTIC_V2_REASONING_EFFORT,
             mapper_prompt_version=SEMANTIC_V2_MAPPER_PROMPT_VERSION,
             planner_prompt_version=SEMANTIC_V2_PLANNER_PROMPT_VERSION,
             topic_proposal_schema=SEMANTIC_V2_TOPIC_PROPOSAL_SCHEMA_VERSION,
@@ -627,18 +691,13 @@ class OpenAISemanticV2PlanningProvider:
     ) -> ProviderResult:
         if stage not in {"topic_mapper", "report_planner"}:
             raise ProviderCallError("CONFIGURATION_ERROR", "unknown planning stage", 0)
+        _validate_semantic_v2_request_config(self.config)
+        request = semantic_v2_chat_completion_request(
+            stage, system_instruction, payload, self.config
+        )
         started = perf_counter()
         try:
-            response = self.client.chat.completions.create(
-                model=self.config.model,
-                messages=[
-                    {"role": "system", "content": system_instruction},
-                    {"role": "user", "content": stable_json(payload)},
-                ],
-                temperature=TEMPERATURE,
-                max_tokens=self.config.output_token_limit,
-                response_format={"type": SEMANTIC_V2_RESPONSE_MODE},
-            )
+            response = self.client.chat.completions.create(**request)
         except Exception as exc:
             latency_ms = round((perf_counter() - started) * 1000)
             category = (
@@ -858,6 +917,9 @@ class RunRecorder:
                 "thinking_mode": config.thinking_mode,
                 "reasoning_effort": config.reasoning_effort,
                 "output_token_limit": config.output_token_limit,
+                "temperature_stability_evidence": getattr(
+                    config, "temperature_stability_evidence", "not_applicable"
+                ),
                 "strategy_id": config.strategy_id,
                 "strategy_manifest_sha256": config.strategy_manifest_sha256,
                 "model_version": config.model_version,
@@ -1179,17 +1241,28 @@ def _semantic_v2_request_sha256(
     payload: dict[str, object],
     config: Any,
 ) -> str:
-    request = {
-        "stage": stage,
-        "system_instruction": instruction,
-        "payload": payload,
-        "model": getattr(config, "model", None),
-        "temperature": getattr(config, "temperature", TEMPERATURE),
-        "response_mode": getattr(config, "response_mode", SEMANTIC_V2_RESPONSE_MODE),
-        "api_surface": getattr(config, "api_surface", SEMANTIC_V2_API_SURFACE),
-        "output_token_limit": getattr(config, "output_token_limit", MAX_OUTPUT_TOKENS),
-    }
-    return _sha256_bytes(stable_json(request).encode("utf-8"))
+    if isinstance(config, PlanningConfig):
+        request = semantic_v2_chat_completion_request(stage, instruction, payload, config)
+    else:
+        request = {
+            "model": getattr(config, "model", None),
+            "messages": [
+                {"role": "system", "content": instruction},
+                {"role": "user", "content": stable_json(payload)},
+            ],
+            "temperature": getattr(config, "temperature", TEMPERATURE),
+            "max_tokens": getattr(config, "output_token_limit", MAX_OUTPUT_TOKENS),
+            "response_format": {
+                "type": getattr(config, "response_mode", SEMANTIC_V2_RESPONSE_MODE)
+            },
+            "reasoning_effort": getattr(config, "reasoning_effort", None),
+            "extra_body": {
+                "thinking": {"type": getattr(config, "thinking_mode", None)}
+            },
+        }
+    return _sha256_bytes(
+        stable_json({"stage": stage, "request": request}).encode("utf-8")
+    )
 
 
 def _semantic_v2_call_stage(
@@ -1434,15 +1507,17 @@ def build_from_transcript_v2(
     run_id: str,
     output_root: Path,
     provider: Any | None = None,
+    recorder: RunRecorder | None = None,
 ) -> PlanningRunSummary:
     """Build one current semantic-v2 product prototype report."""
-    recorder = RunRecorder.create(
-        output_root,
-        run_id,
-        schema_version=SEMANTIC_V2_RUN_SCHEMA_VERSION,
-        event_schema_version=SEMANTIC_V2_EVENT_SCHEMA_VERSION,
-        call_schema_version=SEMANTIC_V2_CALL_SCHEMA_VERSION,
-    )
+    if recorder is None:
+        recorder = RunRecorder.create(
+            output_root,
+            run_id,
+            schema_version=SEMANTIC_V2_RUN_SCHEMA_VERSION,
+            event_schema_version=SEMANTIC_V2_EVENT_SCHEMA_VERSION,
+            call_schema_version=SEMANTIC_V2_CALL_SCHEMA_VERSION,
+        )
     retry_state = {"used": False}
     try:
         active_provider = provider or OpenAISemanticV2PlanningProvider.from_environment()

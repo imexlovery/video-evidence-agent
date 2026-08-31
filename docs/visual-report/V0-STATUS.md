@@ -14,9 +14,9 @@ For normative detail, follow the source-of-truth order below.
 | Canonical deliverable | `artifacts/visual-report/v0-rlinf/report.html` |
 | Owner visual acceptance | `PENDING` |
 | Next allowed stop | `READY_FOR_OWNER_VISUAL_REVIEW` |
-| V1-A requirements | `READY_FOR_ENGINEERING_HANDOFF` |
-| V1-A implementation | `NOT_AUTHORIZED` |
-| V1-B/V1-C | `NOT_AUTHORIZED` |
+| V1-A requirements | `READY_FOR_ENGINEERING_HANDOFF`; latest runtime override is `DEC-VR1A-062` |
+| V1-A implementation | Latest text closure stopped at `TEXT_CONTENT_INSUFFICIENT`; V0 renderer remains unchanged |
+| Later stages | Local Web MVP is next after a 3/3 text gate; V1-B/V1-C remain deferred and unauthorized |
 
 ## Objective
 
@@ -65,10 +65,10 @@ authority before continuing.
 
 ## Next action
 
-V0 remains frozen at its Owner visual-review boundary. For V1-A, consult
-`docs/visual-report/V1A-STATUS.md`; wait for explicit Owner authorization before
-executing `VR-V1A-PLANNING-001`. Requirements readiness alone does not permit
-implementation or model calls.
+V0 remains frozen at its Owner visual-review boundary. For current automation
+work, consult `docs/visual-report/V1A-STATUS.md` and the latest bounded Goal
+card. Requirements readiness or a task-card draft alone does not permit model
+calls, Web construction, deployment, V1-B, or V1-C.
 
 ## Status history
 
@@ -80,3 +80,5 @@ implementation or model calls.
 | 2026-08-30 | `READY_FOR_OWNER_VISUAL_REVIEW` | Owner visual revision 1 implemented in the generic renderer and real plan: dense Chinese editorial layout, semantic chapter starts at 00:00/03:54/19:21/27:06, 13 blocks, small-radius components, round bullets, and image-only keyframes with one asset timestamp. Automated/offline checks passed; screenshots remain the historical first-candidate evidence by owner request, so the refreshed page awaits direct owner inspection. |
 | 2026-08-30 | `V1A_DESIGN_AUTHORIZED` | Owner authorized G1 V1-A requirements design, full-transcript processing for the three fixed fixtures, and the two-call Topic Mapper/Report Planner boundary. This did not authorize implementation. |
 | 2026-08-30 | `V1A_READY_FOR_ENGINEERING_HANDOFF` | Owner confirmed the exact-model delegation envelope and six-run thresholds; the independent requirements validator returned confidence 100.0 with zero blockers/errors. V1-A implementation and V1-B/C remain unauthorized. |
+| 2026-08-31 | `V1_TEXT_WEB_PRIORITY_SET` | Owner selected a new Thinking/high/32768 V1-A runtime closure and placed a localhost Web MVP before the optional keyframe and full-MP4 stages. V0 renderer contracts remain unchanged; this documentation event authorizes no implementation or provider call. |
+| 2026-08-31 | `V1_TEXT_WEB_CLOSURE_STOPPED` | The authorized text closure executed one frozen three-video set: Kling and RLinf rendered, Wu Yi failed the unchanged V0 compiler's block budget. Gate A did not open the Web slice; V0 implementation and Owner visual-review boundary remain unchanged. |

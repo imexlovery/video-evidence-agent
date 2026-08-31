@@ -28,6 +28,14 @@ MAX_VISIBLE_CHARACTERS = 2_600
 MAX_OUTPUT_TOKENS = 8_192
 THINKING_MODE = "disabled"
 
+# The historical strict-schema v1/provider-conformance path above keeps its
+# original controls.  Semantic v2 has its own frozen runtime tuple so a new
+# product revision cannot silently rewrite historical configuration evidence.
+SEMANTIC_V2_MODEL = "deepseek-v4-flash-vision-exp"
+SEMANTIC_V2_MAX_OUTPUT_TOKENS = 32_768
+SEMANTIC_V2_THINKING_MODE = "enabled"
+SEMANTIC_V2_REASONING_EFFORT = "high"
+
 
 class PlanningError(RuntimeError):
     """A stable deterministic V1-A failure."""
@@ -2123,13 +2131,14 @@ class SemanticV2FakeProviderConfig:
     credential_present: bool = False
     response_mode: str = "json_object"
     temperature: int = 0
-    thinking_mode: str = "disabled"
-    output_token_limit: int = MAX_OUTPUT_TOKENS
+    thinking_mode: str = SEMANTIC_V2_THINKING_MODE
+    output_token_limit: int = SEMANTIC_V2_MAX_OUTPUT_TOKENS
     sdk_max_retries: int = 0
     sdk_version: str = "not-applicable"
     api_surface: str = "chat_completions"
     schema_mechanism: str = "chat.completions.response_format.json_object"
-    reasoning_effort: str = "none"
+    reasoning_effort: str = SEMANTIC_V2_REASONING_EFFORT
+    temperature_stability_evidence: str = "excluded_in_thinking_mode"
     strategy_id: str | None = None
     strategy_manifest_sha256: str | None = None
     model_version: str | None = None
@@ -2150,6 +2159,7 @@ class SemanticV2FakeProviderConfig:
             "api_surface": self.api_surface,
             "schema_mechanism": self.schema_mechanism,
             "temperature": self.temperature,
+            "temperature_stability_evidence": self.temperature_stability_evidence,
             "thinking_mode": self.thinking_mode,
             "reasoning_effort": self.reasoning_effort,
             "output_token_limit": self.output_token_limit,

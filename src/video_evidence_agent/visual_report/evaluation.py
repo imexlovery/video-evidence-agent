@@ -35,10 +35,14 @@ from .planning import (
     SEMANTIC_V2_COMPILER_VERSION,
     SEMANTIC_V2_MAPPER_PROMPT_VERSION,
     SEMANTIC_V2_MAPPER_SYSTEM_INSTRUCTION,
+    SEMANTIC_V2_MAX_OUTPUT_TOKENS,
+    SEMANTIC_V2_MODEL,
     SEMANTIC_V2_NORMALIZATION_SCHEMA_VERSION,
     SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
     SEMANTIC_V2_PLANNER_PROMPT_VERSION,
     SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION,
+    SEMANTIC_V2_REASONING_EFFORT,
+    SEMANTIC_V2_THINKING_MODE,
     SEMANTIC_V2_TOPIC_MAP_SCHEMA_VERSION,
     SEMANTIC_V2_TOPIC_PROPOSAL_SCHEMA_VERSION,
     THINKING_MODE,
@@ -60,6 +64,7 @@ from .planning_runtime import (
     RESPONSE_MODE,
     SCHEMA_MECHANISM,
     SEMANTIC_V2_API_SURFACE,
+    SEMANTIC_V2_PROVIDER_ENDPOINT,
     SEMANTIC_V2_RESPONSE_MODE,
     SEMANTIC_V2_SCHEMA_MECHANISM,
     SourceSnapshot,
@@ -193,6 +198,7 @@ class SemanticV2ProductFreeze(StrictEvaluationModel):
     runtime: dict[str, object]
     limits: dict[str, object]
     runs: tuple[ProductRunDeclaration, ...] = Field(min_length=3, max_length=3)
+    web_smoke: ProductRunDeclaration | None = None
     derived_from_manifest: str | None = None
     derived_at: str | None = None
     derivation_reason: str | None = None
@@ -206,6 +212,11 @@ class SemanticV2ProductFreeze(StrictEvaluationModel):
         ids = [run.run_id for run in self.runs]
         if len(ids) != len(set(ids)):
             raise ValueError("semantic-v2 product run IDs must be unique")
+        if self.web_smoke is not None:
+            if self.web_smoke.video_id != "p0b-kling-2024":
+                raise ValueError("semantic-v2 Web smoke must target Kling")
+            if self.web_smoke.run_id in ids:
+                raise ValueError("semantic-v2 Web smoke ID must be distinct")
         if len(self.review_cards) != 3:
             raise ValueError("semantic-v2 product freeze must contain three review cards")
         return self
@@ -1661,8 +1672,10 @@ def _semantic_v2_provider_snapshot(repository_root: Path) -> dict[str, object]:
     blockers = list(snapshot.get("blockers", []))
     provider = str(snapshot.get("provider", ""))
     model = str(snapshot.get("model", ""))
-    if "deepseek" not in provider.lower() or not model.lower().startswith("deepseek"):
-        blockers.append("current product prototype requires the configured DeepSeek endpoint/model")
+    if provider != SEMANTIC_V2_PROVIDER_ENDPOINT:
+        blockers.append("current product prototype requires https://api.deepseek.com")
+    if model != SEMANTIC_V2_MODEL:
+        blockers.append(f"current product prototype requires {SEMANTIC_V2_MODEL}")
     snapshot.update(
         {
             "provider_family": "DeepSeek",
@@ -1670,11 +1683,21 @@ def _semantic_v2_provider_snapshot(repository_root: Path) -> dict[str, object]:
             "response_mode": SEMANTIC_V2_RESPONSE_MODE,
             "schema_mechanism": SEMANTIC_V2_SCHEMA_MECHANISM,
             "temperature": 0,
-            "thinking_mode": THINKING_MODE,
-            "reasoning_effort": "none",
-            "output_token_limit": MAX_OUTPUT_TOKENS,
+            "temperature_stability_evidence": "excluded_in_thinking_mode",
+            "thinking_mode": SEMANTIC_V2_THINKING_MODE,
+            "reasoning_effort": SEMANTIC_V2_REASONING_EFFORT,
+            "output_token_limit": SEMANTIC_V2_MAX_OUTPUT_TOKENS,
             "sdk_max_retries": 0,
             "technical_retry_max_per_run": 1,
+            "request_shape": {
+                "api_surface": SEMANTIC_V2_API_SURFACE,
+                "messages": ["system", "full_authorized_transcript_payload"],
+                "temperature": 0,
+                "max_tokens": SEMANTIC_V2_MAX_OUTPUT_TOKENS,
+                "response_format": {"type": SEMANTIC_V2_RESPONSE_MODE},
+                "reasoning_effort": SEMANTIC_V2_REASONING_EFFORT,
+                "extra_body": {"thinking": {"type": SEMANTIC_V2_THINKING_MODE}},
+            },
             "blockers": blockers,
             "admission": "READY" if not blockers else "BLOCKED_CONFIGURATION",
         }
@@ -1789,6 +1812,9 @@ def freeze_semantic_v2_product_prototype(
             "base_provider_calls_per_run": 2,
             "maximum_provider_calls_per_run": 3,
             "maximum_total_provider_calls": 9,
+            "web_smoke_base_provider_calls": 2,
+            "web_smoke_maximum_provider_calls": 3,
+            "maximum_goal_provider_calls": 12,
             "technical_retry_max_per_run": 1,
             "formal_six_run_measurement": False,
         },
@@ -1803,8 +1829,17 @@ def freeze_semantic_v2_product_prototype(
         }
         for video_id, _, _ in FIXED_SOURCES
     ]
+    web_smoke = {
+        "run_id": f"p0b-kling-2024-semantic-v2-{revision_seed}-web-smoke",
+        "video_id": "p0b-kling-2024",
+        "planned_provider_calls": 2,
+        "maximum_provider_calls": 3,
+    }
+    declarations = [*runs, web_smoke]
     collisions = [
-        str(run["run_id"]) for run in runs if (artifact_root / str(run["run_id"])).exists()
+        str(run["run_id"])
+        for run in declarations
+        if (artifact_root / str(run["run_id"])).exists()
     ]
     if collisions:
         raise EvaluationError(
@@ -1812,7 +1847,7 @@ def freeze_semantic_v2_product_prototype(
             f"semantic-v2 product run directories already exist: {', '.join(collisions)}",
         )
     revision_hash = _sha256_bytes(
-        stable_json({**stable_payload, "runs": runs}).encode("utf-8")
+        stable_json({**stable_payload, "runs": runs, "web_smoke": web_smoke}).encode("utf-8")
     )[:12]
     payload = {
         **stable_payload,
@@ -1822,6 +1857,7 @@ def freeze_semantic_v2_product_prototype(
         "prompts": contract["prompts"],
         "schemas": contract["schemas"],
         "runs": runs,
+        "web_smoke": web_smoke,
     }
     _write_new_json(output_path, payload)
     try:

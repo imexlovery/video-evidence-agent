@@ -1,4 +1,4 @@
-"""Command line entry point for the local Video Visual Report V0 renderer."""
+"""Command line entry point for the local Video Visual Report runtime."""
 
 from __future__ import annotations
 
@@ -23,6 +23,7 @@ from .planning_runtime import (
     replay_semantic_v2_proposals,
 )
 from .renderer import RenderError, render_report
+from .web import serve_web
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -49,6 +50,15 @@ def _parser() -> argparse.ArgumentParser:
     build_v2.add_argument("--segments", required=True, type=Path)
     build_v2.add_argument("--run-id", required=True)
     build_v2.add_argument("--output-root", required=True, type=Path)
+    serve = commands.add_parser(
+        "serve-web", help="serve the gated semantic-v2 Web MVP on loopback"
+    )
+    serve.add_argument("--source-root", type=Path, default=Path("."))
+    serve.add_argument(
+        "--artifact-root", type=Path, default=Path("artifacts/visual-report/v1a")
+    )
+    serve.add_argument("--product-manifest", required=True, type=Path)
+    serve.add_argument("--port", type=int, default=8765)
     freeze_product = commands.add_parser(
         "freeze-product-prototype",
         aliases=["freeze-semantic-v2-product"],
@@ -289,6 +299,18 @@ def main(argv: list[str] | None = None) -> int:
             f"sections={summary.section_count}, blocks={summary.block_count}, "
             f"report={summary.report_path}"
         )
+        return 0
+    if args.command == "serve-web":
+        try:
+            serve_web(
+                source_root=args.source_root,
+                artifact_root=args.artifact_root,
+                port=args.port,
+                product_manifest=args.product_manifest,
+            )
+        except PlanningError as exc:
+            print(f"{exc.category}: {exc.message}", file=sys.stderr)
+            return 2
         return 0
     try:
         strategy = load_provider_conformance_strategy(args.strategy_manifest, args.strategy_id)

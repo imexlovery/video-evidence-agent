@@ -30,12 +30,25 @@ contract simplification using the already available DeepSeek boundary.
 product-prototype contract via `DEC-VR1A-061`. It keeps two independent
 full-transcript semantic stages but changes the model boundary to shallow
 semantic JSON followed by observable non-semantic normalization, source
-resolution, canonical compilation, and the existing V0 renderer. The current
-proof is three videos × one product run, with one explicit recorded technical
-retry available per run and a nine-call absolute ceiling. Content, grounding,
-cross-video structure fit and six desktop/mobile screenshots are primary;
-schema-first-hit is diagnostic. This requirements session authorizes no code or
-provider execution; a separate Owner execution instruction is still required.
+resolution, canonical compilation, and the existing V0 renderer. That contract
+was implemented at `844978f08d07775b650467e31e221a969ddef3e3`; the first
+three-video set rendered RLinf and Wu Yi, while Kling exhausted its one retry
+on an incomplete Mapper response. The retained conclusion is therefore
+`PROTOTYPE_EXECUTION_INCONCLUSIVE`. `DEC-VR1A-062` now fixes the next complete
+three-video runtime tuple, and `DEC-VR1A-063/064` place a separate localhost Web
+MVP behind its 3/3 text gate. This documentation turn authorizes no new code,
+provider execution, or Web construction; a new Owner construction message is
+still required.
+
+The Owner then authorized the complete bounded Goal
+`VR-V1-TEXT-WEB-CLOSURE-007`. Provider-free request/snapshot/retry/replay and
+loopback contract checks passed, and one new frozen three-video revision was
+executed exactly once per declared product identity. Kling and RLinf rendered;
+Wu Yi reached a deterministic `PLAN_BUDGET_ERROR` because the model-selected
+plan exceeded the unchanged V0 compiler's block ceiling. Gate A therefore did
+not open the Web runtime, and the Goal stopped at
+`READY_FOR_OWNER_V1A_REVIEW — TEXT_CONTENT_INSUFFICIENT` without Owner
+acceptance.
 
 ## Current state
 
@@ -51,7 +64,7 @@ provider execution; a separate Owner execution instruction is still required.
 | Owner checkpoint | Current semantic-v2 product contract confirmed via `DEC-VR1A-061`, superseding unconfirmed recommendations `DEC-VR1A-059/060`; no product-contract checkpoint remains open |
 | Implementation task | `VR-V1A-PLANNING-001` |
 | Implementation authorization | `AUTHORIZED` — explicit Owner instruction on 2026-08-30 |
-| Latest completed execution | `READY_FOR_OWNER_V1A_REVIEW — MEASUREMENT_EXECUTION_FAILED` |
+| Historical strict measurement | `READY_FOR_OWNER_V1A_REVIEW — MEASUREMENT_EXECUTION_FAILED` |
 | Latest recovery execution | `20` retained canary runs, all `FAILED`, at `36/36` calls |
 | Follow-up measurement task | `VR-V1A-MEASUREMENT-002` |
 | Follow-up authorization | `AUTHORIZED — COMPLETED`; executed from commit `f8cb402d37bc05a30c7a912ed044548a71c128c7` while preserving the Owner's uncommitted `.env.example` update |
@@ -61,20 +74,24 @@ provider execution; a separate Owner execution instruction is still required.
 | Completed continuation task | `VR-V1A-PROVIDER-CONFORMANCE-004` |
 | Completed continuation status | `READY_FOR_OWNER_V1A_REVIEW — V1A_PROVIDER_CONFORMANCE_NO_GO` |
 | Current continuation evidence | Frozen two-strategy native Responses manifest; all six canaries executed once and failed with retained `8/8` provider/model calls; no formal measurement created |
-| Current frozen baseline | `e72503f5b20831c1e86a1b72c93fb4c4f7debe2a` — provider-conformance no-go package |
+| Current implementation baseline | `844978f08d07775b650467e31e221a969ddef3e3` — semantic-v2 prototype; earlier `e72503f…` provider-conformance no-go remains historical |
 | Cancelled diagnostic task | `VR-V1A-BOUNDARY-ISOLATION-005` |
 | Cancelled diagnostic status | `CANCELLED_BY_OWNER — NEVER_AUTHORIZED / NEVER_EXECUTED`; official OpenAI key/provider work is closed |
-| Current continuation task | `VR-V1A-CONTRACT-SIMPLIFICATION-006` |
-| Current continuation status | `PRODUCT_PROTOTYPE_CONTRACT_CONFIRMED — NOT_STARTED`; no code/model work authorized by the design session |
-| Current continuation boundary | Existing DeepSeek only; two semantic stages per complete run; semantic-v2 proposals plus non-semantic deterministic compiler; one product run per video; one technical retry maximum per run; six base and nine maximum calls; three reports plus six screenshots |
+| Completed continuation task | `VR-V1A-CONTRACT-SIMPLIFICATION-006` |
+| Completed continuation status | `READY_FOR_OWNER_V1A_REVIEW — PROTOTYPE_EXECUTION_INCONCLUSIVE`; RLinf and Wu Yi rendered, Kling exhausted its one Mapper retry |
+| Latest bounded Goal | `VR-V1-TEXT-WEB-CLOSURE-007` — executed once; Gate A failed on Wu Yi content budget |
+| Latest bounded Goal status | `READY_FOR_OWNER_V1A_REVIEW — TEXT_CONTENT_INSUFFICIENT`; no Web server, browser smoke, or Owner acceptance |
+| Latest frozen revision | `vr1a-semantic-v2-56340249c6f9`; product calls `6/6`, Web smoke `0/3`, Goal usage `6/12` |
+| Next designed Goal | `VR-V1-TEXT-WEB-CLOSURE-007` — V1-A runtime closure gated before a separate local Web MVP slice |
+| Next runtime tuple | DeepSeek `deepseek-v4-flash-vision-exp`; Chat Completions JSON object; Thinking enabled; reasoning effort high; `max_tokens=32768`; SDK retry zero; one identical application retry per run; temperature is not stability evidence |
 | Product code/dependency/runtime changes in design phase | `0 / 0 / 0` |
 | Model calls in design phase | `0` |
-| V1-B/V1-C | `NOT_AUTHORIZED` |
-| Next gate | Owner separately authorizes the bounded Goal implementation/execution session; GLM/Qwen, V1-B and V1-C remain unauthorized |
+| Immediate roadmap | Owner reviews the retained Kling/RLinf reports and Wu Yi failure; any new revision or Web attempt requires separate authorization; V1-B keyframes and V1-C MP4/ASR remain deferred and unauthorized |
+| Next gate | Owner review of `TEXT_CONTENT_INSUFFICIENT`; no self-acceptance or automatic rerun |
 
 ## Current requirements validator result
 
-After `DEC-VR1A-061`, the independent validator regenerated
+After `DEC-VR1A-061` and the later `DEC-VR1A-062/063/064` design decisions, the independent validator regenerated
 `docs/requirements/visual-report-v1a/requirements-readiness.json` with:
 
 - status `READY_FOR_ENGINEERING_HANDOFF`;
@@ -82,7 +99,7 @@ After `DEC-VR1A-061`, the independent validator regenerated
 - confidence `100.0`;
 - no blocker and no error;
 - evaluated artifact hash
-  `ce7fff058867da153d2c804e7a074e837b965b317fe6d0d13c097cf0f92e228a`.
+  `9c5e61652f75720d991fcf771c5e4e88616d521a85dc78292e6ae699aff16d90`.
 
 This result proves current semantic-v2 documentation readiness only. It is not
 implementation authorization or V1-A quality acceptance. The previous blocked revision
@@ -260,6 +277,8 @@ the prototype proof; there is no canary-to-formal continuation in this task.
 | 2026-08-31 | `CONTRACT_SIMPLIFICATION_DESIGNED` | `VR-V1A-CONTRACT-SIMPLIFICATION-006` proposes DeepSeek JSON-object semantic v2 Mapper/Planner contracts, observable deterministic normalization, a frozen three-video canary and gated six-run formal measurement. Product/provider execution remains unauthorized pending the exact two-item contract checkpoint. |
 | 2026-08-31 | `PRODUCT_PROTOTYPE_CONTRACT_CONFIRMED` | Owner confirmation `DEC-VR1A-061` supersedes the unconfirmed canary/formal recommendations without rewriting them: current V1-A validates `Semantic Proposal → Deterministic Compiler → V0 Renderer` on one frozen three-video product set. Normalization is non-semantic only, one identical recorded technical retry is available per run, and three reports plus six viewport screenshots drive Owner review. Implementation/provider execution remains `NOT_STARTED` pending a separate Goal instruction. |
 | 2026-08-31 | `PRODUCT_PROTOTYPE_REQUIREMENTS_READY` | Independent readiness validation returned `READY_FOR_ENGINEERING_HANDOFF`, confidence `100.0`, zero blockers/errors, artifact hash `ce7fff05…`. This closes documentation preparation only; product code/model execution and Owner acceptance remain unstarted. |
+| 2026-08-31 | `TEXT_WEB_CLOSURE_DESIGNED` | Owner selected Thinking enabled, reasoning effort high, `max_tokens=32768`, temperature excluded from stability claims, one identical retry, and one new complete three-video set. Owner also moved V1-B keyframes off the critical path and requested a gated localhost Web MVP after the 3/3 text result. `VR-V1-TEXT-WEB-CLOSURE-007` records the continuous Goal; this documentation turn performs no implementation or model call. |
+| 2026-08-31 | `READY_FOR_OWNER_V1A_REVIEW — TEXT_CONTENT_INSUFFICIENT` | `VR-V1-TEXT-WEB-CLOSURE-007` froze `vr1a-semantic-v2-56340249c6f9` and executed Kling, RLinf, and Wu Yi exactly once. Kling/RLinf rendered at `2/2` calls; Wu Yi failed `PLAN_BUDGET_ERROR` after `2/2` successful provider calls because the unchanged compiler rejected more than 14 blocks. Observed product calls were `6/6`; Web smoke remained `0/3`; Gate A failed, so no Web server/browser smoke or Owner acceptance occurred. |
 
 ## Current contract-simplification execution evidence — 2026-08-31
 
@@ -269,7 +288,7 @@ shared one-retry trace, provider-free replay, product evaluator, and CLI were
 implemented within the allowed V1-A surface. The historical documentation,
 cancelled tasks, frozen P0-B inputs, and prior V1-A identities were preserved.
 
-The frozen product revision is `vr1a-semantic-v2-758187ce10bd` with DeepSeek
+The historical frozen product revision is `vr1a-semantic-v2-758187ce10bd` with DeepSeek
 `deepseek-v4-flash-vision-exp`, Chat Completions JSON object, temperature `0`,
 SDK retry `0`, and one identical technical retry per run. It declares three
 videos × one run, six base calls, maximum nine calls, and
@@ -309,3 +328,75 @@ preserved as append-only evidence; `-003` is the current package after the
 deterministic evaluator terminal mapping correction. No formal six-run
 measurement, V1-B/V1-C work, commit, push, PR, deployment, or Owner acceptance
 was performed.
+
+## Next Goal — text runtime closure then local Web MVP
+
+The next proposed construction unit is
+`docs/tasks/VISUAL-REPORT-V1-TEXT-WEB-CLOSURE.md`. It must first create a new
+complete three-video revision under `DEC-VR1A-062`; only a 3/3 `RENDERED`
+result may open the Web slice. The Web slice is a separate G1 local product
+surface over the same runtime and `run.json` authority. It does not retroactively
+change V1-A, and it does not authorize MP4/ASR, keyframes, OCR/VLM, accounts,
+database/queue, remote hosting, V1-B, or V1-C.
+
+## Latest Goal execution evidence — 2026-08-31
+
+`VR-V1-TEXT-WEB-CLOSURE-007` was explicitly authorized as one continuous Goal
+from the requested worktree. The branch remained
+`codex/visual-report-semantic-v2` at
+`844978f08d07775b650467e31e221a969ddef3e3`; historical artifacts, failed
+identities, revisions, aggregate/rubric files, screenshots, and protected
+inputs were preserved. No commit, push, PR, deployment, or public publication
+was performed.
+
+G1 provider-free admission passed with `10` focused semantic-v2 tests, `79`
+full regression tests using the canonical checkout as read-only source root,
+full Ruff, `git diff --check`, and `5` fake-provider loopback Web contract
+tests. The current provider request and run snapshots record exactly DeepSeek
+`deepseek-v4-flash-vision-exp`, Chat Completions JSON object, Thinking enabled,
+reasoning effort `high`, `max_tokens=32768`, SDK retry `0`, and one identical
+application retry ceiling. Replay remained `0/0`; no provider-free test
+contacted the model.
+
+The new frozen manifest is
+`eval/visual-report-v1a/text-web-closure-007-product-manifest.json`, revision
+`vr1a-semantic-v2-56340249c6f9`, SHA-256
+`d14211b92fb3b09d4b40e404bdd714b7ab4a916c13b542ad8fc8cb1628c9cb78`.
+It declares the three product identities and the separate Kling Web smoke
+identity `p0b-kling-2024-semantic-v2-98d9af23a9-web-smoke`.
+
+| Video | State | Calls | Evidence |
+|---|---|---:|---|
+| `p0b-kling-2024` | `RENDERED` | `2/2` | Two `finish_reason=stop` calls, usage/raw/request hashes, empty assets, canonical report |
+| `p0b-rlinf-2026` | `RENDERED` | `2/2` | Two `finish_reason=stop` calls, 5 sections / 11 blocks, valid lineage, empty assets, canonical report |
+| `p0b-wuyi-goals` | `FAILED — PLAN_BUDGET_ERROR` | `2/2` | Two `finish_reason=stop` calls; unchanged V0 compiler rejected more than 14 model-selected blocks; failure/raw/usage retained |
+
+The product denominator is `6/6` provider/model calls with no retry; the Web
+smoke is `0/3`, so Goal usage is `6/12`. Kling's event ledger also retains an
+operator cancellation marker appended while its already-admitted Planner
+request was completing; final `run.json` is `RENDERED`, `2/2`, with two
+successful call records. This marker was not deleted or relabeled.
+
+Recorded total-token usage by Mapper/Planner was Kling `15803/19506`, RLinf
+`20754/25788`, and Wu Yi `15795/23303` (`120949` total); all six attempts ended
+with `finish_reason=stop`.
+
+The append-only review package is
+`artifacts/visual-report/v1a/evaluation/text-web-closure-007/vr1a-semantic-v2-56340249c6f9/`.
+Its aggregate reports `technical_status=FAILED`,
+`stop_state=PROTOTYPE_CONTENT_INSUFFICIENT`, observed calls `6/6`, and pending
+Owner rubrics. Wu Yi's failure is content/compiler insufficiency after
+successful provider transport; no semantic deletion, prompt/config change,
+third call, or selective rerun was authorized.
+
+Gate A consequently failed because not all three product identities rendered.
+The Web implementation and fake contract tests remain local, unaccepted code,
+but no Web server was started, no browser verification or Web screenshots were
+created, and no real Web smoke provider call occurred. The exact current
+Owner-review stop is:
+
+`READY_FOR_OWNER_V1A_REVIEW — TEXT_CONTENT_INSUFFICIENT`
+
+This status is not Owner acceptance. A future revision or Web attempt requires
+separate Owner authorization; MP4/ASR, keyframes, OCR/VLM, V1-B, V1-C,
+database, queue, accounts, deployment, and public hosting remain outside scope.
