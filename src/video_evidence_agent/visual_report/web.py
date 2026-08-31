@@ -303,63 +303,99 @@ def _url_html_page() -> str:
   <title>Video Visual Report · Bilibili</title>
   <style>
     :root {
-      color-scheme: dark;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: light;
+      font-family: "Avenir Next", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --ink: #172033; --muted: #667085; --line: #dce5f2; --blue: #4776ee;
+      --pink: #ed72b6; --blue-soft: #eef4ff; --pink-soft: #fff0f8;
     }
     * { box-sizing: border-box; }
     html, body {
-      margin: 0; min-height: 100%; background: #111827; color: #f8fafc;
+      margin: 0; min-height: 100%; color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 5%, #eaf1ff 0, transparent 34%),
+        radial-gradient(circle at 92% 18%, #ffedf7 0, transparent 30%), #f8fbff;
       overflow-x: hidden;
     }
     body { padding: clamp(20px, 5vw, 72px) 16px; }
     main { width: min(760px, 100%); margin: 0 auto; }
     .eyebrow {
-      color: #67e8f9; font-size: 12px; font-weight: 700; letter-spacing: .14em;
+      color: var(--blue); font-size: 12px; font-weight: 750; letter-spacing: .14em;
       text-transform: uppercase;
     }
     h1 {
       margin: 10px 0 12px; font-size: clamp(30px, 7vw, 56px);
       line-height: 1.05; letter-spacing: -.04em;
     }
-    .intro { color: #cbd5e1; max-width: 620px; line-height: 1.65; }
+    .intro { color: var(--muted); max-width: 650px; line-height: 1.7; }
     .card {
-      margin-top: 28px; padding: clamp(18px, 4vw, 30px); border: 1px solid #334155;
-      border-radius: 18px; background: #1e293b; box-shadow: 0 18px 50px #02061766;
+      margin-top: 28px; padding: clamp(20px, 4vw, 34px); border: 1px solid #e3eaf5;
+      border-radius: 24px; background: #ffffffd9;
+      box-shadow: 0 22px 60px #526b9c1c; backdrop-filter: blur(12px);
     }
-    label { display: block; margin-bottom: 9px; color: #cbd5e1; font-size: 14px; font-weight: 650; }
+    label { display: block; margin-bottom: 9px; color: #344054; font-size: 14px; font-weight: 700; }
     input, button { width: 100%; min-height: 48px; border-radius: 11px; font: inherit; }
     input {
-      border: 1px solid #475569; padding: 0 13px; color: #f8fafc; background: #0f172a;
+      border: 1px solid #cbd6e6; padding: 0 14px; color: var(--ink); background: #fff;
+      box-shadow: inset 0 1px 2px #1018280a;
     }
     button {
-      margin-top: 16px; border: 0; padding: 0 18px; color: #082f49;
-      background: #67e8f9; font-weight: 750; cursor: pointer;
+      margin-top: 16px; border: 0; padding: 0 18px; color: white;
+      background: linear-gradient(100deg, var(--blue), #8177ed 52%, var(--pink));
+      box-shadow: 0 10px 24px #6978e934; font-weight: 750; cursor: pointer;
     }
     button:disabled { cursor: wait; opacity: .52; }
-    :focus-visible { outline: 3px solid #facc15; outline-offset: 3px; }
+    :focus-visible { outline: 3px solid #7aa2ff; outline-offset: 3px; }
     .source-info {
-      min-height: 24px; margin-top: 12px; color: #94a3b8; font-size: 13px;
+      min-height: 24px; margin-top: 12px; color: var(--muted); font-size: 13px;
       line-height: 1.5; overflow-wrap: anywhere;
     }
-    .status { margin-top: 24px; padding-top: 20px; border-top: 1px solid #334155; }
+    .status { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); }
     .status-title {
       display: flex; align-items: baseline; justify-content: space-between;
       gap: 12px; flex-wrap: wrap;
     }
-    .status-label { color: #f8fafc; font-size: 18px; font-weight: 750; }
+    .status-label { color: var(--ink); font-size: 18px; font-weight: 750; }
     .status-code {
-      color: #67e8f9; font-size: 12px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--blue); font-size: 13px; font-weight: 700;
     }
-    .status-detail { margin: 9px 0 0; color: #cbd5e1; line-height: 1.55; overflow-wrap: anywhere; }
-    .report-link { display: inline-block; margin-top: 14px; color: #67e8f9; font-weight: 700; }
+    .status-detail { margin: 10px 0 0; color: var(--muted); line-height: 1.55; overflow-wrap: anywhere; }
+    .progress-track {
+      height: 6px; margin: 22px 9px 0; border-radius: 99px; background: #e9eef7;
+      overflow: hidden;
+    }
+    .progress-fill {
+      width: 0; height: 100%; border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), var(--pink));
+      transition: width .45s ease;
+    }
+    .progress-steps {
+      display: grid; grid-template-columns: repeat(4, 1fr); margin-top: -12px;
+      list-style: none; padding: 0;
+    }
+    .progress-step { position: relative; text-align: center; color: #98a2b3; font-size: 12px; }
+    .step-dot {
+      display: grid; width: 20px; height: 20px; margin: 0 auto 9px; place-items: center;
+      border: 4px solid #fff; border-radius: 50%; background: #d5ddea;
+      box-shadow: 0 0 0 1px #d5ddea; transition: background .25s, box-shadow .25s;
+    }
+    .progress-step.is-current, .progress-step.is-complete { color: #344054; font-weight: 700; }
+    .progress-step.is-complete .step-dot { background: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+    .progress-step.is-current .step-dot {
+      background: var(--pink); box-shadow: 0 0 0 4px var(--pink-soft), 0 0 0 5px #ef9dca;
+    }
+    .report-link {
+      display: inline-block; margin-top: 16px; padding: 10px 15px; border-radius: 10px;
+      color: #315dcd; background: var(--blue-soft); font-weight: 700; text-decoration: none;
+    }
     [hidden] { display: none !important; }
     @media (max-width: 520px) {
       body { padding-top: 28px; }
       .card { margin-top: 22px; border-radius: 14px; }
       .status-title { display: block; }
       .status-code { display: block; margin-top: 5px; }
+      .progress-step { font-size: 11px; }
     }
+    @media (prefers-reduced-motion: reduce) { .progress-fill, .step-dot { transition: none; } }
   </style>
 </head>
 <body>
@@ -368,24 +404,34 @@ def _url_html_page() -> str:
     <h1>把一个公开 BV 视频变成报告</h1>
     <p class="intro">
       输入一个公开的 Bilibili BV 视频地址。本地会依次下载视频、生成文字稿、完成语义规划，
-      最后打开带来源引用的 canonical report.html。
+      最后生成一份带来源引用的视频报告。
     </p>
     <section class="card" aria-labelledby="url-label">
       <label id="url-label" for="url">公开 Bilibili BV URL</label>
       <input id="url" name="url" type="url" inputmode="url"
              placeholder="https://www.bilibili.com/video/BV..." autocomplete="off">
       <div id="source-info" class="source-info" aria-live="polite">
-        只接受一个 canonical HTTPS Bilibili BV URL。
+        仅支持公开的 Bilibili BV 视频链接。
       </div>
       <button id="generate" type="button">生成 Visual Report</button>
       <div class="status" aria-live="polite" aria-atomic="true" aria-busy="false">
         <div class="status-title">
           <span id="status-label" class="status-label">尚未开始</span>
-          <span id="status-code" class="status-code">READY</span>
+          <span id="status-code" class="status-code">准备就绪</span>
         </div>
-        <p id="status-detail" class="status-detail">页面加载不会触发下载或模型调用。</p>
+        <p id="status-detail" class="status-detail">粘贴视频链接后，点击上方按钮开始生成。</p>
+        <div id="progress" role="progressbar" aria-label="报告生成进度"
+             aria-valuemin="0" aria-valuemax="4" aria-valuenow="0">
+          <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+          <ol class="progress-steps">
+            <li class="progress-step" data-step="1"><span class="step-dot"></span>下载视频</li>
+            <li class="progress-step" data-step="2"><span class="step-dot"></span>生成文字稿</li>
+            <li class="progress-step" data-step="3"><span class="step-dot"></span>理解内容</li>
+            <li class="progress-step" data-step="4"><span class="step-dot"></span>生成报告</li>
+          </ol>
+        </div>
         <a id="report-link" class="report-link" href="#" target="_blank"
-           rel="noreferrer" hidden>打开 canonical report.html</a>
+           rel="noreferrer" hidden>查看生成的报告</a>
       </div>
     </section>
   </main>
@@ -397,6 +443,9 @@ def _url_html_page() -> str:
       const statusLabel = document.querySelector('#status-label');
       const statusCode = document.querySelector('#status-code');
       const statusDetail = document.querySelector('#status-detail');
+      const progress = document.querySelector('#progress');
+      const progressFill = document.querySelector('#progress-fill');
+      const progressSteps = [...document.querySelectorAll('.progress-step')];
       const reportLink = document.querySelector('#report-link');
       const labels = {
         DOWNLOADING: '正在下载视频', TRANSCRIBING: '正在生成文字稿',
@@ -407,14 +456,32 @@ def _url_html_page() -> str:
       let currentRunId = null;
       let polling = false;
 
+      function updateProgress(displayStage, state) {
+        const stepByStage = {
+          DOWNLOADING: 1, TRANSCRIBING: 2, CREATED: 1,
+          MAPPING: 3, TOPIC_MAPPED: 3, PLANNING: 4, PLAN_VALIDATED: 4, RENDERED: 4
+        };
+        const step = stepByStage[displayStage] || 0;
+        const completed = state === 'RENDERED' ? 4 : Math.max(0, step - 1);
+        progress.setAttribute('aria-valuenow', String(state === 'RENDERED' ? 4 : step));
+        progressFill.style.width = `${state === 'RENDERED' ? 100 : completed * 25 + (step ? 12.5 : 0)}%`;
+        for (const item of progressSteps) {
+          const itemStep = Number(item.dataset.step);
+          item.classList.toggle('is-complete', itemStep <= completed);
+          item.classList.toggle('is-current', itemStep === step && state !== 'RENDERED');
+        }
+      }
+
       function showStatus(data) {
         const displayStage = data.stage || data.state || 'UNKNOWN';
         statusLabel.textContent = labels[displayStage] || '状态更新';
         statusCode.textContent = displayStage;
         statusBox.dataset.state = data.state || displayStage;
+        updateProgress(displayStage, data.state || displayStage);
+        const step = Number(progress.getAttribute('aria-valuenow'));
+        statusCode.textContent = data.state === 'RENDERED' ? '已完成' : `第 ${step || 1}/4 步`;
         statusDetail.textContent =
-          `模型调用 ${data.provider_calls ?? 0} 次；` +
-          `技术重试 ${data.retry_used ? '已使用' : '未使用'}。` +
+          (data.state === 'RENDERED' ? '报告已经生成，可以立即查看。' : '进度会随处理状态自动更新。') +
           (data.error_category ? ` 错误类别：${data.error_category}。` : '');
         reportLink.hidden = !data.report_url;
         if (data.report_url) reportLink.href = data.report_url;
