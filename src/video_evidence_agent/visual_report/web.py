@@ -6,6 +6,7 @@ import json
 import re
 import threading
 import uuid
+from collections import deque
 from dataclasses import dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -358,7 +359,9 @@ def _url_html_page() -> str:
     .status-code {
       color: var(--blue); font-size: 13px; font-weight: 700;
     }
-    .status-detail { margin: 10px 0 0; color: var(--muted); line-height: 1.55; overflow-wrap: anywhere; }
+    .status-detail {
+      margin: 10px 0 0; color: var(--muted); line-height: 1.55; overflow-wrap: anywhere;
+    }
     .progress-track {
       height: 6px; margin: 22px 9px 0; border-radius: 99px; background: #e9eef7;
       overflow: hidden;
@@ -379,7 +382,9 @@ def _url_html_page() -> str:
       box-shadow: 0 0 0 1px #d5ddea; transition: background .25s, box-shadow .25s;
     }
     .progress-step.is-current, .progress-step.is-complete { color: #344054; font-weight: 700; }
-    .progress-step.is-complete .step-dot { background: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+    .progress-step.is-complete .step-dot {
+      background: var(--blue); box-shadow: 0 0 0 1px var(--blue);
+    }
     .progress-step.is-current .step-dot {
       background: var(--pink); box-shadow: 0 0 0 4px var(--pink-soft), 0 0 0 5px #ef9dca;
     }
@@ -448,6 +453,7 @@ def _url_html_page() -> str:
       const progressSteps = [...document.querySelectorAll('.progress-step')];
       const reportLink = document.querySelector('#report-link');
       const labels = {
+        QUEUED: '等待处理',
         DOWNLOADING: '正在下载视频', TRANSCRIBING: '正在生成文字稿',
         CREATED: '已创建 run', MAPPING: '正在映射主题', TOPIC_MAPPED: '主题已绑定',
         PLANNING: '正在规划报告', PLAN_VALIDATED: '计划已验证',
@@ -458,13 +464,15 @@ def _url_html_page() -> str:
 
       function updateProgress(displayStage, state) {
         const stepByStage = {
-          DOWNLOADING: 1, TRANSCRIBING: 2, CREATED: 1,
+          QUEUED: 0, DOWNLOADING: 1, TRANSCRIBING: 2, CREATED: 1,
           MAPPING: 3, TOPIC_MAPPED: 3, PLANNING: 4, PLAN_VALIDATED: 4, RENDERED: 4
         };
         const step = stepByStage[displayStage] || 0;
         const completed = state === 'RENDERED' ? 4 : Math.max(0, step - 1);
         progress.setAttribute('aria-valuenow', String(state === 'RENDERED' ? 4 : step));
-        progressFill.style.width = `${state === 'RENDERED' ? 100 : completed * 25 + (step ? 12.5 : 0)}%`;
+        const progressPercent = state === 'RENDERED' ? 100 :
+          completed * 25 + (step ? 12.5 : 0);
+        progressFill.style.width = `${progressPercent}%`;
         for (const item of progressSteps) {
           const itemStep = Number(item.dataset.step);
           item.classList.toggle('is-complete', itemStep <= completed);
@@ -479,10 +487,15 @@ def _url_html_page() -> str:
         statusBox.dataset.state = data.state || displayStage;
         updateProgress(displayStage, data.state || displayStage);
         const step = Number(progress.getAttribute('aria-valuenow'));
-        statusCode.textContent = data.state === 'RENDERED' ? '已完成' : `第 ${step || 1}/4 步`;
-        statusDetail.textContent =
-          (data.state === 'RENDERED' ? '报告已经生成，可以立即查看。' : '进度会随处理状态自动更新。') +
-          (data.error_category ? ` 错误类别：${data.error_category}。` : '');
+        const queued = displayStage === 'QUEUED';
+        statusCode.textContent = data.state === 'RENDERED' ? '已完成' :
+          (queued ? `排队第 ${data.queue_position || 1} 位` : `第 ${step || 1}/4 步`);
+        statusDetail.textContent = queued ?
+          `当前正在处理任务 ${data.active_run_id || '未知'}；` +
+          `前面还有 ${data.queue_position || 1} 个任务。完成后会自动开始。` :
+          ((data.state === 'RENDERED' ? '报告已经生成，可以立即查看。' :
+            '进度会随处理状态自动更新。') +
+          (data.error_category ? ` 错误类别：${data.error_category}。` : ''));
         reportLink.hidden = !data.report_url;
         if (data.report_url) reportLink.href = data.report_url;
         const terminal = ['RENDERED', 'FAILED', 'CANCELLED'].includes(data.state);
@@ -813,7 +826,7 @@ class VisualReportWebApp:
 
 
 class UrlIngestWebApp(VisualReportWebApp):
-    """Loopback Web mode that composes one public Bilibili URL run."""
+    """Loopback Web mode with one active URL run and an in-memory FIFO queue."""
 
     def __init__(
         self,
@@ -832,6 +845,7 @@ class UrlIngestWebApp(VisualReportWebApp):
         )
         self.downloader = downloader
         self.ingestor = ingestor
+        self._pending_run_ids: deque[str] = deque()
 
     def page_html(self) -> str:
         return _url_html_page()
@@ -844,6 +858,36 @@ class UrlIngestWebApp(VisualReportWebApp):
         if isinstance(metadata, dict):
             metadata.update(values)
         item.recorder.save()
+
+    def _status(self, item: _WebRun) -> dict[str, object]:
+        status = super()._status(item)
+        pending = tuple(self._pending_run_ids)
+        if item.run_id in pending:
+            status["stage"] = "QUEUED"
+            status["queue_position"] = pending.index(item.run_id) + 1
+            status["active_run_id"] = self._active_run_id
+        else:
+            status["queue_position"] = 0
+            status["active_run_id"] = None
+        return status
+
+    def _start_worker(self, item: _WebRun) -> None:
+        item.display_stage = "DOWNLOADING"
+        self._record_url(item, status="STARTED")
+        thread = threading.Thread(target=self._run_worker, args=(item,), daemon=True)
+        thread.start()
+
+    def _finish_and_start_next(self, item: _WebRun) -> None:
+        next_item: _WebRun | None = None
+        with self._lock:
+            if self._active_run_id == item.run_id:
+                self._active_run_id = None
+                if self._pending_run_ids:
+                    next_run_id = self._pending_run_ids.popleft()
+                    next_item = self._runs[next_run_id]
+                    self._active_run_id = next_run_id
+        if next_item is not None:
+            self._start_worker(next_item)
 
     def _run_worker(self, item: _WebRun) -> None:
         stage = "download"
@@ -914,9 +958,7 @@ class UrlIngestWebApp(VisualReportWebApp):
         except Exception as exc:
             item.recorder.fail(PlanningError("OUTPUT_IO_ERROR", type(exc).__name__))
         finally:
-            with self._lock:
-                if self._active_run_id == item.run_id:
-                    self._active_run_id = None
+            self._finish_and_start_next(item)
 
     def create_run(
         self, url: object, client_request_id: object
@@ -927,6 +969,7 @@ class UrlIngestWebApp(VisualReportWebApp):
             return 400, {"error_category": exc.category}
         if not isinstance(client_request_id, str) or _SAFE_ID.fullmatch(client_request_id) is None:
             return 400, {"error_category": "REQUEST_ID_INVALID"}
+        start_now = False
         with self._lock:
             existing = self._request_ids.get(client_request_id)
             if existing is not None:
@@ -934,8 +977,6 @@ class UrlIngestWebApp(VisualReportWebApp):
                 if item.input_url != source.canonical_url:
                     return 409, {"error_category": "REQUEST_ID_CONFLICT"}
                 return 200, {**self._status(item), "duplicate": True}
-            if self._active_run_id is not None:
-                return 409, {"error_category": "RUN_ACTIVE"}
             run_id = self._next_run_id(source.video_id)
             try:
                 recorder = RunRecorder.create(
@@ -953,7 +994,7 @@ class UrlIngestWebApp(VisualReportWebApp):
                 "canonical_url": source.canonical_url,
                 "bvid": source.bvid,
                 "video_id": source.video_id,
-                "status": "STARTED",
+                "status": "QUEUED" if self._active_run_id is not None else "STARTED",
             }
             recorder.save()
             item = _WebRun(
@@ -962,13 +1003,17 @@ class UrlIngestWebApp(VisualReportWebApp):
                 run_id=run_id,
                 recorder=recorder,
                 input_url=source.canonical_url,
-                display_stage="DOWNLOADING",
+                display_stage="QUEUED" if self._active_run_id is not None else "DOWNLOADING",
             )
             self._runs[run_id] = item
             self._request_ids[client_request_id] = run_id
-            self._active_run_id = run_id
-            thread = threading.Thread(target=self._run_worker, args=(item,), daemon=True)
-            thread.start()
+            if self._active_run_id is None:
+                self._active_run_id = run_id
+                start_now = True
+            else:
+                self._pending_run_ids.append(run_id)
+        if start_now:
+            self._start_worker(item)
         return 202, {**self._status(item), "duplicate": False}
 
     def handle_get(self, request: BaseHTTPRequestHandler) -> None:

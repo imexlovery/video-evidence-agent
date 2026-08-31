@@ -1,5 +1,28 @@
 # Video Visual Report V1-A — Current Status
 
+## Task 012 — URL Web single-user queue — implementation complete — 2026-08-31
+
+The Owner explicitly replaced Task 011's “reject while one run is active”
+behavior with a local single-process FIFO queue for the URL Web mode. A newly
+submitted URL receives its own unique retained run directory immediately,
+shows `QUEUED` plus the active run and queue position in its browser tab, and
+starts automatically after every earlier run reaches a terminal state.
+
+This override is limited to in-memory scheduling and display state in
+`serve-url-web`. It adds no database, durable queue, multi-worker execution,
+account, deployment, retry, provider/model call, Planner/Compiler/Renderer
+change, or recovery of queued work after process restart. Canonical planning
+state remains owned by each run's existing `run.json`; historical Task 011 and
+earlier run evidence remains unchanged.
+
+Implementation evidence: a second URL request now returns `202` with
+`stage=QUEUED`, `queue_position`, and `active_run_id`; the first run's terminal
+handoff starts the next FIFO item automatically. The targeted URL suite passed
+`7` tests, combined fixed-source/URL Web regression passed `12` tests, full
+pytest passed `102` tests, Ruff and `git diff --check` passed, and a two-tab
+local fake-boundary browser review observed processing → waiting → automatic
+completion with zero external/provider/model calls.
+
 ## Task 011 — public Bilibili URL local closure — handoff ready — 2026-08-31
 
 The Owner froze the completed Task 010 code and documentation at commit

@@ -406,3 +406,32 @@ documentation-session evidence and all Task 008–010 evidence remain preserved.
 The exact Task 011 terminal is:
 
 `READY_FOR_OWNER_V1_URL_LOCAL_MVP_REVIEW — PUBLIC_BV_LOOP_READY`
+
+## Task 012 follow-up — local FIFO queue — 2026-08-31
+
+The Owner's later explicit instruction supersedes only Task 011's active-run
+rejection and no-queue statements for `serve-url-web`. URL submissions now
+create unique retained run directories immediately and enter one in-memory
+FIFO when another URL run is active. Only one worker executes at a time; a
+terminal active run automatically starts the next item. This is not a durable
+queue and does not resume queued work after process restart.
+
+The browser/API display contract adds `stage=QUEUED`, `queue_position`, and
+`active_run_id`. The waiting tab shows the active run and waiting position,
+continues polling, and automatically advances through the existing download,
+transcription, planning, and rendered states without another submission.
+
+Verification completed with local fake boundaries only:
+
+- URL targeted tests: `7 passed`;
+- fixed-source plus URL Web regression: `12 passed`;
+- full pytest: `102 passed`;
+- Ruff and `git diff --check`: passed;
+- two-tab browser review: the first tab showed active processing, the second
+  showed `等待处理 / 排队第 1 位` and the active run ID, and both reached
+  `报告已生成` automatically;
+- external download/provider/model calls during this follow-up review: `0/0`.
+
+No historical run, Task 011 real-loop evidence, Planner/Compiler/Renderer,
+provider/model/retry contract, dependency, database, account, deployment, or
+public-hosting boundary changed.

@@ -408,19 +408,6 @@ def test_url_web_composes_one_run_and_serves_canonical_report(tmp_path: Path) ->
         assert downloading["state"] == "CREATED"
         assert downloading["stage"] == "DOWNLOADING"
 
-        status, rejected, _ = _request(
-            base_url,
-            "/api/visual-report/runs",
-            method="POST",
-            payload={
-                "url": "https://www.bilibili.com/video/BV1RxWnzbE7g",
-                "client_request_id": "url-web-002",
-            },
-        )
-        assert status == 409
-        assert rejected == {"error_category": "RUN_ACTIVE"}
-        assert provider.provider_calls == 0
-
         release.set()
         rendered = _wait_for_state(base_url, run_id, "RENDERED")
         assert rendered["stage"] == "RENDERED"
@@ -446,6 +433,106 @@ def test_url_web_composes_one_run_and_serves_canonical_report(tmp_path: Path) ->
         assert (tmp_path / "runs" / run_id / "ingest" / source.video_id / "manifest.json").is_file()
     finally:
         release.set()
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+
+def test_url_web_queues_second_run_and_starts_it_automatically(tmp_path: Path) -> None:
+    first_started = threading.Event()
+    release_first = threading.Event()
+    download_order: list[str] = []
+
+    def downloader(source: BilibiliSource, run_dir: Path) -> DownloadResult:
+        download_order.append(source.bvid)
+        if len(download_order) == 1:
+            first_started.set()
+            release_first.wait(timeout=5)
+        download_dir = run_dir / "download"
+        download_dir.mkdir(parents=True)
+        media_path = download_dir / "source.mp4"
+        media_path.write_bytes(b"media")
+        info_path = download_dir / "source.info.json"
+        info_path.write_text(
+            json.dumps({"title": source.bvid, "uploader": "测试作者"}), encoding="utf-8"
+        )
+        return DownloadResult(
+            source=source,
+            media_path=media_path,
+            info_path=info_path,
+            title=source.bvid,
+            uploader="测试作者",
+            attribution=f"Bilibili；测试作者；《{source.bvid}》；{source.canonical_url}",
+            command=("yt-dlp",),
+        )
+
+    def run_builder(**kwargs: object) -> None:
+        recorder = kwargs["recorder"]
+        for state in ("MAPPING", "TOPIC_MAPPED", "PLANNING", "PLAN_VALIDATED"):
+            recorder.transition(state)
+        (recorder.run_dir / "report.html").write_text("<h1>report</h1>", encoding="utf-8")
+        recorder.transition("RENDERED")
+
+    app = UrlIngestWebApp(
+        artifact_root=tmp_path / "runs",
+        downloader=downloader,
+        ingestor=_synthetic_source,
+        run_builder=run_builder,
+    )
+    server = create_web_server(app)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    base_url = f"http://127.0.0.1:{server.server_address[1]}"
+    try:
+        first_status, first, _ = _request(
+            base_url,
+            "/api/visual-report/runs",
+            method="POST",
+            payload={
+                "url": "https://www.bilibili.com/video/BV1HM4m1U7bM",
+                "client_request_id": "queue-001",
+            },
+        )
+        assert first_status == 202
+        assert isinstance(first, dict)
+        first_run_id = str(first["run_id"])
+        assert first_started.wait(timeout=5)
+
+        second_status, second, _ = _request(
+            base_url,
+            "/api/visual-report/runs",
+            method="POST",
+            payload={
+                "url": "https://www.bilibili.com/video/BV1RxWnzbE7g",
+                "client_request_id": "queue-002",
+            },
+        )
+        assert second_status == 202
+        assert isinstance(second, dict)
+        second_run_id = str(second["run_id"])
+        assert second["state"] == "CREATED"
+        assert second["stage"] == "QUEUED"
+        assert second["queue_position"] == 1
+        assert second["active_run_id"] == first_run_id
+        assert download_order == ["BV1HM4m1U7bM"]
+        assert (tmp_path / "runs" / second_run_id / "run.json").is_file()
+
+        page_status, page, _ = _request(base_url, "/visual-report/")
+        assert page_status == 200
+        assert isinstance(page, bytes)
+        assert "等待处理" in page.decode("utf-8")
+        assert "完成后会自动开始" in page.decode("utf-8")
+
+        release_first.set()
+        _wait_for_state(base_url, first_run_id, "RENDERED")
+        second_rendered = _wait_for_state(base_url, second_run_id, "RENDERED")
+        assert second_rendered["stage"] == "RENDERED"
+        assert second_rendered["queue_position"] == 0
+        assert download_order == ["BV1HM4m1U7bM", "BV1RxWnzbE7g"]
+        assert (tmp_path / "runs" / first_run_id / "report.html").is_file()
+        assert (tmp_path / "runs" / second_run_id / "report.html").is_file()
+    finally:
+        release_first.set()
         server.shutdown()
         server.server_close()
         thread.join(timeout=5)
