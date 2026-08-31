@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -8,16 +9,24 @@ import pytest
 
 from video_evidence_agent.schemas import VideoSegment
 from video_evidence_agent.visual_report.planning import (
+    SEMANTIC_V2_COMPILER_VERSION,
+    SEMANTIC_V2_HARD_MAX_COMPILED_BLOCKS,
+    SEMANTIC_V2_HARD_MAX_VISIBLE_CHARACTERS,
     SEMANTIC_V2_MAX_OUTPUT_TOKENS,
     SEMANTIC_V2_MODEL,
     SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
+    SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION,
     SEMANTIC_V2_REASONING_EFFORT,
     SEMANTIC_V2_THINKING_MODE,
     SEMANTIC_V2_TOPIC_PROPOSAL_SCHEMA_VERSION,
     FakeSemanticV2PlanningProvider,
     PlanningError,
     ProviderResult,
+    build_semantic_v2_planning_budget,
     normalize_semantic_v2_topic_proposal,
+    resolve_semantic_v2_topic_map,
+    semantic_v2_budget_diagnostics,
+    semantic_v2_planner_payload,
 )
 from video_evidence_agent.visual_report.planning_runtime import (
     SEMANTIC_V2_RESPONSE_MODE,
@@ -27,6 +36,7 @@ from video_evidence_agent.visual_report.planning_runtime import (
     ProviderCallError,
     _semantic_v2_request_sha256,
     build_from_transcript_v2,
+    load_source,
     replay_semantic_v2_proposals,
     semantic_v2_chat_completion_request,
 )
@@ -161,6 +171,134 @@ def test_semantic_v2_normalizer_and_resolver_keep_semantics_and_diagnostics() ->
     assert any(event["rule_id"] == "RECORD_TOPIC_COVERAGE_DIAGNOSTICS" for event in events)
 
 
+@pytest.mark.parametrize(
+    ("duration_ms", "primary_topic_count", "expected"),
+    [
+        (0, 0, 6),
+        (60_000, 1, 6),
+        (600_000, 0, 6),
+        (600_001, 0, 7),
+        (1_000_000, 0, 10),
+        (1, 13, 24),
+        (60_000_000, 0, 24),
+    ],
+)
+def test_semantic_v2_adaptive_budget_formula_and_clamps(
+    duration_ms: int, primary_topic_count: int, expected: int
+) -> None:
+    budget = build_semantic_v2_planning_budget(
+        duration_ms=duration_ms, primary_topic_count=primary_topic_count
+    )
+    assert budget.recommended_block_budget == expected
+    assert budget.recommendations_are_soft is True
+    assert budget.hard_limits == {
+        "compiled_blocks": SEMANTIC_V2_HARD_MAX_COMPILED_BLOCKS,
+        "visible_authored_characters": SEMANTIC_V2_HARD_MAX_VISIBLE_CHARACTERS,
+    }
+
+
+def test_semantic_v2_budget_payload_and_diagnostics_are_deterministic() -> None:
+    topic_payload, _ = _v2_proposals()
+    segments = [VideoSegment.model_validate(item) for item in _segments()]
+    from video_evidence_agent.visual_report.planning import resolve_semantic_v2_topic_map
+
+    topic_result = normalize_semantic_v2_topic_proposal(topic_payload)
+    topic_map, _ = resolve_semantic_v2_topic_map(topic_result.proposal, segments)
+    budget = build_semantic_v2_planning_budget(
+        duration_ms=8_000,
+        primary_topic_count=3,
+    )
+    payload = semantic_v2_planner_payload(
+        {"video_id": "synthetic-v1a", "title": "合成样例", "duration_ms": 8_000},
+        segments,
+        topic_map,
+        planning_budget=budget,
+    )
+    assert payload["planning_budget"] == budget.model_dump(mode="json")
+    assert "block 数量是软范围提示" in SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION
+    assert "不要为了命中推荐值而填充" in SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION
+    assert "重复、截断、改写、合并或拆分" in SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION
+
+    undershoot = semantic_v2_budget_diagnostics(
+        budget,
+        actual_compiled_block_count=5,
+        actual_visible_authored_characters=899,
+    )
+    assert undershoot["block_budget_status"] == "BUDGET_UNDERSHOOT"
+    assert undershoot["visible_density_status"] == "DENSITY_UNDERSHOOT"
+    assert undershoot["hard_failure"] is False
+
+    overshoot = semantic_v2_budget_diagnostics(
+        budget,
+        actual_compiled_block_count=7,
+        actual_visible_authored_characters=1_821,
+    )
+    assert overshoot["block_budget_status"] == "BUDGET_OVERSHOOT"
+    assert overshoot["visible_density_status"] == "DENSITY_OVERSHOOT"
+    assert overshoot["hard_failure"] is False
+
+    exact_boundary = semantic_v2_budget_diagnostics(
+        budget,
+        actual_compiled_block_count=SEMANTIC_V2_HARD_MAX_COMPILED_BLOCKS,
+        actual_visible_authored_characters=SEMANTIC_V2_HARD_MAX_VISIBLE_CHARACTERS,
+        compiler_version=SEMANTIC_V2_COMPILER_VERSION,
+    )
+    assert exact_boundary["hard_checks"]["compiled_blocks"]["passed"] is True
+    assert exact_boundary["hard_checks"]["visible_authored_characters"]["passed"] is True
+    assert exact_boundary["hard_failure"] is False
+
+    above_boundary = semantic_v2_budget_diagnostics(
+        budget,
+        actual_compiled_block_count=SEMANTIC_V2_HARD_MAX_COMPILED_BLOCKS + 1,
+        actual_visible_authored_characters=SEMANTIC_V2_HARD_MAX_VISIBLE_CHARACTERS + 1,
+    )
+    assert above_boundary["hard_failure"] is True
+    assert above_boundary["hard_checks"]["compiled_blocks"]["passed"] is False
+    assert above_boundary["hard_checks"]["visible_authored_characters"]["passed"] is False
+
+
+def test_semantic_v2_budget_derives_current_retained_recommendations() -> None:
+    retained_inputs = [
+        ("p0b-kling-2024", "p0b-kling-2024-semantic-v2-98d9af23a9"),
+        ("p0b-rlinf-2026", "p0b-rlinf-2026-semantic-v2-98d9af23a9"),
+        ("p0b-wuyi-goals", "p0b-wuyi-goals-semantic-v2-98d9af23a9"),
+    ]
+    recommendations: list[int] = []
+    for video_id, run_id in retained_inputs:
+        source = load_source(
+            Path(f"artifacts/p0b-ingest/{video_id}/manifest.json"),
+            Path(f"artifacts/p0b-ingest/{video_id}/segments.jsonl"),
+        )
+        topic_payload = json.loads(
+            (
+                Path("artifacts/visual-report/v1a")
+                / run_id
+                / "topic-map.raw.json"
+            ).read_text(encoding="utf-8")
+        )
+        topic_result = normalize_semantic_v2_topic_proposal(topic_payload)
+        topic_map, _ = resolve_semantic_v2_topic_map(topic_result.proposal, source.segments)
+        primary_topic_count = sum(
+            topic.importance == "primary" for topic in topic_map.topics
+        )
+        budget = build_semantic_v2_planning_budget(
+            duration_ms=source.duration_ms,
+            primary_topic_count=primary_topic_count,
+        )
+        derived = min(
+            24,
+            max(
+                6,
+                math.ceil(
+                    max(source.duration_ms / 60_000 * 0.6, primary_topic_count * 2, 6)
+                ),
+            ),
+        )
+        assert budget.recommended_block_budget == derived
+        recommendations.append(derived)
+    assert recommendations == [21, 21, 18]
+
+
 def test_semantic_v2_run_compiles_without_semantic_rewrite(tmp_path: Path) -> None:
     topic_map, report_plan = _v2_proposals()
     provider = FakeSemanticV2PlanningProvider([topic_map, report_plan])
@@ -183,7 +321,26 @@ def test_semantic_v2_run_compiles_without_semantic_rewrite(tmp_path: Path) -> No
     assert ledger["summary"]["semantic_split_count"] == 0
     assert ledger["summary"]["semantic_synthesis_count"] == 0
     assert json.loads((summary.run_dir / "assets.json").read_text(encoding="utf-8"))["assets"] == []
+    planning_budget = json.loads(
+        (summary.run_dir / "planning-budget.json").read_text(encoding="utf-8")
+    )
+    assert planning_budget["recommended_block_budget"] == 6
+    assert planning_budget["formula_version"] == planning_budget["schema_version"]
+    budget_diagnostics = json.loads(
+        (summary.run_dir / "budget-diagnostics.json").read_text(encoding="utf-8")
+    )
+    assert budget_diagnostics["actual_compiled_block_count"] == 3
+    assert budget_diagnostics["hard_failure"] is False
+    planner_request = json.loads(
+        (summary.run_dir / "planner-request.json").read_text(encoding="utf-8")
+    )
+    assert planner_request["planning_budget"] == {
+        key: value for key, value in planning_budget.items() if key != "formula_version"
+    }
+    assert planner_request["frozen_before_call"] is True
     run_payload = json.loads((summary.run_dir / "run.json").read_text(encoding="utf-8"))
+    assert run_payload["planning_budget"] == planner_request["planning_budget"]
+    assert run_payload["request_snapshots"]["report_planner"] == planner_request
     assert run_payload["config"] == provider.config.public_snapshot()
     assert run_payload["config"]["model"] == "fake-semantic-v2-model"
     assert run_payload["config"]["thinking_mode"] == SEMANTIC_V2_THINKING_MODE
@@ -279,6 +436,17 @@ def test_semantic_v2_replay_is_zero_provider_calls_and_deterministic(tmp_path: P
     assert replay.topic_map.model_dump(mode="json") == json.loads(
         (first.run_dir / "topic-map.json").read_text(encoding="utf-8")
     )
+    for artifact_name in (
+        "planning-budget.json",
+        "planner-request.json",
+        "budget-diagnostics.json",
+        "report.html",
+    ):
+        assert (tmp_path / "replay" / artifact_name).is_file()
+    replay_request = json.loads(
+        (tmp_path / "replay" / "planner-request.json").read_text(encoding="utf-8")
+    )
+    assert replay_request["provider_calls"] == replay_request["model_calls"] == 0
 
 
 def test_semantic_v2_provider_uses_chat_json_object_request() -> None:

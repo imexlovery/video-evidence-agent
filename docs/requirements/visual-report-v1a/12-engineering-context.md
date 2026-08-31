@@ -21,8 +21,9 @@
   desktop/mobile product review.
 - Prohibited scope: product code changes in this design phase; and in later
   V1-A implementation, MP4/ASR orchestration, frames/assets, OCR/VLM, Agent,
-  LangGraph, RAG, database/queue/service/API/UI/deployment, public publishing,
-  multi-template/free-layout work, or V1-B/C.
+  LangGraph, RAG, database/queue/hosted service/deployment, public publishing,
+  multi-template/free-layout work, or V1-B/C. The already-implemented,
+  separately gated loopback-only Web MVP is the sole API/UI exception.
 - A separately gated `V1-WEB MVP` may add a localhost-only browser surface only
   after a new three-video V1-A revision reaches `RENDERED` for all three videos.
   That surface is not V1-A acceptance and does not relax any V1-A model,
@@ -73,7 +74,7 @@ Routes below make that non-adoption and each project-owned seam explicit.
 | Serving Cache/WorkCache | `NOT_APPLICABLE` | None | No service or cache | None | None | None | Dependency review | Owner | None |
 | Policy/identity/approval | `PROJECT_OWNED` | CLI preconditions + Owner gates | Enforce scope/phase authority without account system | Local operator; Owner accepts/promotes | Owner | No publish/deploy/V1-B/C | Status/diff review | Owner | Stop |
 | Evaluation/testing | `PROJECT_OWNED` | Pytest, fake adapter, product review cards and browser screenshots | V1-A quality needs deterministic and human evidence | Three fixed videos × one product run, reviewed at 1080 px and about 390 px | Implementer + Owner | Protocol in `09-test-acceptance.md` | Tests, three reports, six screenshots and Owner rubric | Owner | New complete three-video product revision after change |
-| Product surface | `PROJECT_OWNED` | Existing `build-from-transcript` subcommand + existing HTML | Smallest local surface | No API/UI | Visual-report module | Existing render output | CLI/render tests | Owner | Existing V0 render remains |
+| Product surface | `PROJECT_OWNED` | Existing `build-from-transcript`/`serve-web` commands, loopback API/UI, and HTML | Smallest local single-Owner surface | No hosted/public/multi-user API/UI | Visual-report module | `run.json` and existing render output remain canonical | CLI/render/fake-Web/real-browser tests | Owner | Web can be removed while existing V0 render remains |
 | Operations | `NOT_APPLICABLE` | Foreground local process only | No hosted operation | Timeout and visible failure only | Local operator | No SLO/support promise | Failure trace | Owner | Explicit new run |
 
 ## Required framework capability map
@@ -105,7 +106,10 @@ Routes below make that non-adoption and each project-owned seam explicit.
 | Historical Goal recovery after v3 failure | closed historical authority | None | Preserve its 22 candidates, 20 failed runs, and 36/36 calls | Continue or relabel the exhausted loop | `DEC-VR1A-051/052`, frozen commit `4ba28bf1b3288a6fb77bcc27378a45a69cd2b895` |
 | Canonical provider-conformance continuation | closed historical authority | None | Preserve the completed two-strategy no-go and its artifacts | Continue calls, mutate results, or treat it as current product acceptance | `DEC-VR1A-053/054`, strategy registry, manifests, call ledger and terminal |
 | Strict-boundary isolation | rejected/cancelled | None | Retain card as never-executed design evidence | Official OpenAI credential/call or use as current authority | `DEC-VR1A-058`, cancelled task/status |
-| Current semantic-v2 product prototype closure | Owner-confirmed configuration; execution not authorized by this documentation turn | Implementer after a separately issued execution prompt | Two independent semantic stages; `DEC-VR1A-062` tuple; Mapper spans and Planner content units; logged non-semantic normalization; one new complete product run per video; one shared technical retry per run; 9-call maximum | Semantic rewrite/merge/split, valid-semantic retry, fallback/provider comparison, per-video tuning, selective rerun or prompt change | `DEC-VR1A-061/062`, new task card, product manifest, attempt ledger and Owner content/visual review |
+| Latest semantic-v2 product prototype closure | completed retained attempt; Owner not accepted | None for the frozen revision | Preserve `vr1a-semantic-v2-56340249c6f9`: Kling/RLinf rendered, Wu Yi failed at old 14-block cap, `6/6` calls | Selective rerun, relabel, deletion, or backfill | Frozen manifest, run directories, aggregate, status |
+| Next adaptive-budget product/Web closure | documentation-ready; execution not authorized by this turn | Implementer after an explicit Goal prompt | `DEC-VR1A-062` runtime plus `DEC-VR1A-065/066` adaptive budget; zero-call replay gate; one new three-video set; gated existing Web smoke; 12-call maximum | Exact-count prompting, semantic budget repair, post-freeze tuning, provider/model change, V1-B/C | Task 008, budget/replay evidence, frozen product/Web identities and Owner review |
+| Task 008 external-blocked stop | completed retained attempt; Owner review pending | None for the frozen revision | Preserve `vr1a-semantic-v2-29d077aa0bdc`, Kling run `p0b-kling-2024-semantic-v2-e3d720ac27`, its two identical `APIConnectionError` attempts, aggregate, manifest, and history | Selective continuation into RLinf/Wu Yi, mutation, or relabeling | Task 008 terminal and retained artifacts |
+| Task 009 network-recovery diagnostic | documentation-ready; execution not started | Implementer after a separate explicit Goal prompt | One new Kling diagnostic-only run on the Task 008 tuple; inline `NO_PROXY/no_proxy=api.deepseek.com`; expected 2 and maximum 3 provider/model calls; exact terminal and stop | Product denominator change, Task 008 continuation, contract tuning, evaluator/Web/RLinf/Wu Yi work, V1-B/C | Task 009 card, new run trace, terminal and immutability audit |
 | Local Web MVP after the 3/3 gate | implementation-delegated inside `DEC-VR1A-064` | Implementer | One local Owner; bind `127.0.0.1`; allowlisted source IDs; one active run; same planning runtime and `run.json`; server-only secrets; inspect/open report | Hosted/public service, arbitrary filesystem path API, client secrets, duplicate planner path, database/queue/accounts | Provider-free API/browser E2E, real-report opening, failure and security boundary tests |
 | V1-B/C, G2, production, publishing | prohibited | Owner | Separate future requirements and authorization; V1-B is no longer on the immediate critical path | Automatic continuation | New Owner decision |
 
@@ -119,6 +123,8 @@ validator remains the sole readiness authority.
 - Project/repository root: `/Users/tristana/Develop/video-evidence-agent`.
 - Branch: `visual-report`.
 - Original requirements baseline: `6576d1e8a0df3aa7288a6b9c84b6615114d9decc`.
+- Current merged baseline for Task 008:
+  `bb8f6f75aa2e4ae91ab6688a7f16ed87caec7741`.
 - Current frozen code/evidence baseline after
   `VR-V1A-PROVIDER-CONFORMANCE-004`:
   `e72503f5b20831c1e86a1b72c93fb4c4f7debe2a`.
@@ -140,7 +146,7 @@ validator remains the sole readiness authority.
 | `ASSET-VR1A-V0-CONTRACTS` | `src/video_evidence_agent/visual_report/{models.py,renderer.py,__main__.py}` | V0 / current baseline | Import/reuse public contracts; modify only for an observed regression that cannot be handled in the new adapter and is separately evidenced | No aesthetic redesign, new template, image automation, or schema reinterpretation | Existing visual-report tests and required render command |
 | `ASSET-VR1A-PROVIDER-PATTERN` | `src/video_evidence_agent/answering.py` | P0 / current baseline | Reuse SDK/config/trace lessons, not module semantics | Do not alter answer path or reuse P0 model variable implicitly | P0 tests unchanged |
 | `ASSET-VR1A-REVIEW-CARDS` | Existing `eval/visual-report-v1a/review-cards/` | Implementer-created; Owner review pending | Derive and snapshot an explicit semantic-v2 product card covering content, grounding, cross-video fit and both viewports | No post-run target editing inside the product revision; no auto-filled Owner score | Existing card validation plus new product revision snapshot |
-| `ASSET-VR1A-RUNS` | Existing ignored `artifacts/visual-report/v1a/<run-id>/` | Historical implementation/recovery plus future Goal | Create only three new unique product directories and their derived artifacts | Never overwrite or selectively delete any historical or new attempt | Run inventory/product-set audit |
+| `ASSET-VR1A-RUNS` | Existing ignored `artifacts/visual-report/v1a/<run-id>/` | Historical implementation/recovery plus future Goal | Create three new unique product directories, one gated Web-smoke directory, and zero-call replay outputs | Never overwrite or selectively delete any historical or new attempt | Run inventory/product-set/Web audit |
 
 ## Real entry points and runtime path
 
@@ -206,14 +212,15 @@ public command behavior, artifacts, calls, and states remain fixed.
 | Capability | State | Baseline evidence | Gap | Change layer | Owner | Acceptance |
 |---|---|---|---|---|---|---|
 | Timestamped transcript source | `SUPPORTED` | Three validated `VideoSegment` JSONL fixtures and implemented read-only loader | None in current scope | Reuse unchanged | Existing source owner | Contract/boundary tests |
-| DeepSeek provider transport | `PARTIAL` | Existing Responses JSON-Schema adapter and retained DeepSeek calls work as transport, but strict proposal conformance failed; official DeepSeek docs provide Chat Completions JSON Output and warn of occasional empty content | Add one frozen Chat Completions `json_object` v2 path using the existing credential and one run-scoped identical technical retry for eligible transport/JSON failures | Existing provider adapter | Implementer | Exact request, retry eligibility/exhaustion and three-product-run attempt evidence |
-| Topic Mapper | `PARTIAL` | V1 strict schema/binder and historical failures exist | Add v2 approximate topic spans/importance/representatives plus deterministic Topic Resolver and coverage diagnostics; preserve v1 | Existing planning module | Owner/implementer | V2 raw-normalized-canonical fixtures, replay and product evidence |
-| Report Planner | `PARTIAL` | V1 typed proposal/compiler exists; no DeepSeek conformance run rendered | Add v2 flat semantic content units/advisory types and observable non-semantic normalizer; preserve current V0 compiler/renderer authority | Existing planning module | Owner/implementer | V2 normalization, grounding, compile/render and three-report rubric evidence |
-| Deterministic plan compiler | `PARTIAL` | Existing compiler owns IDs, times, refs, metrics, empty assets, and V0 contracts | Extend with closed non-semantic v2 normalization rules and ledger; never rewrite, merge or split semantic units | Existing planning module | Implementer | Raw-normalized-final diff, 0/0 replay, V0 regression |
+| DeepSeek provider transport | `SUPPORTED_FOR_CURRENT_G1_TUPLE` | Latest set completed all six base calls with `finish_reason=stop`; explicit retry path is tested/retained | No provider change; preserve exact tuple and evidence | Existing provider adapter | Implementer | Exact request, retry, call, and product evidence |
+| Topic Mapper | `SUPPORTED_FOR_SEMANTIC_V2_G1` | Approximate spans/importance/representatives, Topic Resolver, diagnostics, replay, and three latest successful Mapper stages exist | Supply canonical primary-topic count to the new budget builder | Existing planning module | Owner/implementer | Formula/source-authority and replay/product evidence |
+| Report Planner | `SUPPORTED_WITH_AGGREGATE_BUDGET_GAP` | Three latest Planner calls returned valid semantic proposals; Wu Yi produced 17 units | Add the adaptive soft budget payload and version; no per-video semantics | Existing planning module | Owner/implementer | Payload snapshot, saved-proposal replay and three-report rubric evidence |
+| Deterministic plan compiler | `PARTIAL` | Semantic-v2 non-semantic compiler/replay exists; old aggregate 14 cap rejected the valid Wu Yi proposal | Add semantic-v2-only soft diagnostics and hard 32/8,000 protection while preserving v1/V0 rules | Existing planning module | Implementer | Formula/boundary/raw-final replay, V0 regression |
 | V0 renderer and typed plan | `SUPPORTED` | Current models/renderer/tests and local report | V1-A adapter only | Reuse unchanged | V0 module | Existing + integration regression |
 | Run evidence/state | `SUPPORTED` | Unique retained run directories, state/call traces, replay, and 20 historical failed canaries exist | Three new product identities, attempt ordinals/reasons and prototype revision fields | Existing recorder/runtime | Implementer | State/retry/product-set tests and preservation audit |
-| Quality evaluation | `SUPPORTED_NO_CURRENT_PRODUCT_RESULT` | Historical cards/evaluator exist; v3 aggregate is invalid and no automated report has reached Owner review | Versioned product review package centered on three reports, grounding, cross-video structure and six screenshots | Existing evaluator/review package | Owner/implementer | Three-report package or explicit technical-inconclusive/content-insufficient/contract-change stop |
-| Hosting/accounts/operations | `MISSING` but prohibited | No service | None in G1 | No change | Owner | Not applicable review |
+| Quality evaluation | `PARTIAL_CURRENT_PRODUCT_RESULT` | Latest aggregate retains two reports, one budget failure, `6/6` calls, and pending rubrics | Add adaptive budget/density fields and one complete three-report/six-screenshot package | Existing evaluator/review package | Owner/implementer | Three-report package or exact non-success terminal |
+| Local Web MVP | `IMPLEMENTED_NOT_REAL_SMOKED` | `web.py`, `serve-web`, and five fake-provider loopback tests are merged | Open only after 3/3 text gate; real loopback/browser and one predeclared Kling smoke | Existing Web module | Implementer/Owner | Fake/API/security tests, 1080/390 browser evidence, canonical run state/report |
+| Hosted service/accounts/operations | `MISSING` and prohibited | No deployment/accounts/database/queue | None in G1 | No change | Owner | Scope review |
 
 ## Business, project adapter/overlay, and shared platform boundaries
 
@@ -260,8 +267,10 @@ modify the few existing V1-A modules and avoid a new subsystem.
   observed V1-A compatibility defect.
 - `pyproject.toml` and `uv.lock` unless an observed blocker proves the existing
   OpenAI/Pydantic stack insufficient; convenience dependencies are prohibited.
-- MP4/ASR/keyframe/OCR/VLM/RAG/Agent/LangGraph/database/queue/service/API/UI,
-  deployment/hosting, publishing, V1-B, and V1-C code.
+- MP4/ASR/keyframe/OCR/VLM/RAG/Agent/LangGraph/database/queue/hosted service,
+  deployment/hosting, publishing, V1-B, and V1-C code. The existing
+  loopback-only `web.py` surface may receive only an observed defect fix needed
+  by Task 008; no redesign or new service boundary is allowed.
 
 ### Cross-module contract owners
 
@@ -290,6 +299,7 @@ observed need, and keep `.venv` untracked; the default V1-A plan adds none.
 | Python 3.12 + project `.venv` | Source/tests/CLI | Local development | Existing project/Owner | No |
 | Local artifact root | Unique run/evidence output | All V1-A runs | Operator | No; may contain full transcript/model response |
 | Network | Two base provider requests per successful run, with at most one eligible retry shared by that run | Real product runs only | Owner | Not applicable |
+| `NO_PROXY` / `no_proxy` | Process-scoped DeepSeek network-recovery diagnostic override | Task 009 canary child process only | Owner/operator | No; domain label only |
 
 No secret values belong in documentation, commands, status files, logs, or
 model prompts.
@@ -404,6 +414,43 @@ content, merges or splits semantic units, and every final Hero/block retains a
 valid model-selected source ID. The product set has six base calls and a
 nine-call absolute maximum. Schema-first-hit and retry counts are diagnostics;
 content, grounding, cross-video structure fit and real desktop/mobile visual
-results determine the Owner review. The current edits are documentation-only;
-implementation and provider execution remain `NOT_STARTED` until a separate
-Owner instruction starts the Goal session.
+results determine the Owner review. That implementation is now merged at
+`bb8f6f75aa2e4ae91ab6688a7f16ed87caec7741`; its latest set retained two
+reports and one Wu Yi old-budget failure.
+
+The next bounded engineering change is
+`VR-V1A-ADAPTIVE-BUDGET-WEB-CLOSURE-008`. It adds no framework or subsystem:
+one deterministic budget builder/diagnostic around the existing semantic-v2
+Planner/compiler, a zero-call three-proposal replay and visual gate, one wholly
+new frozen three-video set, and only then the existing real loopback Web smoke.
+This requirements turn is documentation-only; adaptive-budget implementation
+and new provider calls remain `NOT_STARTED` until a separate explicit Goal
+instruction.
+
+## Latest continuation context: Task 009
+
+Task 008 is the current frozen external-blocked evidence, not an unfinished
+queue. On revision `vr1a-semantic-v2-29d077aa0bdc`, Kling run
+`p0b-kling-2024-semantic-v2-e3d720ac27` retained two identical
+`APIConnectionError` attempts (`2/2`); RLinf, Wu Yi, and Web smoke did not
+execute. The Task 008 revision, run, aggregate, manifest, and all history stay
+immutable.
+
+`VR-V1A-NETWORK-RECOVERY-CANARY-009` is a separate G1 diagnostic-only
+construction task. It freezes the unused run ID
+`p0b-kling-2024-semantic-v2-network-recovery-canary-009`, reuses the Task 008
+provider/model/API/request/prompt/schema/normalizer/compiler/budget/source/
+renderer tuple, and sets only these variables inline on one `uv` child process:
+
+```text
+NO_PROXY=api.deepseek.com
+no_proxy=api.deepseek.com
+```
+
+The next session may execute exactly one Kling Mapper → Planner → compiler → V0
+Renderer canary, with two expected and three maximum provider/model calls after
+one eligible identical technical retry. It must retain `diagnostic_only=true`,
+exclude the run from the Task 008 product set, classify one exact
+`NETWORK_RECOVERY_*` terminal, and stop. This documentation session is
+`READY_FOR_OWNER_V1A_REVIEW — NOT_STARTED`, created no run/artifact, and made
+`model calls=0`.

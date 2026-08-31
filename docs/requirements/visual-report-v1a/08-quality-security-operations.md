@@ -20,9 +20,10 @@ credential secrecy, retained failures, and protected V0/P0-B artifacts.
 | Model calls | 2 base calls on success; at most 3 when one eligible technical retry is spent; 0 on pre-call failure | attempt-level `model-calls.jsonl` |
 | Completed provider-conformance canary | At most 2 strategies × 3 videos × 2 calls = 12 calls | Frozen strategy registry + canary manifest |
 | Cancelled boundary isolation | Never executed; `0` requests | Cancelled task/status evidence |
-| Current semantic-v2 product Goal | 3 videos × 2 base calls + at most one retry per run = `6` base / `9` maximum | Frozen product-set manifest + attempt ledger + three reports/screenshots |
+| Next semantic-v2 adaptive-budget product set | 3 videos × 2 base calls + at most one retry per run = `6` base / `9` maximum | Frozen product-set manifest + attempt ledger + three reports/screenshots |
 | Historical Development measurement | 3 videos × 2 runs = 6 runs, 12 planned calls | Retained historical aggregate only |
-| Output size | 3–5 sections, 8–14 blocks, ≤2,600 visible authored characters | Compiler validation |
+| Historical strict-v1 output size | 3–5 sections, 8–14 blocks, ≤2,600 visible authored characters | Retained historical compiler evidence |
+| Current semantic-v2 output size | Recommended blocks `clamp(ceil(max(minutes × 0.6, primary topics × 2, 6)), 6, 24)`; recommended aggregate density 180–260 visible characters per compiled block; hard maxima 32 blocks / 8,000 characters | Planner budget snapshot + compiler diagnostics/hard validation |
 | Stored data | Small JSON/JSONL/HTML per run | Local owner-controlled root |
 
 No growth, burst, queue, or multi-user scale claim is made.
@@ -32,9 +33,11 @@ transcript-bearing calls: 12 across two possible complete canary sets and 12 in
 the one formal revision after the first passing strategy. It closed at
 `V1A_PROVIDER_CONFORMANCE_NO_GO` after retained `8/8` calls, so that authority
 cannot be reused. The later official-OpenAI boundary-isolation proposal was
-cancelled before execution. The current Owner-confirmed DeepSeek semantic-v2
-product Goal is capped at nine calls; execution has not started in this
-documentation session.
+cancelled before execution. The previous DeepSeek semantic-v2 Goal used six
+calls and stopped after Wu Yi exceeded the historical 14-block ceiling. The
+next adaptive-budget Goal may use at most nine calls for one new three-video
+product set and, only after 3/3 render, three more for one predeclared Web
+smoke; its absolute ceiling is twelve.
 
 ## Responsiveness, timeout, and cost
 
@@ -70,6 +73,8 @@ are not service SLOs or part of the Owner-confirmed semantic quality threshold.
 | `SLO-VR1A-011` | Current v2 product output | 3/3 canonical HTML reports plus six viewport screenshots; a successful technical retry remains eligible | Run/call/render/visual manifests | Owner | Classify a missing report as technical-inconclusive or content-insufficient from its retained first-failing layer |
 | `SLO-VR1A-012` | Compiler authority | 0 semantic rewrite/merge/split/synthesis; all whole-unit omissions visible | Rule ledger + raw/final deltas | Owner | Contract-change stop or quality concern |
 | `SLO-VR1A-013` | Visual usability | Each report reviewed at 1080 px and approximately 390 px; no critical clipping, overlap, unreadable source text, or horizontal overflow | Browser screenshots + visual rubric | Owner | Owner quality concern/rejection |
+| `SLO-VR1A-014` | Adaptive block budget | Formula inputs/result exact; soft miss never triggers retry or semantic change; more than 32 fails | Budget artifact, boundary/replay tests, compiler diagnostic | Implementer | Block next revision |
+| `SLO-VR1A-015` | Visible content density | Record actual visible Unicode characters and recommended `blocks × 180–260`; only more than 8,000 fails | Deterministic counter + review package | Implementer/Owner | Hard miss fails; soft miss remains Owner-visible quality evidence |
 
 There is no availability percentage, production error budget, RPO, or RTO.
 The equivalent G1 operating rule is: any retained failure counts; no conclusion
@@ -164,3 +169,18 @@ billing/refunds, trials, contractual SLAs, regulated-region operation, status
 pages, support hours/severity, maintenance windows, deprecation notices, data
 portability, and offboarding workflows are not applicable because V1-A is a
 single-owner local feasibility prototype with no service or customer.
+
+## Task 009 diagnostic operations boundary
+
+Task 009 is a bounded G1 diagnostic workload, not a product measurement or
+service-availability test:
+
+| Workload | Planned scope | Call ceiling | Evidence | Product meaning |
+|---|---|---|---|---|
+| Network-recovery canary | One Kling full pipeline: Mapper → Planner → compiler → V0 renderer | Two expected; three absolute maximum after one eligible identical technical retry | New run directory, attempt/call trace, terminal state, and any generated report artifacts | Diagnostic only; excluded from Task 008 and all three-video denominators |
+
+Only the two process-scoped `NO_PROXY`/`no_proxy` labels are permitted as a
+transport diagnostic override. They do not establish an availability, latency,
+quality, stability, cost, or provider-capability SLO. Any terminal state from
+the canary is recorded and the task stops immediately; no RLinf, Wu Yi, Web,
+evaluator, rubric, tuning, or product revision follows within Task 009.

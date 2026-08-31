@@ -54,6 +54,10 @@ category remain in its run directory. There is no semantic patch, block
 substitution, silent truncation, third call, or automatic rerun. A deliberate
 retry uses a new run ID and preserves the failure.
 
+For current semantic-v2, a soft adaptive-budget or density miss is not a budget
+violation. Only the current hard limits or an unchanged lower-level V0/field/
+grounding rule causes this failure behavior.
+
 ## `SCN-VR1A-005` — Provider unavailable or timed out
 
 The current call fails with `PROVIDER_ERROR` or `PROVIDER_TIMEOUT`. The system
@@ -164,3 +168,42 @@ the trigger are retained. Valid but weak semantic content is never retried.
 Retry exhaustion yields `PROTOTYPE_EXECUTION_INCONCLUSIVE`, not a Visual Report
 product-route No-Go. A successful retry remains fully eligible for content and
 visual review.
+
+### `SCN-VR1A-014` — Adaptive budget scales without becoming a template
+
+After Topic Resolver, deterministic code uses source duration and canonical
+primary-topic count to recommend report capacity. Planner may deviate when the
+source calls for less or more grounded explanation. The compiler records an
+undershoot/overshoot and density status but does not delete, rewrite, merge,
+split, pad, or retry content to hit the recommendation. More than 32 compiled
+blocks or 8,000 visible authored characters fails visibly.
+
+### `SCN-VR1A-015` — Text gate opens the existing local Web loop
+
+The Owner first sees three replay-validated, newly frozen reports. Only when all
+three new product identities reach `RENDERED` may the existing loopback Web MVP
+start. The Owner selects an allowlisted source, starts one unique run, watches
+the canonical `run.json` state, and opens its report. A duplicate submit cannot
+start a second paid call, credentials stay server-only, and no hosted/public
+surface or V1-B/C capability appears.
+
+### `SCN-VR1A-016` — Independent network-recovery diagnostic canary
+
+After Task 008 stops at its external block, the operator starts a separate
+Task 009 Goal with a new Kling run ID. The operator preserves the Task 008
+revision, manifest, failed run, aggregate, and unstarted identities, and adds
+only `NO_PROXY=api.deepseek.com` and `no_proxy=api.deepseek.com` to that one
+`uv` child process. The same Topic Mapper → Report Planner → Compiler → V0
+Renderer path runs once. A successful render is marked `diagnostic_only=true`
+and excluded from every product or formal-measurement denominator. The run
+stops immediately after success or one classified failure; it never proceeds
+to RLinf, Wu Yi, Web, evaluator, rubric, tuning, or a new product revision.
+
+| Boundary | User-visible result |
+|---|---|
+| Full canary renders | `READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_CANARY_PASSED` |
+| Endpoint remains unreachable after the eligible retry | `READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_EXTERNAL_BLOCKED` |
+| Credential, balance, permission, or model access is unavailable | `READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_CONFIGURATION_BLOCKED` |
+| API/JSON technical failure remains after one eligible identical retry | `READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_RUNTIME_INCONCLUSIVE` |
+| Network works but valid content cannot compile/render | `READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_CONTENT_INSUFFICIENT` |
+| Further progress requires a contract/provider/model/compiler change | `READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_CONTRACT_CHANGE_REQUIRED` |

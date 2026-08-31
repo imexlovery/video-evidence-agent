@@ -205,22 +205,80 @@ its one retry on an incomplete response. It therefore closed as
 `PROTOTYPE_EXECUTION_INCONCLUSIVE`; its identities and artifacts remain
 historical evidence.
 
-## Next gated text closure and local Web MVP
+## Completed gated text closure attempt and local Web implementation
 
-`VR-V1-TEXT-WEB-CLOSURE-007` is the next designed construction unit. It first
-freezes and executes one wholly new three-video semantic-v2 set using the exact
+`VR-V1-TEXT-WEB-CLOSURE-007` froze and executed one wholly new three-video
+semantic-v2 set using the exact
 `DEC-VR1A-062` tuple: DeepSeek `deepseek-v4-flash-vision-exp`, Chat Completions
 JSON object, Thinking enabled, reasoning effort high, `max_tokens=32768`, SDK
 retry zero, and one identical retained application retry. Temperature may be
 recorded but is not stability evidence.
 
-Only a 3/3 rendered text set opens the second gate: a separate single-user,
+Only a 3/3 rendered text set could open the second gate: a separate single-user,
 loopback-only Web MVP over the same runtime, `run.json`, artifacts, allowlisted
 fixtures, and server-side credential. The Web slice may select a source, start
 one unique run, observe canonical state, and open the rendered report. It adds
 no MP4/ASR, keyframe, OCR/VLM, database, queue, account, public host, V1-B, or
 V1-C authority. Its detailed call ceiling, API boundary, verification, and
-terminal states live in the task card.
+terminal states live in the task card. The implementation and fake-provider
+tests were completed, but the real Web gate remained closed: Kling and RLinf
+rendered while Wu Yi's valid 17-unit semantic proposal exceeded the inherited
+14-block hard limit. The retained terminal is
+`READY_FOR_OWNER_V1A_REVIEW — TEXT_CONTENT_INSUFFICIENT`.
+
+## Next adaptive-budget text and Web closure
+
+`VR-V1A-ADAPTIVE-BUDGET-WEB-CLOSURE-008` is the next designed construction
+unit under `DEC-VR1A-065/066`:
+
+```text
+preserve visual-report@bb8f6f7 and every historical run
+  -> add semantic-v2-only adaptive soft block/density budgets
+  -> retain hard protection at >32 blocks or >8,000 visible characters
+  -> pass formula/boundary tests and replay all three saved proposals at 0/0
+  -> render/inspect six replay viewports before any model call
+  -> freeze one new three-video product revision
+  -> execute Kling/RLinf/Wu Yi once under one unchanged DeepSeek tuple
+  -> if and only if 3/3 render, start and inspect the existing local Web MVP
+  -> run one predeclared Kling Web smoke
+  -> evaluate once, regress, close documentation, and stop for Owner review
+```
+
+The product-set ceiling is nine calls; the gated Web smoke may use three more,
+for twelve across the Goal. Soft-budget or density misses remain visible review
+evidence and do not trigger retry or semantic normalization. After the product
+freeze, a prompt/formula/hard-limit/compiler/source/model change invalidates the
+set and stops rather than starting a prompt micro-version. The detailed gates,
+allowed paths, terminal states, and acceptance evidence are in the task card.
+
+Task 008 reached its bounded execution stop at
+`READY_FOR_OWNER_V1A_REVIEW — EXTERNAL_BLOCKED` on frozen revision
+`vr1a-semantic-v2-29d077aa0bdc`. Its Kling run retained two identical
+`APIConnectionError` attempts (`2/2`); RLinf, Wu Yi, and Web smoke did not
+continue. The retained revision, run, aggregate, manifest, and history are not
+reused as a selective continuation.
+
+## Task 009 network-recovery diagnostic delivery
+
+`VR-V1A-NETWORK-RECOVERY-CANARY-009` is a documentation-ready G1 prototype
+diagnostic. Its next construction session is bounded to:
+
+```text
+preserve all Task 008 artifacts and frozen revision
+  -> freeze p0b-kling-2024-semantic-v2-network-recovery-canary-009
+  -> set only inline NO_PROXY/no_proxy for the single uv child process
+  -> run one Kling Mapper -> Planner -> compiler -> V0 Renderer pipeline
+  -> expect 2 calls; permit one identical technical retry; cap at 3
+  -> record diagnostic_only=true and an exact NETWORK_RECOVERY_* terminal
+  -> stop immediately, regardless of success or failure
+```
+
+The canary is excluded from the Task 008 product set and all three-video
+quality, stability, and acceptance evidence. It does not run RLinf, Wu Yi, Web,
+evaluator, or rubric work; it does not tune or modify code, dependencies,
+runtime data, infrastructure, or contracts. The current documentation session
+creates no run and makes zero provider/model calls. A successful canary can
+only inform a separately authorized new complete three-video revision.
 
 ## Historical v1 vertical slices
 

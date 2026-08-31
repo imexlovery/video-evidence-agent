@@ -196,6 +196,50 @@ Owner review. First-attempt JSON success, retry rate, schema shape, and
 normalization count are diagnostics only. No six-run formal measurement is
 created in this prototype.
 
+## Current adaptive-budget closure protocol
+
+`VR-V1A-ADAPTIVE-BUDGET-WEB-CLOSURE-008` is admitted only after formula,
+boundary, and all-three saved-proposal replay checks pass with `0/0` calls and
+six usable replay screenshots. The retained Wu Yi 17-unit proposal must compile
+and render without budget-driven semantic deletion/rewrite/merge/split.
+
+After that gate, one new frozen revision executes all three videos once under
+the unchanged `DEC-VR1A-062` runtime tuple. The product set has six base calls
+and nine maximum. A 3/3 `RENDERED` result opens the already-implemented local
+Web MVP and one predeclared Kling Web-smoke identity with two base calls and
+three maximum. The whole Goal therefore has twelve calls maximum. A soft block
+or density miss is included in Owner review but does not fail compilation or
+keep Web closed; a hard limit, grounding failure, invalid V0 plan, missing
+report, or critical layout defect does.
+
+Any prompt/formula/hard-limit/compiler/source/model change after product freeze
+invalidates the set. The failed set remains evidence and cannot be patched or
+selectively rerun inside the same revision.
+
+## Task 009 network-recovery diagnostic protocol
+
+`VR-V1A-NETWORK-RECOVERY-CANARY-009` is a separate G1 diagnostic-only task,
+not a continuation of Task 008 and not a new three-video product measurement.
+The current documentation session does not execute it and has
+`provider_calls/model_calls=0/0`.
+
+In a separately authorized construction session, preserve the Task 008
+revision/run/aggregate/manifest and all attempts, freeze the new diagnostic
+run ID `p0b-kling-2024-semantic-v2-network-recovery-canary-009`, and reuse the
+same provider/model/API/request/prompt/schema/normalizer/compiler/budget/source/
+renderer tuple. Set only `NO_PROXY=api.deepseek.com` and
+`no_proxy=api.deepseek.com` inline for that `uv` child process. Execute one
+Kling Mapper → Planner → compiler → V0 Renderer pipeline: two calls are
+expected, one eligible identical technical retry is allowed, and three calls
+is the absolute Task 009 ceiling.
+
+The new run must record `diagnostic_only=true`, its base revision, process
+override labels, and explicit exclusion from the Task 008 product set. It does
+not replace the retained Kling failure, alter any denominator, or create
+product quality/stability/acceptance evidence. Success or failure stops the
+task immediately; RLinf, Wu Yi, Web, evaluator, rubric, tuning, code repair,
+and a new product revision are outside the canary.
+
 ## Owner-confirmed historical v1 quality rubric
 
 ### Topic Mapper
@@ -236,6 +280,8 @@ For current v2, replace the historical execution-oriented rows with:
 | Product-path completion | Semantic proposals → non-semantic compiler → current V0 renderer | 3/3 canonical HTML reports; 2 base calls or 3 with one eligible retry per run |
 | Compiler authority | Raw-to-final event ledger | Zero semantic rewrite/merge/split/synthesis; every whole-unit omission visible and reviewed |
 | Source integrity | Final refs plus raw model-selected IDs | 100% final refs valid; every Hero/block retains ≥1 valid model-selected source ID |
+| Adaptive block budget | Versioned deterministic formula plus compiler diagnostic | Recommendation is soft; exact inputs/result recorded; only more than 32 compiled blocks fails for aggregate count |
+| Visible content density | Existing visible-authored Unicode counter | Record `actual blocks × 180–260` advisory range; only more than 8,000 characters fails for aggregate size |
 | Visual usability | Real-browser desktop/mobile review | Six screenshots; no critical clipping, overlap, unreadable source text, or horizontal overflow |
 | Schema/retry diagnostics | Attempt and parser ledger | Recorded, but never the primary product acceptance score |
 
@@ -243,8 +289,8 @@ For current v2, replace the historical execution-oriented rows with:
 
 `TEST-VR1A-001` through `022` retain the implemented/historical v1 and
 provider-conformance acceptance record. `TEST-VR1A-023` through `028` define
-the current Owner-confirmed semantic-v2 product prototype and its runtime
-closure.
+the Owner-confirmed semantic-v2 product prototype and its runtime closure.
+`TEST-VR1A-029` through `031` define the current adaptive-budget amendment.
 
 | Test ID | Given | When | Then | Links |
 |---|---|---|---|---|
@@ -276,6 +322,13 @@ closure.
 | `TEST-VR1A-026` | Valid JSON with weak semantics or V0 incompatibility | Compiler rejects it | No retry, model repair, fabricated content, provider fallback, or hidden new run occurs | `REQ-VR1A-020`, `021` |
 | `TEST-VR1A-027` | Frozen three-video product set renders | Browser/content review runs | Three HTML reports, six viewport screenshots, content/grounding/structure/visual evidence exist; total calls ≤9; schema-first-hit remains diagnostic | `REQ-VR1A-022` |
 | `TEST-VR1A-028` | Next product revision is admitted | Request spy, manifest, and attempt trace are compared | Actual DeepSeek Chat Completions request and snapshot agree on `deepseek-v4-flash-vision-exp`, JSON object, Thinking enabled, reasoning effort high, `max_tokens=32768`, SDK retry zero, and one identical application retry; temperature is excluded from stability claims | `REQ-VR1A-021`, `022` |
+| `TEST-VR1A-029` | Fixed durations and canonical semantic-v2 topic maps, including 0/1/many primary-topic and fractional-duration boundaries | Adaptive budget computes before Planner | `ceil(max(minutes × 0.6, primary topics × 2, 6))` is clamped to 6–24; formula inputs/version/result are identical in payload, snapshot, and budget artifact | `REQ-VR1A-023` |
+| `TEST-VR1A-030` | Compilable plans at soft and hard block boundaries | Compiler validates | Below/above recommendation through 32 emits diagnostics and preserves all usable semantic units; exactly 32 may pass if V0-compatible; 33 fails `PLAN_BUDGET_ERROR`; no retry or semantic budget repair occurs | `REQ-VR1A-024` |
+| `TEST-VR1A-031` | Compilable plans around density and hard character boundaries plus retained Wu Yi 17-unit proposal | Counter/compiler/replay run with `0/0` calls | Soft density miss remains compilable and visible; exactly 8,000 may pass, 8,001 fails; Wu Yi replay compiles/renders without budget-driven deletion, rewrite, merge, or split | `REQ-VR1A-024` |
+| `TEST-VR1A-032` | Task 008 artifacts and frozen tuple are present; new canary ID is unused | Task 009 run is initialized with inline process overrides | Existing evidence remains unchanged; the new run ID is unique; request/config/source/revision values match Task 008 exactly apart from the two non-secret process labels and diagnostic metadata | `REQ-VR1A-025` |
+| `TEST-VR1A-033` | Task 009 canary is authorized | One Kling full pipeline executes | Mapper and Planner run sequentially, compiler and V0 renderer run on valid output, expected calls are `2`, and eligible technical retry is at most one for a total of `3` | `REQ-VR1A-026` |
+| `TEST-VR1A-034` | Task 009 reaches any terminal state | Evidence and product-set membership are inspected | `diagnostic_only=true` is retained; Task 008 run/aggregate/manifest and denominator are not changed; no RLinf/Wu Yi/Web/evaluator/rubric/product revision follows | `REQ-VR1A-026` |
+| `TEST-VR1A-035` | Canary succeeds, remains externally blocked, hits configuration failure, is runtime-inconclusive, is content-insufficient, or needs contract change | Terminal state is classified | One exact `NETWORK_RECOVERY_*` terminal is recorded and execution stops; no prompt/compiler/provider/model change is made inside Task 009 | `REQ-VR1A-026` |
 
 ## Invalid, partial, stale, and adversarial cases
 
@@ -285,8 +338,9 @@ closure.
 - JSON wrapped in Markdown, extra field, unknown discriminant, wrong topic ID;
 - one unaccounted segment, duplicate primary assignment, invalid exclusion,
   non-contiguous topic source run;
-- too few/many topics/sections/blocks/items, overlong copy, invalid final
-  takeaway, `image_caption`, layout/style/asset fields;
+- too few/many historical strict-v1 topics/sections/blocks/items; current-v2
+  hard counts above 32, visible copy above 8,000, invalid final takeaway,
+  `image_caption`, layout/style/asset fields;
 - metric value absent from all cited text; source ref outside selected topics;
 - transcript text that says “ignore previous instructions” or imitates JSON
   policy; it must remain inert source content;
@@ -336,6 +390,9 @@ viewports, and generate the documented prototype review package.
 | `GOAL-VR1A-002/003` current v2 | `SCN-VR1A-010`, `011` | `REQ-VR1A-019`, `020` | Planner/compiler | `TEST-VR1A-024`, `026`; grounding/product-quality signals |
 | `GOAL-VR1A-006` current v2 | `SCN-VR1A-013` | `REQ-VR1A-021` | Model adapter/run recorder | `TEST-VR1A-025`; attempt/call ledger |
 | `GOAL-VR1A-004/005` current v2 | `SCN-VR1A-012` | `REQ-VR1A-022` | Renderer/prototype reviewer | `TEST-VR1A-027`; content/visual rubrics/screenshots |
+| `GOAL-VR1A-002` current adaptive budget | `SCN-VR1A-010`, `011` | `REQ-VR1A-023`, `024` | Budget builder/Planner/compiler | `TEST-VR1A-029`–`031`; budget artifact, diagnostics, replay and screenshots |
+
+| `GOAL-VR1A-007` network recovery diagnostic | `SCN-VR1A-016` | `REQ-VR1A-025`, `026` | Run recorder/provider boundary/compiler/renderer | `TEST-VR1A-032`–`035`; diagnostic run trace and exact terminal |
 
 ## Acceptance ownership
 

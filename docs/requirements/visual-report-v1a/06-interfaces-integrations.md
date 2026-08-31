@@ -123,6 +123,35 @@ tokens when supplied by the provider. The official DeepSeek JSON Output warning
 about incomplete content maps to an eligible retained technical retry; retry
 exhaustion remains technical-inconclusive rather than product-route No-Go.
 
+### Semantic-v2 Planner budget payload
+
+The next revision adds one deterministic `planning_budget` object to the
+Planner user payload after the canonical Topic Map exists. It is data derived
+from validated source/map artifacts, not a third model call or a new provider
+capability:
+
+```json
+{
+  "planning_budget": {
+    "schema_version": "visual-report-planning-budget.v1a-semantic-v2-adaptive-1",
+    "duration_ms": 1763207,
+    "primary_topic_count": 6,
+    "recommended_block_budget": 18,
+    "recommended_block_range": {"minimum": 6, "maximum": 24},
+    "recommended_visible_characters_per_block": {"minimum": 180, "maximum": 260},
+    "hard_limits": {"compiled_blocks": 32, "visible_authored_characters": 8000},
+    "recommendations_are_soft": true
+  }
+}
+```
+
+The request snapshot records the exact object and formula/compiler/prompt
+versions. Planner may return fewer or more units than recommended; compatible
+output at or below both hard limits is still compiled with an observable
+diagnostic. No adapter retry, corrective prompt, model fallback, or semantic
+normalization is triggered by a soft-budget miss. Historical request snapshots
+remain byte-for-byte historical evidence and are never backfilled.
+
 ## Prompt transport shape
 
 Transcript rows are serialized as ordered JSON objects with only:
@@ -178,3 +207,30 @@ existing renderer owns typography, responsive layout, semantic HTML, and
 accessibility. Generated Chinese copy must already fit current field limits.
 The v2 compiler may omit a whole unusable unit with evidence but may not clip,
 rewrite, merge, or split semantic copy to force layout compliance.
+
+## Task 009 network-recovery transport boundary
+
+Task 009 reuses the frozen Task 008 Kling manifest, source snapshot, semantic-v2
+revision, provider/model/API tuple, prompts, schemas, normalizer, compiler,
+aggregate budget, and V0 renderer. The only transport change is an inline
+environment override on the single `uv` child process:
+
+| Variable | Value | Scope | Meaning |
+|---|---|---|---|
+| `NO_PROXY` | `api.deepseek.com` | One diagnostic child process | Bypass proxy selection for the DeepSeek domain |
+| `no_proxy` | `api.deepseek.com` | One diagnostic child process | Equivalent lowercase process override |
+
+The operator must not edit a global proxy, shell profile, `.env`, dependency,
+provider, model, API surface, request body, prompt, schema, retry policy,
+compiler, budget, source, or renderer. The run records the two non-secret
+override labels and `diagnostic_only=true`; they do not change the product
+contract or any frozen Task 008 artifact.
+
+The canary executes one complete Kling pipeline, Mapper then Planner then the
+existing compiler and V0 renderer. A successful run normally uses two
+provider/model calls. One eligible technical failure may receive the existing
+identical, attempt-recorded retry, for an absolute Task 009 ceiling of three
+provider/model calls. Semantic weakness or V0 incompatibility is not retried.
+Regardless of the terminal result, the canary stops without RLinf, Wu Yi, Web,
+evaluator, rubric, tuning, or a new product revision. The exact run command and
+terminal mapping are owned by the Task 009 card.

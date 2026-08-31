@@ -162,6 +162,7 @@ free layout, public publishing, prompt self-improvement, fine-tuning, and V1-B/C
 | Proposal then compiler | Model output is not the renderer contract until validated and compiled | [System design](04-system-design.md) |
 | Non-semantic compiler only | It may bind/validate/map structure but cannot rewrite, merge, or split semantic content | [Functional specification](03-functional-spec.md) |
 | One technical retry | One identical, explicit, attempt-recorded retry per run is allowed only for eligible API/JSON anomalies | [Interfaces](06-interfaces-integrations.md) |
+| Adaptive semantic-v2 budget | Duration and primary-topic breadth produce a soft 6–24 recommendation; only more than 32 blocks or 8,000 visible characters is an aggregate hard failure | [Functional specification](03-functional-spec.md) |
 | Text-only V1-A | No image blocks; empty assets manifest feeds existing renderer | [Interfaces](06-interfaces-integrations.md) |
 | Three-video product prototype | RLinf development reference; Kling and Wu Yi broaden content and visual structure | [Acceptance](09-test-acceptance.md) |
 
@@ -209,6 +210,8 @@ free layout, public publishing, prompt self-improvement, fine-tuning, and V1-B/C
 | Provider-conformance continuation | closed historical experiment | None | Preserve its completed no-go evidence | Reopen calls, mutate results, or reuse it as current product acceptance | `DEC-VR1A-053/054`; strategy/canary/formal manifests |
 | Minimal strict-boundary isolation design | rejected/cancelled before execution | Owner | Retain as historical design evidence only | Official OpenAI credential/provider call or use as current authority | `DEC-VR1A-055/056/057/058`; cancelled isolation card |
 | V1-A semantic-v2 product prototype | fixed constraint; Owner-confirmed | Owner | Two semantic stages; non-semantic compiler; one recorded technical retry per run; one three-video product set; content/visual review | Semantic rewrite/merge/split, model repair, provider fallback, six-run formal, schema compliance as product goal | `DEC-VR1A-061`; contract-simplification card |
+| Semantic-v2 adaptive aggregate budget | fixed constraint; Owner-confirmed | Owner | Soft block/density recommendations, hard protection at >32 blocks or >8,000 visible characters, observable diagnostics | Exact-count prompting, budget-driven semantic deletion/rewrite/merge/split, mutation of historical v1 artifacts | `DEC-VR1A-065/066`; adaptive-budget Goal card |
+| Network-recovery diagnostic canary | Owner-confirmed process override and delegated diagnostic design | Owner/implementer | One new Kling diagnostic-only canary on the frozen Task 008 tuple; process-scoped `NO_PROXY/no_proxy` only; 3-call total ceiling | Selective Task 008 continuation, product-set denominator change, provider/model/prompt/compiler change, quality claim | `DEC-VR1A-067/068`; Task 009 card |
 | V1-B/C start | prohibited | Owner | Separate later authorization | Automatic continuation | New Owner instruction |
 
 ## Readiness gate
@@ -217,6 +220,21 @@ The original implementation/measurement checkpoint is historical. The latest
 product contract is `DEC-VR1A-061`. The independent validator determines this
 package's documentation readiness in `requirements-readiness.json`; this
 documentation session still performs no implementation or provider call.
+
+The current merged engineering baseline is branch `visual-report` at
+`bb8f6f75aa2e4ae91ab6688a7f16ed87caec7741`. Task 008 is now closed at
+`READY_FOR_OWNER_V1A_REVIEW — EXTERNAL_BLOCKED`: the frozen revision is
+`vr1a-semantic-v2-29d077aa0bdc`, and the Kling run retained two identical
+`APIConnectionError` attempts (`2/2`). RLinf, Wu Yi, and Web smoke did not
+continue. Its revision, run, aggregate, manifest, and historical evidence
+remain immutable. Task 009 is the next documentation-ready, independent
+network-recovery diagnostic; it is `READY_FOR_OWNER_V1A_REVIEW — NOT_STARTED`
+and this session has made zero provider/model calls.
+
+Task 009 may be executed only in a separately started construction session
+using the exact task card and process-scoped proxy override. It cannot resume
+Task 008's remaining videos, alter the frozen product denominator, or authorize
+a new three-video revision.
 
 ## Package index
 

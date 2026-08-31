@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 from dataclasses import dataclass
 from typing import Annotated, Any, Literal, Mapping, Protocol, Sequence, TypeAlias
@@ -831,8 +832,8 @@ SEMANTIC_V2_NORMALIZATION_SCHEMA_VERSION = (
     "visual-report-normalization.v1a-semantic-v2"
 )
 SEMANTIC_V2_MAPPER_PROMPT_VERSION = "topic-mapper.v1a-semantic-v2-p1"
-SEMANTIC_V2_PLANNER_PROMPT_VERSION = "report-planner.v1a-semantic-v2-p1"
-SEMANTIC_V2_COMPILER_VERSION = "visual-report-v1a-semantic-v2-compiler.v1"
+SEMANTIC_V2_PLANNER_PROMPT_VERSION = "report-planner.v1a-semantic-v2-p2"
+SEMANTIC_V2_COMPILER_VERSION = "visual-report-v1a-semantic-v2-compiler.v2"
 SEMANTIC_V2_CALL_SCHEMA_VERSION = "visual-report-model-call.v1a-semantic-v2"
 SEMANTIC_V2_ALLOWED_BLOCK_TYPES = (
     "insight_card",
@@ -845,6 +846,18 @@ SEMANTIC_V2_ALLOWED_BLOCK_TYPES = (
 SEMANTIC_V2_MAX_TOPICS = 24
 SEMANTIC_V2_MAX_SECTIONS = 8
 SEMANTIC_V2_MAX_CONTENT_UNITS = 40
+SEMANTIC_V2_PLANNING_BUDGET_SCHEMA_VERSION = (
+    "visual-report-planning-budget.v1a-semantic-v2-adaptive-1"
+)
+SEMANTIC_V2_BUDGET_DIAGNOSTICS_SCHEMA_VERSION = (
+    "visual-report-budget-diagnostics.v1a-semantic-v2-adaptive-1"
+)
+SEMANTIC_V2_RECOMMENDED_BLOCK_MIN = 6
+SEMANTIC_V2_RECOMMENDED_BLOCK_MAX = 24
+SEMANTIC_V2_RECOMMENDED_VISIBLE_CHARACTERS_MIN = 180
+SEMANTIC_V2_RECOMMENDED_VISIBLE_CHARACTERS_MAX = 260
+SEMANTIC_V2_HARD_MAX_COMPILED_BLOCKS = 32
+SEMANTIC_V2_HARD_MAX_VISIBLE_CHARACTERS = 8_000
 
 
 class SemanticV2TopicProposal(StrictPlanningModel):
@@ -861,6 +874,172 @@ class SemanticV2TopicMapProposal(StrictPlanningModel):
     topics: tuple[SemanticV2TopicProposal, ...] = Field(
         min_length=1, max_length=SEMANTIC_V2_MAX_TOPICS
     )
+
+
+class SemanticV2PlanningBudget(StrictPlanningModel):
+    """Deterministic semantic-v2 planning guidance frozen before Planner."""
+
+    schema_version: Literal[SEMANTIC_V2_PLANNING_BUDGET_SCHEMA_VERSION]
+    duration_ms: int = Field(ge=0)
+    primary_topic_count: int = Field(ge=0)
+    recommended_block_budget: int = Field(
+        ge=SEMANTIC_V2_RECOMMENDED_BLOCK_MIN,
+        le=SEMANTIC_V2_RECOMMENDED_BLOCK_MAX,
+    )
+    recommended_block_range: dict[str, int]
+    recommended_visible_characters_per_block: dict[str, int]
+    hard_limits: dict[str, int]
+    recommendations_are_soft: Literal[True] = True
+
+
+def build_semantic_v2_planning_budget(
+    *, duration_ms: int, primary_topic_count: int
+) -> SemanticV2PlanningBudget:
+    """Translate validated source/map inputs into the adaptive v2 budget."""
+    if isinstance(duration_ms, bool) or not isinstance(duration_ms, int) or duration_ms < 0:
+        raise ValueError("duration_ms must be a non-negative integer")
+    if (
+        isinstance(primary_topic_count, bool)
+        or not isinstance(primary_topic_count, int)
+        or primary_topic_count < 0
+    ):
+        raise ValueError("primary_topic_count must be a non-negative integer")
+    duration_term = duration_ms / 60_000 * 0.6
+    topic_term = primary_topic_count * 2
+    recommended = min(
+        SEMANTIC_V2_RECOMMENDED_BLOCK_MAX,
+        max(SEMANTIC_V2_RECOMMENDED_BLOCK_MIN, math.ceil(max(duration_term, topic_term, 6))),
+    )
+    return SemanticV2PlanningBudget(
+        schema_version=SEMANTIC_V2_PLANNING_BUDGET_SCHEMA_VERSION,
+        duration_ms=duration_ms,
+        primary_topic_count=primary_topic_count,
+        recommended_block_budget=recommended,
+        recommended_block_range={
+            "minimum": SEMANTIC_V2_RECOMMENDED_BLOCK_MIN,
+            "maximum": SEMANTIC_V2_RECOMMENDED_BLOCK_MAX,
+        },
+        recommended_visible_characters_per_block={
+            "minimum": SEMANTIC_V2_RECOMMENDED_VISIBLE_CHARACTERS_MIN,
+            "maximum": SEMANTIC_V2_RECOMMENDED_VISIBLE_CHARACTERS_MAX,
+        },
+        hard_limits={
+            "compiled_blocks": SEMANTIC_V2_HARD_MAX_COMPILED_BLOCKS,
+            "visible_authored_characters": SEMANTIC_V2_HARD_MAX_VISIBLE_CHARACTERS,
+        },
+        recommendations_are_soft=True,
+    )
+
+
+def _coerce_semantic_v2_planning_budget(
+    value: SemanticV2PlanningBudget | Mapping[str, object] | None,
+    *,
+    duration_ms: int,
+    primary_topic_count: int,
+) -> SemanticV2PlanningBudget:
+    expected = build_semantic_v2_planning_budget(
+        duration_ms=duration_ms, primary_topic_count=primary_topic_count
+    )
+    if value is None:
+        return expected
+    try:
+        candidate = (
+            value
+            if isinstance(value, SemanticV2PlanningBudget)
+            else SemanticV2PlanningBudget.model_validate(value)
+        )
+    except ValidationError as exc:
+        raise PlanningError("PLAN_BUDGET_ERROR", "semantic-v2 planning budget is invalid") from exc
+    if candidate != expected:
+        raise PlanningError(
+            "PLAN_BUDGET_ERROR",
+            "semantic-v2 planning budget does not match validated source and Topic Map",
+        )
+    return candidate
+
+
+def semantic_v2_budget_diagnostics(
+    planning_budget: SemanticV2PlanningBudget | Mapping[str, object],
+    *,
+    actual_compiled_block_count: int,
+    actual_visible_authored_characters: int,
+    compiler_version: str = SEMANTIC_V2_COMPILER_VERSION,
+) -> dict[str, object]:
+    """Return deterministic soft-budget diagnostics and hard-limit outcomes."""
+    if (
+        isinstance(actual_compiled_block_count, bool)
+        or not isinstance(actual_compiled_block_count, int)
+        or actual_compiled_block_count < 0
+    ):
+        raise ValueError("actual_compiled_block_count must be a non-negative integer")
+    if (
+        isinstance(actual_visible_authored_characters, bool)
+        or not isinstance(actual_visible_authored_characters, int)
+        or actual_visible_authored_characters < 0
+    ):
+        raise ValueError(
+            "actual_visible_authored_characters must be a non-negative integer"
+        )
+    budget = (
+        planning_budget
+        if isinstance(planning_budget, SemanticV2PlanningBudget)
+        else SemanticV2PlanningBudget.model_validate(planning_budget)
+    )
+    recommended_blocks = budget.recommended_block_budget
+    if actual_compiled_block_count < recommended_blocks:
+        block_status = "BUDGET_UNDERSHOOT"
+    elif actual_compiled_block_count > recommended_blocks:
+        block_status = "BUDGET_OVERSHOOT"
+    else:
+        block_status = "AT_RECOMMENDATION"
+    recommended_min = (
+        actual_compiled_block_count * SEMANTIC_V2_RECOMMENDED_VISIBLE_CHARACTERS_MIN
+    )
+    recommended_max = min(
+        actual_compiled_block_count * SEMANTIC_V2_RECOMMENDED_VISIBLE_CHARACTERS_MAX,
+        SEMANTIC_V2_HARD_MAX_VISIBLE_CHARACTERS,
+    )
+    if actual_visible_authored_characters < recommended_min:
+        density_status = "DENSITY_UNDERSHOOT"
+    elif actual_visible_authored_characters > recommended_max:
+        density_status = "DENSITY_OVERSHOOT"
+    else:
+        density_status = "DENSITY_WITHIN_RECOMMENDATION"
+    block_hard_passed = actual_compiled_block_count <= SEMANTIC_V2_HARD_MAX_COMPILED_BLOCKS
+    character_hard_passed = (
+        actual_visible_authored_characters <= SEMANTIC_V2_HARD_MAX_VISIBLE_CHARACTERS
+    )
+    return {
+        "schema_version": SEMANTIC_V2_BUDGET_DIAGNOSTICS_SCHEMA_VERSION,
+        "compiler_version": compiler_version,
+        "planning_budget": budget.model_dump(mode="json"),
+        "actual_compiled_block_count": actual_compiled_block_count,
+        "actual_visible_authored_characters": actual_visible_authored_characters,
+        "recommended_block_budget": recommended_blocks,
+        "block_budget_status": block_status,
+        "recommended_visible_characters": {
+            "minimum": recommended_min,
+            "maximum": recommended_max,
+        },
+        "visible_density_status": density_status,
+        "soft_diagnostics": {
+            "block_budget": block_status,
+            "visible_character_density": density_status,
+        },
+        "hard_checks": {
+            "compiled_blocks": {
+                "actual": actual_compiled_block_count,
+                "maximum_accepted": SEMANTIC_V2_HARD_MAX_COMPILED_BLOCKS,
+                "passed": block_hard_passed,
+            },
+            "visible_authored_characters": {
+                "actual": actual_visible_authored_characters,
+                "maximum_accepted": SEMANTIC_V2_HARD_MAX_VISIBLE_CHARACTERS,
+                "passed": character_hard_passed,
+            },
+        },
+        "hard_failure": not (block_hard_passed and character_hard_passed),
+    }
 
 
 class SemanticV2CanonicalTopic(StrictPlanningModel):
@@ -982,6 +1161,11 @@ SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION = f"""
 不是额外事实来源；每个表述仍需由同一 content_unit 列出的 source_segment_ids 直接支持。只返回
 JSON object，不返回代码围栏、解释或思考过程。
 
+planning_budget 是确定性代码根据视频时长和 canonical primary topics 计算的编辑建议。推荐的
+block 数量是软范围提示，不是精确目标；推荐字符密度也是聚合诊断。不要为了命中推荐值而填充、
+重复、截断、改写、合并或拆分语义单元。超过 hard_limits 才是聚合预算失败，且仍不能通过语义修复
+来规避。
+
 {SEMANTIC_V2_PLANNER_OUTPUT_CONTRACT}
 """.strip()
 
@@ -1054,7 +1238,19 @@ def semantic_v2_planner_payload(
     video: dict[str, object],
     segments: Sequence[VideoSegment],
     topic_map: SemanticV2TopicMap,
+    planning_budget: SemanticV2PlanningBudget | Mapping[str, object] | None = None,
 ) -> dict[str, object]:
+    duration_ms = video.get("duration_ms", 0)
+    if not isinstance(duration_ms, int):
+        raise PlanningError("PLAN_BUDGET_ERROR", "semantic-v2 video duration is invalid")
+    primary_topic_count = sum(
+        topic.importance == "primary" for topic in topic_map.topics
+    )
+    budget = _coerce_semantic_v2_planning_budget(
+        planning_budget,
+        duration_ms=duration_ms,
+        primary_topic_count=primary_topic_count,
+    )
     return {
         "task": "plan_semantic_v2_visual_report",
         "schema_version": SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
@@ -1071,6 +1267,7 @@ def semantic_v2_planner_payload(
             "max_source_segments_per_unit": 4,
             "semantic_repair": "none; incomplete units are omitted by deterministic compilation",
         },
+        "planning_budget": budget.model_dump(mode="json"),
         "video": video,
         "canonical_topic_map": topic_map.model_dump(mode="json"),
         "transcript_segments": transcript_payload(list(segments)),
@@ -1680,6 +1877,62 @@ def _semantic_v2_visible_values(
     return values
 
 
+def _semantic_v2_compiled_visible_character_count(
+    hero_title: str,
+    hero_tldr: str,
+    sections: Sequence[Mapping[str, object]],
+) -> int:
+    """Count authored visible strings from the compiled content surface."""
+    visible_values = [hero_title, hero_tldr]
+    for section in sections:
+        title = section.get("title")
+        if isinstance(title, str):
+            visible_values.append(title)
+        blocks = section.get("blocks")
+        if not isinstance(blocks, list):
+            continue
+        for block in blocks:
+            if not isinstance(block, dict):
+                continue
+            for key, value in block.items():
+                if key in {"block_id", "source_refs", "asset_id", "type"}:
+                    continue
+                if isinstance(value, str):
+                    visible_values.append(value)
+                elif isinstance(value, dict):
+                    visible_values.extend(
+                        str(item) for item in value.values() if isinstance(item, str)
+                    )
+                elif isinstance(value, list):
+                    for item in value:
+                        if isinstance(item, str):
+                            visible_values.append(item)
+                        elif isinstance(item, dict):
+                            visible_values.extend(
+                                str(part) for part in item.values() if isinstance(part, str)
+                            )
+    return sum(len(value) for value in visible_values)
+
+
+def semantic_v2_visible_authored_character_count(plan: ReportPlan) -> int:
+    """Count authored Unicode strings in a validated V0 ReportPlan."""
+    sections = [
+        {
+            "title": section.title,
+            "blocks": [
+                block.model_dump(mode="json")
+                for block in section.blocks
+            ],
+        }
+        for section in plan.sections
+    ]
+    return _semantic_v2_compiled_visible_character_count(
+        plan.hero.title,
+        plan.hero.tldr,
+        sections,
+    )
+
+
 def _semantic_v2_metric_is_grounded(
     unit: SemanticV2ContentUnit,
     cited: Sequence[VideoSegment],
@@ -1868,11 +2121,20 @@ def compile_semantic_v2_report_plan(
     attribution: str,
     duration_ms: int,
     normalization_events: list[dict[str, object]] | None = None,
+    planning_budget: SemanticV2PlanningBudget | Mapping[str, object] | None = None,
+    budget_diagnostics_out: dict[str, object] | None = None,
 ) -> tuple[ReportPlan, AssetManifest, SemanticV2NormalizationLedger]:
     """Compile v2 semantics into the unchanged V0 plan/asset contracts."""
     events = normalization_events if normalization_events is not None else []
     segment_by_id = {segment.segment_id: segment for segment in segments}
     topic_by_id = {topic.topic_id: topic for topic in topic_map.topics}
+    planning_budget = _coerce_semantic_v2_planning_budget(
+        value=planning_budget,
+        duration_ms=duration_ms,
+        primary_topic_count=sum(
+            topic.importance == "primary" for topic in topic_map.topics
+        ),
+    )
     hero_ids = _semantic_v2_ordered_unique_ids(
         proposal.hero.source_segment_ids,
         segment_by_id,
@@ -2058,35 +2320,28 @@ def compile_semantic_v2_report_plan(
             "PLAN_BUDGET_ERROR",
             "semantic-v2 compiler needs at least three grounded content units",
         )
-    if block_count > 14:
+    visible_character_count = _semantic_v2_compiled_visible_character_count(
+        proposal.hero.title,
+        proposal.hero.tldr,
+        sections,
+    )
+    budget_diagnostics = semantic_v2_budget_diagnostics(
+        planning_budget,
+        actual_compiled_block_count=block_count,
+        actual_visible_authored_characters=visible_character_count,
+        compiler_version=SEMANTIC_V2_COMPILER_VERSION,
+    )
+    if budget_diagnostics_out is not None:
+        budget_diagnostics_out.update(budget_diagnostics)
+    if block_count > SEMANTIC_V2_HARD_MAX_COMPILED_BLOCKS:
         raise PlanningError(
             "PLAN_BUDGET_ERROR",
-            "semantic-v2 compiler received more than fourteen blocks",
+            "semantic-v2 compiler received more than 32 blocks",
         )
-    visible_values = [proposal.hero.title, proposal.hero.tldr]
-    for section in sections:
-        visible_values.append(str(section["title"]))
-        for block in section["blocks"]:
-            for key, value in block.items():
-                if key in {"block_id", "source_refs", "asset_id", "type"}:
-                    continue
-                if isinstance(value, str):
-                    visible_values.append(value)
-                elif isinstance(value, dict):
-                    visible_values.extend(
-                        str(item) for item in value.values() if isinstance(item, str)
-                    )
-                elif isinstance(value, list):
-                    for item in value:
-                        if isinstance(item, str):
-                            visible_values.append(item)
-                        elif isinstance(item, dict):
-                            visible_values.extend(
-                                str(part) for part in item.values() if isinstance(part, str)
-                            )
-    if sum(len(value) for value in visible_values) > MAX_VISIBLE_CHARACTERS:
+    if visible_character_count > SEMANTIC_V2_HARD_MAX_VISIBLE_CHARACTERS:
         raise PlanningError(
-            "PLAN_BUDGET_ERROR", "semantic-v2 visible content exceeds 2600 characters"
+            "PLAN_BUDGET_ERROR",
+            "semantic-v2 visible content exceeds 8000 characters",
         )
     omitted_topic_ids = sorted(set(topic_by_id) - selected_topic_ids)
     for topic_id in omitted_topic_ids:

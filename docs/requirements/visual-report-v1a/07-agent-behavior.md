@@ -287,7 +287,10 @@ current execution protocol.
 ## Current semantic-v2 product behavior
 
 `VR-V1A-CONTRACT-SIMPLIFICATION-006` is the Owner-confirmed current product
-contract; execution has not started in this documentation session.
+contract and is implemented on the merged baseline. The latest frozen set
+proved both semantic stages on all three videos but retained Wu Yi as an
+old-budget compiler failure; Task 008 amends only the aggregate semantic-v2
+budget and leaves the role behavior below intact.
 It keeps the two roles but reduces their output obligations:
 
 - Mapper returns title, summary, `primary|supporting`, approximate start/end
@@ -310,6 +313,25 @@ build for each of the three videos. Each run may spend one identical recorded
 technical retry, so the total generation ceiling is nine calls. GLM/Qwen,
 official OpenAI, a second DeepSeek model, six-run formal measurement, prompt
 micro-versions, and per-video tuning are outside the task.
+
+The next semantic-v2 revision adds an adaptive editorial budget without making
+the model a budget state machine:
+
+- deterministic code computes the recommendation from validated duration and
+  canonical `primary` topics, then includes the same versioned budget fields in
+  the Planner request and run snapshot;
+- Planner should use the recommendation to choose enough grounded explanation
+  for the video's breadth, but must prefer clarity and non-redundancy over
+  hitting an exact count or per-block character quota;
+- a result outside `6–24` blocks or outside the aggregate `180–260` visible
+  characters per compiled block is reviewable diagnostic evidence, not a
+  semantic failure or retry trigger;
+- deterministic code may sort, bind, type-map, validate, and report budget
+  status, but may not delete, rewrite, merge, split, or pad semantic units to
+  hit the recommendation; and
+- more than 32 compiled blocks or more than 8,000 visible authored characters
+  is a hard failure. Boundary values 32 and 8,000 remain eligible if every V0,
+  grounding, field, metric, section, and per-section rule passes.
 
 ## Evaluation, drift, and versioning
 
@@ -335,3 +357,21 @@ Not applicable — neither model can call tools or another model, write memory,
 spawn agents, or mutate external systems. The local foreground process can be
 cancelled; no worker/callback can later commit a result. A late response cannot
 advance a terminal `CANCELLED`/`FAILED` run.
+
+## Task 009 diagnostic model boundary
+
+Task 009 does not introduce a new model behavior. Topic Mapper and Report
+Planner remain two sequential independent calls, each receiving the full
+authorized transcript; Planner also receives the canonical Topic Map. Models
+select existing IDs and semantic content only. Deterministic code continues to
+own canonical IDs, timestamps, `SourceRef`, validation, budgets, compilation,
+state, and renderer invocation.
+
+The single Kling canary reuses the frozen Task 008 semantic-v2 prompt/schema/
+model tuple and the existing one identical technical retry rule. The process
+scoped `NO_PROXY/no_proxy` labels affect transport selection only. A technical
+failure may consume the one retry; valid but unusable semantic output is not
+retried or repaired. `diagnostic_only=true` excludes the run from the Task 008
+product set and from any three-video quality, stability, or acceptance claim.
+The current documentation session performs no model call and does not create a
+diagnostic run.

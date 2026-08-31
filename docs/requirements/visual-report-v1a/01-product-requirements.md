@@ -31,11 +31,12 @@ support promises, or service-level commitments.
 | ID | Goal | Measure | Owner-confirmed G1 target |
 |---|---|---|---|
 | `GOAL-VR1A-001` | Build a global semantic map before selection | Human coverage card plus Topic Resolver coverage diagnostics | ≥90% required-topic recall and no must-cover miss; current v2 exposes uncovered/overlap segments rather than requiring exact partition |
-| `GOAL-VR1A-002` | Produce a useful compressed Report Plan | Owner prioritization and narrative rubric | 3–5 sections, 8–14 blocks, ≥4/5 prioritization per video |
+| `GOAL-VR1A-002` | Produce a useful compressed Report Plan | Owner prioritization, narrative, density, and adaptive-budget evidence | 3–5 sections; semantic-v2 uses a source-derived soft block budget and 180–260 visible characters per compiled block as guidance; ≥4/5 prioritization per video |
 | `GOAL-VR1A-003` | Prevent hallucination/overclaim | Source validation and human entailment review | 100% block refs valid; zero major unsupported claim/metric |
 | `GOAL-VR1A-004` | Avoid a generic fixed template | Cross-video structural signature and block-affordance review | Not all three plans share one normalized structure; every special block is justified |
 | `GOAL-VR1A-005` | Preserve the V0 rendering contract | Existing `ReportPlan` validation and renderer | All accepted plans render without V0 schema/renderer change |
 | `GOAL-VR1A-006` | Make the prototype auditable | Run/attempt manifests, call traces, normalization and screenshots | One run per video; any single technical retry and all failures remain in evidence |
+| `GOAL-VR1A-007` | Diagnose process-level recovery of the frozen provider path | One independent Kling diagnostic canary and its terminal classification | `diagnostic_only=true`; one complete pipeline; expected `2/2`, maximum `3` provider/model calls; no product-set or formal-measurement claim |
 
 The content thresholds originated in `DEC-VR1A-049`; `DEC-VR1A-061` now makes
 content and visual prototype quality primary and retires the six-run/first-hit
@@ -62,6 +63,16 @@ MP4/ASR, keyframes/assets, OCR/VLM, retrieval/RAG, Agent/LangGraph/tools,
 multi-agent execution, database/cache/queue, background processing, API/UI,
 URL download, multi-video synthesis, free layout, new renderer/template,
 publishing, production hardening, online learning, or prompt self-modification.
+
+The already-implemented `V1-WEB MVP` is a separately gated loopback-only
+surface over this runtime, authorized by `DEC-VR1A-064/066` only after a 3/3
+text gate. It does not retroactively become V1-A scope or authorize a hosted
+API/UI.
+
+`VR-V1A-NETWORK-RECOVERY-CANARY-009` is a separate G1 diagnostic task. It is
+not part of the first-release three-video product set, does not replace Task
+008's Kling failure, and creates no new product-quality or formal-measurement
+denominator. Its complete protocol is in the [Task 009 card](../../tasks/VISUAL-REPORT-V1A-NETWORK-RECOVERY-CANARY.md).
 
 ## Historical implemented v1 requirements
 
@@ -97,6 +108,19 @@ v1 behavior. `DEC-VR1A-061` confirms the current product-prototype amendments:
 | `REQ-VR1A-020` | The compiler must apply only closed, recorded non-semantic governance; it must not rewrite, merge, split, shorten, expand, or synthesize semantic content | Prevent hidden authorship by the normalizer | P0 | `DEC-VR1A-061` | `TEST-VR1A-024`, `025` |
 | `REQ-VR1A-021` | Each of the three frozen product runs may use at most one identical, explicit, recorded retry for an eligible API/JSON technical anomaly; no semantic-quality retry, prompt change, or provider fallback is allowed | Avoid treating incidental transport faults as product failure without enabling tuning | P0 | `DEC-VR1A-061` | `TEST-VR1A-026` |
 | `REQ-VR1A-022` | V1-A must produce and review one report per video at desktop and mobile viewports; content, grounding, cross-video fit, and visual usability are primary, while schema-first-hit and retry rates are diagnostic | Test the actual product hypothesis | P0 | `DEC-VR1A-061` | `TEST-VR1A-027` |
+| `REQ-VR1A-023` | Semantic-v2 must calculate a per-video recommended block budget after canonical Topic Map creation as `clamp(ceil(max(video_minutes × 0.6, primary_topic_count × 2, 6)), 6, 24)` and supply the frozen result to Planner | Scale report shape with source duration and semantic breadth without prescribing an exact template | P0 | `DEC-VR1A-065/066` | `TEST-VR1A-029` |
+| `REQ-VR1A-024` | The recommended block budget and aggregate visible-character range of `compiled_block_count × 180–260` are soft diagnostics; the compiler must accept values outside them when every other contract passes, but must fail above 32 compiled blocks or 8,000 visible authored Unicode characters without deleting or rewriting semantics to fit | Separate editorial guidance from corruption protection and remove the obsolete 14-block product bottleneck | P0 | `DEC-VR1A-065/066` | `TEST-VR1A-030`, `031` |
+
+## Task 009 diagnostic requirements
+
+These requirements describe an independent diagnostic continuation, not a
+change to the semantic-v2 product contract or to any historical Task 008
+artifact.
+
+| ID | Requirement | Rationale | Priority | Evidence | Acceptance |
+|---|---|---|---|---|---|
+| `REQ-VR1A-025` | The network-recovery canary must reuse the frozen Task 008 revision, Kling source snapshot, provider/model/API tuple, Thinking/reasoning/output settings, prompts, schemas, normalizer, compiler, budgets, source, and V0 renderer; the only added transport setting is process-scoped `NO_PROXY=api.deepseek.com` and `no_proxy=api.deepseek.com` | Isolate endpoint reachability without changing the product experiment | P0 | `DEC-VR1A-061/062/067` | `TEST-VR1A-032`, `033` |
+| `REQ-VR1A-026` | Task 009 must run one new `diagnostic_only=true` Kling full pipeline with the existing one-identical-technical-retry rule, at most three provider/model calls, and an immediate terminal; it must not enter the Task 008 product set, continue RLinf/Wu Yi/Web, run evaluator/rubric, or claim V1-A quality/acceptance | Separate network diagnosis from selective rerun and product measurement | P0 | `DEC-VR1A-068` | `TEST-VR1A-034`, `035` |
 
 ## Constraints and dependencies
 
@@ -107,6 +131,10 @@ v1 behavior. `DEC-VR1A-061` confirms the current product-prototype amendments:
 - Intended input is Chinese technical/knowledge content around 10–30 minutes;
   Kling and RLinf are named approximately 34-minute G1 exceptions.
 - One foreground run at a time; no queue or concurrent execution contract.
+- Task 009 adds no product dependency: its process-level `NO_PROXY`/`no_proxy`
+  override is inline to one `uv` child process only; global proxy settings,
+  shell profiles, `.env`, code, dependencies, runtime data, and infrastructure
+  remain outside the documentation session's change scope.
 
 ## Glossary
 
@@ -121,5 +149,8 @@ v1 behavior. `DEC-VR1A-061` confirms the current product-prototype amendments:
 - **Product prototype set:** one frozen run for each of three videos, with
   content/visual review evidence; not formal Development measurement, Freeze,
   Locked Eval, release, or production acceptance.
+- **Diagnostic canary:** one newly identified, single-video run used to classify
+  network/configuration/runtime/content boundaries; it is explicitly excluded
+  from product and formal-measurement denominators.
 - **Major overclaim:** a central, numeric, causal, comparative, or evaluative
   assertion not supported by its cited transcript segments.

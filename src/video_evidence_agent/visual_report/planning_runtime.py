@@ -41,6 +41,7 @@ from .planning import (
     SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
     SEMANTIC_V2_PLANNER_PROMPT_VERSION,
     SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION,
+    SEMANTIC_V2_PLANNING_BUDGET_SCHEMA_VERSION,
     SEMANTIC_V2_REASONING_EFFORT,
     SEMANTIC_V2_THINKING_MODE,
     SEMANTIC_V2_TOPIC_MAP_SCHEMA_VERSION,
@@ -54,6 +55,7 @@ from .planning import (
     TopicMap,
     TopicMapProposal,
     bind_topic_map,
+    build_semantic_v2_planning_budget,
     compile_report_plan,
     compile_semantic_v2_report_plan,
     mapper_payload,
@@ -1560,10 +1562,55 @@ def build_from_transcript_v2(
             _semantic_v2_events_payload("topic_mapper", topic_events),
         )
         recorder.artifact("topic_normalization", topic_normalization_path)
+
+        planning_budget = build_semantic_v2_planning_budget(
+            duration_ms=source.duration_ms,
+            primary_topic_count=sum(
+                topic.importance == "primary" for topic in topic_map.topics
+            ),
+        )
+        planning_budget_payload = planning_budget.model_dump(mode="json")
+        recorder.payload["planning_budget"] = planning_budget_payload
+        planning_budget_path = recorder.run_dir / "planning-budget.json"
+        _atomic_json(
+            planning_budget_path,
+            {
+                "formula_version": SEMANTIC_V2_PLANNING_BUDGET_SCHEMA_VERSION,
+                **planning_budget_payload,
+            },
+        )
+        recorder.artifact("planning_budget", planning_budget_path)
+        recorder.save()
         recorder.transition("TOPIC_MAPPED")
 
         recorder.transition("PLANNING")
-        plan_payload = semantic_v2_planner_payload(source.video_payload, segments, topic_map)
+        plan_payload = semantic_v2_planner_payload(
+            source.video_payload,
+            segments,
+            topic_map,
+            planning_budget=planning_budget,
+        )
+        planner_request_snapshot = {
+            "schema_version": SEMANTIC_V2_CALL_SCHEMA_VERSION,
+            "stage": "report_planner",
+            "prompt_version": SEMANTIC_V2_PLANNER_PROMPT_VERSION,
+            "request_sha256": _semantic_v2_request_sha256(
+                "report_planner",
+                SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION,
+                plan_payload,
+                active_provider.config,
+            ),
+            "payload_sha256": _sha256_bytes(stable_json(plan_payload).encode("utf-8")),
+            "planning_budget": planning_budget_payload,
+            "frozen_before_call": True,
+        }
+        planner_request_path = recorder.run_dir / "planner-request.json"
+        _atomic_json(planner_request_path, planner_request_snapshot)
+        recorder.artifact("planner_request", planner_request_path)
+        recorder.payload["request_snapshots"] = {
+            "report_planner": planner_request_snapshot
+        }
+        recorder.save()
         plan_proposal, plan_events = _semantic_v2_call_stage(
             recorder,
             active_provider,
@@ -1575,16 +1622,26 @@ def build_from_transcript_v2(
             normalizer=normalize_semantic_v2_plan_proposal,
             retry_state=retry_state,
         )
-        plan, assets, ledger = compile_semantic_v2_report_plan(
-            plan_proposal,
-            topic_map,
-            segments,
-            title=source.title,
-            source_url=source.source_url,
-            attribution=source.attribution,
-            duration_ms=source.duration_ms,
-            normalization_events=plan_events,
-        )
+        budget_diagnostics: dict[str, object] = {}
+        try:
+            plan, assets, ledger = compile_semantic_v2_report_plan(
+                plan_proposal,
+                topic_map,
+                segments,
+                title=source.title,
+                source_url=source.source_url,
+                attribution=source.attribution,
+                duration_ms=source.duration_ms,
+                normalization_events=plan_events,
+                planning_budget=planning_budget,
+                budget_diagnostics_out=budget_diagnostics,
+            )
+        except PlanningError:
+            if budget_diagnostics:
+                budget_diagnostics_path = recorder.run_dir / "budget-diagnostics.json"
+                _atomic_json(budget_diagnostics_path, budget_diagnostics)
+                recorder.artifact("budget_diagnostics", budget_diagnostics_path)
+            raise
         planner_normalization_path = recorder.run_dir / "planner-normalization.json"
         _atomic_json(
             planner_normalization_path,
@@ -1597,9 +1654,12 @@ def build_from_transcript_v2(
         _atomic_json(plan_path, plan.model_dump(mode="json"))
         _atomic_json(assets_path, assets.model_dump(mode="json"))
         _atomic_json(normalization_path, ledger.model_dump(mode="json"))
+        budget_diagnostics_path = recorder.run_dir / "budget-diagnostics.json"
+        _atomic_json(budget_diagnostics_path, budget_diagnostics)
         recorder.artifact("report_plan", plan_path)
         recorder.artifact("assets", assets_path)
         recorder.artifact("normalization", normalization_path)
+        recorder.artifact("budget_diagnostics", budget_diagnostics_path)
         validation_path = recorder.run_dir / "validation.json"
         _atomic_json(
             validation_path,
@@ -1619,6 +1679,8 @@ def build_from_transcript_v2(
                 "hero_source_segment_ids": list(plan_proposal.hero.source_segment_ids),
                 "asset_count": len(assets.assets),
                 "normalization_summary": ledger.summary,
+                "planning_budget": planning_budget_payload,
+                "budget_diagnostics": budget_diagnostics,
             },
         )
         recorder.artifact("validation", validation_path)
@@ -1742,28 +1804,73 @@ def replay_semantic_v2_proposals(
     topic_map, topic_events = resolve_semantic_v2_topic_map(
         topic_result.proposal, segments, events=topic_events
     )
+    planning_budget = build_semantic_v2_planning_budget(
+        duration_ms=source.duration_ms,
+        primary_topic_count=sum(
+            topic.importance == "primary" for topic in topic_map.topics
+        ),
+    )
+    planning_budget_payload = planning_budget.model_dump(mode="json")
     plan_result = normalize_semantic_v2_plan_proposal(plan_proposal_payload)
     plan_events = list(plan_result.events)
-    plan, assets, ledger = compile_semantic_v2_report_plan(
-        plan_result.proposal,
-        topic_map,
-        segments,
-        title=source.title,
-        source_url=source.source_url,
-        attribution=source.attribution,
-        duration_ms=source.duration_ms,
-        normalization_events=plan_events,
-    )
     output_dir.mkdir(parents=True, exist_ok=True)
+    planning_budget_path = output_dir / "planning-budget.json"
+    _atomic_json(
+        planning_budget_path,
+        {
+            "formula_version": SEMANTIC_V2_PLANNING_BUDGET_SCHEMA_VERSION,
+            **planning_budget_payload,
+        },
+    )
+    planner_payload = semantic_v2_planner_payload(
+        source.video_payload,
+        segments,
+        topic_map,
+        planning_budget=planning_budget,
+    )
+    planner_request_path = output_dir / "planner-request.json"
+    _atomic_json(
+        planner_request_path,
+        {
+            "schema_version": SEMANTIC_V2_CALL_SCHEMA_VERSION,
+            "stage": "report_planner",
+            "prompt_version": SEMANTIC_V2_PLANNER_PROMPT_VERSION,
+            "payload_sha256": _sha256_bytes(stable_json(planner_payload).encode("utf-8")),
+            "planning_budget": planning_budget_payload,
+            "replay": True,
+            "provider_calls": 0,
+            "model_calls": 0,
+        },
+    )
+    budget_diagnostics: dict[str, object] = {}
+    try:
+        plan, assets, ledger = compile_semantic_v2_report_plan(
+            plan_result.proposal,
+            topic_map,
+            segments,
+            title=source.title,
+            source_url=source.source_url,
+            attribution=source.attribution,
+            duration_ms=source.duration_ms,
+            normalization_events=plan_events,
+            planning_budget=planning_budget,
+            budget_diagnostics_out=budget_diagnostics,
+        )
+    except PlanningError:
+        if budget_diagnostics:
+            _atomic_json(output_dir / "budget-diagnostics.json", budget_diagnostics)
+        raise
     plan_path = output_dir / "report-plan.json"
     assets_path = output_dir / "assets.json"
     topic_path = output_dir / "topic-map.json"
     normalization_path = output_dir / "normalization.json"
+    budget_diagnostics_path = output_dir / "budget-diagnostics.json"
     report_path = output_dir / "report.html"
     _atomic_json(topic_path, topic_map.model_dump(mode="json"))
     _atomic_json(plan_path, plan.model_dump(mode="json"))
     _atomic_json(assets_path, assets.model_dump(mode="json"))
     _atomic_json(normalization_path, ledger.model_dump(mode="json"))
+    _atomic_json(budget_diagnostics_path, budget_diagnostics)
     render_report(plan_path, assets_path, report_path)
     return SemanticV2ReplaySummary(
         provider_calls=0,

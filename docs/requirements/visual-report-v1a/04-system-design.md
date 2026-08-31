@@ -41,6 +41,23 @@ Transcript and provider output are untrusted data. The provider receives the
 authorized transcript and task contract but no secret, local path, media, tool,
 or execution authority.
 
+## Task 009 network-recovery overlay
+
+Task 009 adds no component or alternate provider path. It runs the existing
+single-video pipeline with the Task 008 revision and Kling source snapshot as
+read-only inputs. The only transport difference is an inline
+`NO_PROXY=api.deepseek.com` and `no_proxy=api.deepseek.com` assignment on the
+one `uv` child process. The global proxy, shell profile, `.env`, product code,
+dependencies, runtime data, and infrastructure remain outside this
+documentation session's change boundary.
+
+The new run directory is marked `diagnostic_only=true` and remains outside the
+Task 008 product set. `run.json` remains the sole execution-state authority;
+the task terminal is a separate review label. A successful `RENDERED` artifact
+therefore proves only that this one frozen path completed under the process
+override. It does not open the Web gate, create a product denominator, or
+authorize any other video.
+
 ## Components and responsibilities
 
 | Component | Responsibility | Must not do |
@@ -100,6 +117,7 @@ Names are logical responsibilities, not a mandate for one file per row.
 | What the transcript covers | Proposes ordered approximate topic spans and representative evidence | Reads only | Resolves spans, reports overlap/uncovered segments, binds times |
 | What to emphasize/omit | Prohibited | Proposes selection/order | Computes unselected topic diagnostics; does not require exact model disposition |
 | Narrative/section/block type | Prohibited | Proposes semantic structure and advisory block hints | Chooses compatible typed block and enforces closed V0 grammar/budgets |
+| Adaptive report size | Prohibited | Receives and uses a soft recommendation; may deviate for grounded editorial quality | Computes the versioned recommendation from manifest duration/canonical primary topics, records diagnostics, and enforces only aggregate hard ceilings plus unchanged V0 rules |
 | Claim wording | Topic summaries only | Report copy | Validates refs/metrics; never rewrites |
 | IDs/timestamps/metadata | Prohibited | Prohibited | Sole authority |
 | HTML/CSS/SVG/layout | Prohibited | Prohibited | Existing renderer only |
@@ -141,6 +159,27 @@ No queue, cache, background worker, concurrency controller, or backpressure laye
 is introduced. An input outside the 80-segment/50,000-character envelope fails;
 V1-A does not silently chunk it. A later observed need may authorize a separate
 design change.
+
+The adaptive-budget change adds no service or orchestration node. A small
+deterministic budget builder runs after Topic Resolver and before Planner:
+
+```text
+validated manifest + canonical Topic Map
+  -> planning-budget.json / Planner planning_budget payload
+  -> semantic Planner proposal
+  -> non-semantic compiler + budget diagnostics
+  -> unchanged V0 plan validation and renderer
+```
+
+The recommendation is frozen input to Planner; the hard check is deterministic
+output validation. The builder/validator never calls a model and cannot repair
+semantic content.
+
+For Task 009, the same two semantic stages remain sequential. The process
+override is applied before the first stage and is recorded as non-secret
+diagnostic metadata. The run owns the existing one eligible identical retry,
+for a maximum of three provider/model calls; no second execution path is
+introduced.
 
 ## Failure isolation and recovery
 

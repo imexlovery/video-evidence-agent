@@ -24,6 +24,7 @@
 | `ASSET-VR1A-REVIEW-CARDS / AVAILABLE` | `eval/visual-report-v1a/review-cards/` | Implementer created; Owner reviews | Three versioned cards; content/visual rubrics remain pending | Derived locally from authorized transcripts | Validate and snapshot unchanged into the new product-prototype set |
 | `ASSET-VR1A-HISTORICAL-RUNS / AVAILABLE_IMMUTABLE` | `artifacts/visual-report/v1a/` plus `eval/visual-report-v1a/` manifests | V1-A recorder/evaluator | Three historical formal revisions, 22 recovery candidate manifests, 20 failed recovery canaries | Local restricted evidence; no public redistribution | Preserve every identity/aggregate/rubric; create three new unique product-run identities |
 | `ASSET-VR1A-NORMALIZATION-LEDGER / CURRENT CONTRACT` | New semantic-v2 run directories | Deterministic normalizer | Ordered raw-to-final rules, affected paths, before/after values and whole-unit omission counts | Contains derived transcript text; local restricted evidence | Create once per v2 run; replayable; never rewrite historical v1 artifacts |
+| `ASSET-VR1A-NETWORK-CANARY-009 / NOT_CREATED_THIS_SESSION` | Next-session diagnostic manifest and new run directory under `artifacts/visual-report/v1a/` | Task 009 operator; Owner reviews | One Kling diagnostic-only run; JSON/JSONL/HTML only when the existing pipeline produces them | Reuses Task 008 source/revision read-only; process override is non-secret; no public export | Create only during separately started Task 009 execution; preserve through Owner review; no Task 008 replacement |
 | `STORE-VR1A-DATABASE / NOT_APPLICABLE` | None | None | None | No G1 need | Must not add |
 | Brand/creative assets | Not applicable | None | None | V1-A creates no visual identity | Existing renderer retained |
 
@@ -60,6 +61,8 @@ ProductPrototypeSet 1 ── 6 ViewportReview
 | `DATA-VR1A-COST` | Monetary cost | Derived only with authoritative price | None | `unavailable` when pricing/usage cannot prove it |
 | `DATA-VR1A-PROTOTYPE-REVIEW` | Per-video diagnostics, screenshots and pending content/visual rubrics | Prototype reviewer/Owner | None | Versioned three-report review package |
 | `DATA-VR1A-NORMALIZATION` | Ordered rule ID, JSON path, reason, before/after value and discard counters | Deterministic normalizer | Derived transcript content | `normalization.json`; raw response remains immutable |
+| `DATA-VR1A-DIAGNOSTIC-MARKER` | Task ID, `diagnostic_only`, base revision, run ID, and product-set exclusion | Task 009 recorder/evidence | None | Diagnostic manifest/run evidence; never a product-set authority |
+| `DATA-VR1A-NETWORK-OVERRIDE` | `NO_PROXY`/`no_proxy` domain labels only | Task 009 operator | Operational | New diagnostic evidence; values contain no credential or transcript content |
 
 ## Data-source register
 
@@ -102,11 +105,13 @@ artifacts/visual-report/v1a/<run-id>/
 ├── topic-map.raw.json
 ├── topic-map.normalized.json
 ├── topic-map.json
+├── planning-budget.json
 ├── report-plan.raw.json
 ├── report-plan.normalized.json
 ├── report-plan.json
 ├── assets.json
 ├── normalization.json
+├── budget-diagnostics.json
 ├── validation.json
 ├── screenshots/
 │   ├── desktop.png
@@ -123,6 +128,11 @@ artifacts/visual-report/v1a/<run-id>/
 - Semantic-v2 normalized files and `normalization.json` exist only after the
   corresponding raw JSON object is parseable; a pre-response failure records
   the absence explicitly in run/events evidence.
+- `planning-budget.json` records formula version, validated duration,
+  canonical primary-topic count, recommended block budget, density guidance,
+  and hard limits before Planner. `budget-diagnostics.json` records actual
+  block/character counts and soft/hard outcomes after compilation. These files
+  are deterministic evidence, not model output or semantic memory.
 - `report.html` exists only for a successfully validated/rendered run.
 - No transcript duplicate or complete rendered prompt is stored; the source
   hash, prompt revision, and structured context contract reconstruct the input.
@@ -163,6 +173,11 @@ this local prototype's control; this is an accepted G1 risk, not a privacy or
 production claim. Media, frames, reports, and raw artifacts are not publicly
 redistributed under current source-use restrictions.
 
+Task 009 introduces no new decision-relevant source. It reuses the Task 008
+Kling manifest, transcript snapshot, frozen semantic-v2 revision, and current
+renderer as read-only authorities. The two process override labels are
+transport metadata, not source content or a new model/provider contract.
+
 ## Retention, deletion, export, backup, and withdrawal
 
 - No automatic expiry. Owner may delete any V1-A run or the entire V1-A artifact
@@ -175,6 +190,11 @@ redistributed under current source-use restrictions.
 - If source processing authorization is withdrawn, stop new runs and delete
   derived V1-A run artifacts for that source; preserve non-content decision
   history where required.
+
+Task 009's diagnostic marker and process override are retained with its new run
+evidence, while the Task 008 revision, run, aggregate, and product manifest
+remain immutable. The canary is not a new product revision or
+formal-measurement record.
 
 ## Information deliberately not stored
 

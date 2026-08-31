@@ -41,6 +41,7 @@ from .planning import (
     SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
     SEMANTIC_V2_PLANNER_PROMPT_VERSION,
     SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION,
+    SEMANTIC_V2_PLANNING_BUDGET_SCHEMA_VERSION,
     SEMANTIC_V2_REASONING_EFFORT,
     SEMANTIC_V2_THINKING_MODE,
     SEMANTIC_V2_TOPIC_MAP_SCHEMA_VERSION,
@@ -51,11 +52,15 @@ from .planning import (
     PlanningError,
     ReportPlanProposal,
     ReviewCard,
+    SemanticV2PlanningBudget,
     SemanticV2ReportPlanProposal,
     SemanticV2TopicMap,
     SemanticV2TopicMapProposal,
     TopicMap,
     TopicMapProposal,
+    build_semantic_v2_planning_budget,
+    semantic_v2_budget_diagnostics,
+    semantic_v2_visible_authored_character_count,
     stable_json,
 )
 from .planning_runtime import (
@@ -1740,6 +1745,27 @@ def _semantic_v2_contract_snapshot() -> dict[str, object]:
                 "name": "semantic_v2_normalization_ledger",
                 "schema_version": SEMANTIC_V2_NORMALIZATION_SCHEMA_VERSION,
             },
+            "adaptive_budget": {
+                "schema_version": SEMANTIC_V2_PLANNING_BUDGET_SCHEMA_VERSION,
+                "formula_version": SEMANTIC_V2_PLANNING_BUDGET_SCHEMA_VERSION,
+                "formula": (
+                    "clamp(ceil(max(duration_ms / 60000 * 0.6, "
+                    "primary_topic_count * 2, 6)), 6, 24)"
+                ),
+                "recommended_block_range": {
+                    "minimum": 6,
+                    "maximum": 24,
+                },
+                "recommended_visible_characters_per_block": {
+                    "minimum": 180,
+                    "maximum": 260,
+                },
+                "hard_limits": {
+                    "compiled_blocks": 32,
+                    "visible_authored_characters": 8000,
+                },
+                "recommendations_are_soft": True,
+            },
             "call": SEMANTIC_V2_CALL_SCHEMA_VERSION,
             "compiler": SEMANTIC_V2_COMPILER_VERSION,
         },
@@ -1958,6 +1984,9 @@ def _semantic_v2_product_run_row(
             "topic_map_valid": False,
             "report_plan_valid": False,
             "normalization_ledger_valid": False,
+            "planning_budget_valid": False,
+            "planner_request_snapshot_valid": False,
+            "budget_diagnostics_valid": False,
             "assets_empty": False,
             "report_present": False,
             "desktop_screenshot_present": False,
@@ -1971,6 +2000,9 @@ def _semantic_v2_product_run_row(
             "topic_map": str(run_dir / "topic-map.json"),
             "report_plan": str(run_dir / "report-plan.json"),
             "normalization": str(run_dir / "normalization.json"),
+            "planning_budget": str(run_dir / "planning-budget.json"),
+            "planner_request": str(run_dir / "planner-request.json"),
+            "budget_diagnostics": str(run_dir / "budget-diagnostics.json"),
             "report_html": str(run_dir / "report.html"),
             "desktop_screenshot": str(run_dir / "screenshots" / "desktop.png"),
             "mobile_screenshot": str(run_dir / "screenshots" / "mobile.png"),
@@ -2094,6 +2126,57 @@ def _semantic_v2_product_run_row(
     else:
         errors.append("semantic-v2 Topic Map artifact is missing or invalid")
 
+    planning_budget_payload = run_payload.get("planning_budget")
+    planning_budget: SemanticV2PlanningBudget | None = None
+    budget_path = run_dir / "planning-budget.json"
+    if isinstance(planning_budget_payload, dict) and budget_path.is_file():
+        try:
+            planning_budget = SemanticV2PlanningBudget.model_validate(planning_budget_payload)
+            budget_artifact = _read_json(budget_path)
+            expected_budget_artifact = {
+                "formula_version": SEMANTIC_V2_PLANNING_BUDGET_SCHEMA_VERSION,
+                **planning_budget_payload,
+            }
+            expected_budget = (
+                build_semantic_v2_planning_budget(
+                    duration_ms=source.duration_ms,
+                    primary_topic_count=sum(
+                        topic.importance == "primary" for topic in topic_map.topics
+                    ),
+                )
+                if topic_map is not None
+                else None
+            )
+            deterministic["planning_budget_valid"] = (
+                budget_artifact == expected_budget_artifact
+                and expected_budget is not None
+                and planning_budget == expected_budget
+            )
+            row["planning_budget"] = planning_budget_payload
+            if not deterministic["planning_budget_valid"]:
+                errors.append("semantic-v2 planning budget differs from its source/map inputs")
+        except (EvaluationError, ValidationError, ValueError, TypeError):
+            errors.append("semantic-v2 planning budget artifact is missing or invalid")
+    else:
+        errors.append("semantic-v2 planning budget artifact is missing or invalid")
+
+    planner_request_path = run_dir / "planner-request.json"
+    planner_request = _read_json(planner_request_path) if planner_request_path.is_file() else None
+    planner_calls = [call for call in calls if call.get("stage") == "report_planner"]
+    planner_call = planner_calls[-1] if planner_calls else None
+    request_snapshots = run_payload.get("request_snapshots")
+    deterministic["planner_request_snapshot_valid"] = bool(
+        isinstance(planner_request, dict)
+        and planner_request.get("stage") == "report_planner"
+        and planner_request.get("planning_budget") == planning_budget_payload
+        and isinstance(request_snapshots, dict)
+        and request_snapshots.get("report_planner") == planner_request
+        and isinstance(planner_call, dict)
+        and planner_call.get("request_sha256") == planner_request.get("request_sha256")
+    )
+    if not deterministic["planner_request_snapshot_valid"]:
+        errors.append("frozen Planner request snapshot is missing or inconsistent")
+
     plan: ReportPlan | None = None
     plan_path = run_dir / "report-plan.json"
     assets_path = run_dir / "assets.json"
@@ -2123,6 +2206,20 @@ def _semantic_v2_product_run_row(
             errors.append("report plan source refs are invalid")
         if not deterministic["assets_empty"]:
             errors.append("assets manifest is not empty")
+    budget_diagnostics_path = run_dir / "budget-diagnostics.json"
+    budget_diagnostics = (
+        _read_json(budget_diagnostics_path) if budget_diagnostics_path.is_file() else None
+    )
+    if plan is not None and planning_budget is not None and isinstance(budget_diagnostics, dict):
+        expected_diagnostics = semantic_v2_budget_diagnostics(
+            planning_budget,
+            actual_compiled_block_count=sum(len(section.blocks) for section in plan.sections),
+            actual_visible_authored_characters=semantic_v2_visible_authored_character_count(plan),
+        )
+        deterministic["budget_diagnostics_valid"] = budget_diagnostics == expected_diagnostics
+        row["budget_diagnostics"] = budget_diagnostics
+    if not deterministic["budget_diagnostics_valid"]:
+        errors.append("semantic-v2 budget diagnostics are missing or inconsistent")
     normalization_path = run_dir / "normalization.json"
     if normalization_path.is_file():
         normalization = _read_json(normalization_path)
@@ -2157,6 +2254,9 @@ def _semantic_v2_product_run_row(
         and deterministic["topic_map_valid"]
         and deterministic["report_plan_valid"]
         and deterministic["normalization_ledger_valid"]
+        and deterministic["planning_budget_valid"]
+        and deterministic["planner_request_snapshot_valid"]
+        and deterministic["budget_diagnostics_valid"]
         and deterministic["assets_empty"]
         and report_present
         and (not call_errors or recovered_retry)

@@ -60,6 +60,10 @@ into Owner confirmation.
 | `DEC-VR1A-062 / USER_CONFIRMED` | Freeze DeepSeek Chat Completions with Thinking enabled, reasoning effort high, `max_tokens=32768`, SDK retry zero, and one identical application retry; temperature is not stability evidence | Owner message after semantic-v2 product run | The failed/successful attempts all spent material output budget on reasoning; the next revision must test the intended Thinking path with enough combined reasoning/output headroom | Disable Thinking; retain 8192; rely on temperature zero | Higher bounded latency/token exposure, but directly tests the Owner-selected quality-oriented configuration | New complete three-video revision; historical run unchanged | Request-shape test, exact trace, three new retained runs and call-budget audit |
 | `DEC-VR1A-063 / USER_CONFIRMED` | Put V1-B keyframes off the critical path; close text generation first, then build a local Web MVP before optional V1-B/V1-C | Owner product-priority message | Complete the smallest usable product loop before automating low-priority media assets | Follow A→B→C order; enter full MP4 pipeline | Text-only Web reports remain visually sparse but become directly usable in a browser | Later roadmap decision | Three text reports plus local Web workflow review |
 | `DEC-VR1A-064 / USER_DELEGATED` | Use one continuous gated Goal: 3/3 text closure first, then a single-user localhost Web surface over the same run/runtime contracts | Owner request to set the next Goal | Avoid another manual session chain and avoid duplicating planning logic in a UI-specific path | Separate Goals; hosted service; static report browser only | Adds a small local HTTP/UI boundary, but no account/database/queue/deployment | Remove the Web slice without changing V1-A artifacts | Task card, provider-free Web integration, browser checks, real-report opening and protected-path review |
+| `DEC-VR1A-065 / USER_CONFIRMED` | Replace semantic-v2's fixed aggregate budget with `max(minutes × 0.6, primary topics × 2, 6)`, recommended 6–24 blocks, 180–260 visible characters per block, and hard protection only above 32/8,000 | Owner supplied the exact budget direction after Wu Yi failed at 17 units | Scale editorial space with duration and semantic breadth; keep recommendations distinct from corruption limits | Retain fixed 14/2,600 for current v2; remove all limits; let model choose unbounded output | Amends semantic-v2 aggregate budgeting only; historical v1 and V0 lower-level contracts remain | Revert the new semantic-v2 budget version; retain all revision evidence | Formula/boundary/replay tests, budget artifacts, diagnostics, three-video product and visual review |
+| `DEC-VR1A-066 / USER_DELEGATED` | Deliver adaptive budgeting and the already-built Web closure as one bounded G1 Goal on merged `visual-report@bb8f6f7` | Owner confirmed the workspace was committed/merged and requested the next modification plan | Avoid another partial task chain while preserving replay-first and post-freeze causal boundaries | Immediate real rerun; Web redesign; VEA redesign | Uses `ceil`, soft diagnostics, one new complete set, gated Web smoke, twelve-call maximum | Stop at an exact Owner-review terminal without acceptance | New task card, readiness package, frozen revision/call ledger, Web/browser evidence and status |
+| `DEC-VR1A-067 / USER_CONFIRMED` | For the single DeepSeek network diagnostic, set only process-level `NO_PROXY=api.deepseek.com` and `no_proxy=api.deepseek.com` on the `uv` child process | Owner message for Task 009 | Test proxy reachability without changing global environment or product contracts | Global proxy/profile/.env change; provider/model/API change; alternate provider | Adds transport metadata and one controlled diagnostic path; does not prove provider or product quality | Remove the override in a later authorized task; preserve all canary evidence | Child-process environment and run snapshot |
+| `DEC-VR1A-068 / USER_DELEGATED` | Publish `VR-V1A-NETWORK-RECOVERY-CANARY-009` as one Kling diagnostic-only full pipeline with an absolute three-call ceiling | Owner requested the minimum network-recovery test design and delegated the single-canary/3-call detail | Isolate network reachability after Task 008's external block while preserving the frozen product evidence | Continue Task 008's remaining videos; launch a new three-video measurement; tune or repair | A passing canary is useful transport evidence but cannot enter a product denominator or acceptance claim | Only a separately authorized new complete three-video revision may use recovery evidence | New run identity, `diagnostic_only` marker, attempt ledger, exact terminal |
 
 ## Business, integration, and platform gap decisions
 
@@ -80,6 +84,7 @@ into Owner confirmation.
 | `ASM-VR1A-003` | Empty assets are valid for every compiled V1-A plan | Existing `AssetManifest` permits zero assets; V1-A forbids image blocks | Renderer could have an undocumented empty-manifest regression | Integration and existing renderer tests before real calls |
 | `ASM-VR1A-004` | The existing DeepSeek account exposes one text model whose JSON-object path fits both full-context calls | Owner has a DeepSeek key; official documentation covers JSON Output but warns of occasional empty content | Product set is externally blocked or remains technical-inconclusive after retry | Non-secret configuration/context preflight, frozen model/API snapshot, retained attempt evidence |
 | `ASM-VR1A-005` | Three videos are sufficient for a G1 directional decision | Owner requested at least three different videos | Results do not generalize to arbitrary content | Scope conclusion to these fixtures and require new evidence for promotion |
+| `ASM-VR1A-006` | The current V0 3–5-section/per-section schema can express useful reports within the new 32-block aggregate hard ceiling without a renderer/schema redesign | V0 permits up to five sections and seven blocks per section; current Wu Yi proposal has 17 units | Some larger valid semantic proposal may still fail a lower-level V0 limit or look visually poor | Replay all three saved proposals and inspect 1080/390 layouts before any new provider call; stop on required V0 contract change |
 
 ## Risk register
 
@@ -109,6 +114,10 @@ into Owner confirmation.
 | `RISK-VR1A-022` | Compiler omits weak or invalid whole units and a thin report is called success | Medium | High | Must-cover loss, an unexplained omission pattern, or too little grounded material for an editorial report | Record every whole-unit omission with reason; prohibit semantic reconstruction; require grounding, content sufficiency and Owner quality review; a compilable thin report does not pass | Owner | Omission ledger, final-source audit and product rubric |
 | `RISK-VR1A-023` | Thinking consumes the 32,768-token ceiling before a complete JSON answer | Medium until measured | High | `finish_reason=length`, reasoning tokens approach the ceiling, or content is absent/truncated | Send and trace the real Thinking/high controls; preserve one identical retry; freeze and run all three videos; stop honestly if any exhausts | Implementer/Owner | Request mock assertion, per-attempt usage/finish trace and 3/3 gate |
 | `RISK-VR1A-024` | A new Web surface hides or duplicates the canonical planning state | Medium | High | UI invents states, retries independently, exposes secrets/paths, or writes reports outside the run recorder | `run.json` remains authority; Web invokes the same runtime; one retry owner; localhost/allowlisted IDs only; no client secret | Implementer | API/state mapping, duplicate-submit, path traversal, failure and browser tests |
+| `RISK-VR1A-025` | The soft adaptive recommendation becomes a new exact template target | Medium | High | Reports cluster at the formula count, repeat filler, or use fixed distributions despite different sources | Prompt labels the value soft; no exact-count validation; record undershoot/overshoot; anti-template and redundancy review | Implementer/Owner | Prompt/payload inspection, cross-video signatures, density/redundancy rubric |
+| `RISK-VR1A-026` | Raising the hard cap hides thin content or creates an unreadable long page | Medium | Medium/High | Blocks average far below 180 characters, hierarchy collapses, mobile overflow appears, or larger reports are called success solely because they compile | Aggregate density diagnostics, replay-first six-viewport gate, current-revision screenshots, Owner content/visual review; soft miss never auto-accepted | Owner | Character/block evidence, desktop/mobile screenshots and human rubric |
+| `RISK-VR1A-027` | A process-scoped proxy override is mistaken for a provider, model, or product repair | Low | High | A canary changes request tuple, prompt/schema/compiler, or claims provider capability from transport recovery alone | Permit only inline `NO_PROXY/no_proxy`; record the labels; compare the request/config snapshot to Task 008; stop on any contract drift | Implementer/Owner | Task 009 environment and request audit |
+| `RISK-VR1A-028` | A diagnostic canary is promoted into Task 008 or treated as product-quality evidence | Medium | High | Canary is added to a denominator, replaces the retained Kling failure, continues to another video, or triggers a new rubric/evaluator claim | `diagnostic_only=true`, separate run ID, explicit product-set exclusion, immediate-stop matrix, new Owner authorization for any complete revision | Owner | Manifest/run/aggregate immutability and status review |
 
 ## Intelligence, source-data, stability, customer-operation, vendor, compliance, and support risks
 
@@ -173,6 +182,15 @@ cross-strategy prompt learning, at most 24 new calls, and at most one formal
 measurement. These rules restore the canonical V1-A content contract; they do
 not change its quality thresholds or Owner-only acceptance.
 
+## Task 009 Owner checkpoint
+
+On 2026-08-31 the Owner confirmed the process-scoped DeepSeek network override
+in `DEC-VR1A-067` and delegated the minimum diagnostic design in
+`DEC-VR1A-068`. The resulting Task 009 card is ready for a separately started
+construction session, but remains `READY_FOR_OWNER_V1A_REVIEW — NOT_STARTED`.
+No new run, artifact, provider/model call, evaluator result, or acceptance
+claim exists in this documentation session.
+
 On 2026-08-31, `DEC-VR1A-061` superseded the unconfirmed semantic-v2
 recommendations `DEC-VR1A-059/060`. The current contract is a three-video G1
 product prototype, not a provider-conformance or six-run measurement. It keeps
@@ -190,6 +208,16 @@ control. `DEC-VR1A-063/064` put keyframe automation off the critical path and
 delegate a gated local Web MVP after a clean 3/3 text-report result. The Web
 slice is not retroactively part of V1-A and does not authorize V1-B, V1-C,
 MP4/ASR, hosting, or production use.
+
+Also on 2026-08-31, the Owner confirmed `DEC-VR1A-065`: semantic-v2 report
+capacity is guided by duration and canonical primary-topic breadth, with 6–24
+as the recommended block range and 180–260 visible characters per compiled
+block as aggregate density guidance. Only values above 32 blocks or 8,000
+visible authored characters are aggregate hard failures. `DEC-VR1A-066`
+delegates the deterministic translation and one continuous replay-first,
+three-video, gated-Web Goal on the merged baseline. These decisions do not
+authorize semantic budget repair, exact-count prompting, V1-B/C, deployment,
+or Owner acceptance.
 
 ## Residual non-blocking questions
 

@@ -61,7 +61,7 @@ acceptance.
 | Original v1 requirements blockers/errors | `0 / 0` |
 | Current semantic-v2 requirements status | `READY_FOR_ENGINEERING_HANDOFF` — documentation readiness only |
 | Current semantic-v2 independent confidence | `100.0`; blockers/errors `0 / 0` |
-| Owner checkpoint | Current semantic-v2 product contract confirmed via `DEC-VR1A-061`, superseding unconfirmed recommendations `DEC-VR1A-059/060`; no product-contract checkpoint remains open |
+| Owner checkpoint | Semantic-v2 product contract and adaptive aggregate budget confirmed via `DEC-VR1A-061/065`; Task 008 translation delegated via `DEC-VR1A-066`; no requirements checkpoint remains open |
 | Implementation task | `VR-V1A-PLANNING-001` |
 | Implementation authorization | `AUTHORIZED` — explicit Owner instruction on 2026-08-30 |
 | Historical strict measurement | `READY_FOR_OWNER_V1A_REVIEW — MEASUREMENT_EXECUTION_FAILED` |
@@ -74,7 +74,7 @@ acceptance.
 | Completed continuation task | `VR-V1A-PROVIDER-CONFORMANCE-004` |
 | Completed continuation status | `READY_FOR_OWNER_V1A_REVIEW — V1A_PROVIDER_CONFORMANCE_NO_GO` |
 | Current continuation evidence | Frozen two-strategy native Responses manifest; all six canaries executed once and failed with retained `8/8` provider/model calls; no formal measurement created |
-| Current implementation baseline | `844978f08d07775b650467e31e221a969ddef3e3` — semantic-v2 prototype; earlier `e72503f…` provider-conformance no-go remains historical |
+| Current implementation baseline | branch `visual-report` at `bb8f6f75aa2e4ae91ab6688a7f16ed87caec7741` — semantic-v2, text/Web closure code, evidence docs, and Owner's merged work; earlier revisions remain historical |
 | Cancelled diagnostic task | `VR-V1A-BOUNDARY-ISOLATION-005` |
 | Cancelled diagnostic status | `CANCELLED_BY_OWNER — NEVER_AUTHORIZED / NEVER_EXECUTED`; official OpenAI key/provider work is closed |
 | Completed continuation task | `VR-V1A-CONTRACT-SIMPLIFICATION-006` |
@@ -82,16 +82,17 @@ acceptance.
 | Latest bounded Goal | `VR-V1-TEXT-WEB-CLOSURE-007` — executed once; Gate A failed on Wu Yi content budget |
 | Latest bounded Goal status | `READY_FOR_OWNER_V1A_REVIEW — TEXT_CONTENT_INSUFFICIENT`; no Web server, browser smoke, or Owner acceptance |
 | Latest frozen revision | `vr1a-semantic-v2-56340249c6f9`; product calls `6/6`, Web smoke `0/3`, Goal usage `6/12` |
-| Next designed Goal | `VR-V1-TEXT-WEB-CLOSURE-007` — V1-A runtime closure gated before a separate local Web MVP slice |
+| Next designed Goal | `VR-V1A-ADAPTIVE-BUDGET-WEB-CLOSURE-008` — zero-call replay first, one new three-video adaptive-budget set, then the existing local Web MVP only after 3/3 render |
 | Next runtime tuple | DeepSeek `deepseek-v4-flash-vision-exp`; Chat Completions JSON object; Thinking enabled; reasoning effort high; `max_tokens=32768`; SDK retry zero; one identical application retry per run; temperature is not stability evidence |
 | Product code/dependency/runtime changes in design phase | `0 / 0 / 0` |
 | Model calls in design phase | `0` |
-| Immediate roadmap | Owner reviews the retained Kling/RLinf reports and Wu Yi failure; any new revision or Web attempt requires separate authorization; V1-B keyframes and V1-C MP4/ASR remain deferred and unauthorized |
-| Next gate | Owner review of `TEXT_CONTENT_INSUFFICIENT`; no self-acceptance or automatic rerun |
+| Immediate roadmap | Start Task 008 only from a new explicit Goal session; V1-B keyframes and V1-C MP4/ASR remain deferred and unauthorized |
+| Next gate | Documentation readiness for Task 008, then explicit Goal execution authorization; no automatic model rerun or self-acceptance |
 
 ## Current requirements validator result
 
-After `DEC-VR1A-061` and the later `DEC-VR1A-062/063/064` design decisions, the independent validator regenerated
+After `DEC-VR1A-061` through the current `DEC-VR1A-065/066` adaptive-budget
+decisions, the independent validator regenerated
 `docs/requirements/visual-report-v1a/requirements-readiness.json` with:
 
 - status `READY_FOR_ENGINEERING_HANDOFF`;
@@ -99,7 +100,7 @@ After `DEC-VR1A-061` and the later `DEC-VR1A-062/063/064` design decisions, the 
 - confidence `100.0`;
 - no blocker and no error;
 - evaluated artifact hash
-  `9c5e61652f75720d991fcf771c5e4e88616d521a85dc78292e6ae699aff16d90`.
+  `1cd886fca2256704e2869c980f21398736f69fbce3eaae1c39ae1b086b88cdb1`.
 
 This result proves current semantic-v2 documentation readiness only. It is not
 implementation authorization or V1-A quality acceptance. The previous blocked revision
@@ -400,3 +401,242 @@ Owner-review stop is:
 This status is not Owner acceptance. A future revision or Web attempt requires
 separate Owner authorization; MP4/ASR, keyframes, OCR/VLM, V1-B, V1-C,
 database, queue, accounts, deployment, and public hosting remain outside scope.
+
+## Next adaptive-budget Goal design — 2026-08-31
+
+The Owner confirmed that the former workspace changes are committed and merged;
+the current canonical baseline is `visual-report` at
+`bb8f6f75aa2e4ae91ab6688a7f16ed87caec7741`. `DEC-VR1A-065` amends only the
+semantic-v2 aggregate report budget:
+
+- recommended blocks are
+  `clamp(ceil(max(video_minutes × 0.6, primary_topics × 2, 6)), 6, 24)`;
+- recommended visible density is 180–260 authored Unicode characters per
+  compiled block;
+- only more than 32 compiled blocks or 8,000 visible authored characters is an
+  aggregate hard failure; and
+- soft misses are diagnostics and never authorize retry, truncation, semantic
+  deletion, rewrite, merge, split, or padding.
+
+Under current retained durations and canonical primary-topic counts, the
+directional recommendations are Kling `21`, RLinf `21`, and Wu Yi `18`.
+Therefore the retained Wu Yi 17-unit proposal is the first mandatory zero-call
+replay case rather than evidence that VEA needs a redesign.
+
+`DEC-VR1A-066` delegates the next documentation-ready construction unit:
+[`VR-V1A-ADAPTIVE-BUDGET-WEB-CLOSURE-008`](../tasks/VISUAL-REPORT-V1A-ADAPTIVE-BUDGET-WEB-CLOSURE.md).
+It requires provider-free formula/boundary tests and three saved-proposal
+replays with six viewport checks before any real call; then one wholly new
+three-video product set with nine calls maximum; only a 3/3 render opens the
+already-implemented local Web MVP and one predeclared three-call Kling smoke.
+The absolute Goal ceiling is twelve calls.
+
+This design section records pre-execution state only. It did not itself execute
+Task 008; the Task 008 execution evidence and terminal are recorded below.
+
+## Latest adaptive-budget Goal execution evidence — 2026-08-31
+
+`VR-V1A-ADAPTIVE-BUDGET-WEB-CLOSURE-008` was then executed as one continuous
+Goal from the requested checkout. G0 confirmed branch `visual-report`,
+product-code baseline `bb8f6f75aa2e4ae91ab6688a7f16ed87caec7741`, and the
+expected uncommitted Task 008 documentation overlay. Historical 007 runs,
+frozen inputs, and prior review packages were preserved; no reset,
+reinitialization, commit, push, PR, deployment, or Owner acceptance occurred.
+
+G1/G2 changed only the semantic-v2 adaptive budget path and its focused test
+surface. Historical strict-v1 `8–14`/`2,600` limits remain unchanged. The
+provider-free formula/boundary/soft-diagnostic tests passed, deriving current
+recommendations Kling `21`, RLinf `21`, and Wu Yi `18`. Three new saved-
+proposal replays under
+`artifacts/visual-report/v1a/vr-v1a-adaptive-budget-web-closure-008-replay/`
+all rendered at `provider_calls/model_calls=0/0`: Kling `10` blocks/`1,024`
+visible characters, RLinf `11`/`1,080`, and Wu Yi `17`/`1,634`. All had soft
+block/density undershoot diagnostics, no hard failure, and zero semantic
+rewrite/merge/split/synthesis ledger counts. Wu Yi's 17 raw usable units were
+all retained. Six real-browser screenshots and `viewport-check.json` files
+recorded 1080 px and 390 px checks for all three reports: five ordered
+sections, zero horizontal-overflow nodes, and natural page heights
+2,839/3,424 px (Kling), 3,131/3,637 px (RLinf), and 3,734/4,531 px (Wu Yi).
+Gate A passed without a provider call.
+
+G3 froze the wholly new manifest
+`eval/visual-report-v1a/semantic-v2-adaptive-budget-web-closure-008-manifest.json`
+as revision `vr1a-semantic-v2-29d077aa0bdc` (SHA-256
+`13e7784d161f101c1e75bbdd104db722d61a72beff56ef65caf45d35431e81b3`). The
+frozen tuple is DeepSeek `deepseek-v4-flash-vision-exp`, Chat Completions JSON
+object, Thinking enabled, reasoning effort `high`, `max_tokens=32768`,
+temperature `0`, SDK retry `0`, and one identical application retry per run.
+The new Kling run
+`p0b-kling-2024-semantic-v2-e3d720ac27` retained two identical
+`PROVIDER_ERROR` attempts (`provider request failed: APIConnectionError`) and
+ended `FAILED`, `2/2`, after its eligible retry. The external block stopped the
+frozen set before RLinf/Wu Yi; product calls are `2/9`, Goal calls are `2/12`.
+
+G4 was not entered: Gate B was unmet, so the existing localhost Web MVP and
+predeclared Kling Web smoke remained `0/3`. The static loopback server used
+only to load replay HTML for G2 was stopped and was not the Web MVP.
+
+G5's append-only evaluator package is
+`artifacts/visual-report/v1a/evaluation-008/vr1a-semantic-v2-29d077aa0bdc/`;
+it records `technical_status=FAILED`,
+`stop_state=PROTOTYPE_EXECUTION_INCONCLUSIVE`, observed calls `2/2`, and
+pending Owner rubrics. Final regressions passed: focused planning/semantic/Web
+tests `55`, full pytest `93`, full Ruff, V0 renderer tests `10`, replay `0/0`
+inventory, and `git diff --check`. The exact Task 008 terminal is:
+
+`READY_FOR_OWNER_V1A_REVIEW — EXTERNAL_BLOCKED`
+
+This is an external-blocked Owner-review stop, not an acceptance or release
+claim. V1-B/V1-C, deployment, publication, commit, push, and PR remain
+outside the completed scope.
+
+## Task 009 network-recovery diagnostic — completed — 2026-08-31
+
+The Owner confirmed that a DeepSeek network diagnostic may set only the
+process-scoped overrides `NO_PROXY=api.deepseek.com` and
+`no_proxy=api.deepseek.com` on the single `uv` child process. The global proxy,
+shell profile, `.env`, provider/model/API tuple, Thinking/reasoning settings,
+max tokens, prompts, schemas, normalizer, compiler, budget, source, and
+renderer remain unchanged.
+
+The new task card is
+[`VR-V1A-NETWORK-RECOVERY-CANARY-009`](../tasks/VISUAL-REPORT-V1A-NETWORK-RECOVERY-CANARY.md).
+It reserves diagnostic run ID
+`p0b-kling-2024-semantic-v2-network-recovery-canary-009` and reuses Task 008's
+frozen revision `vr1a-semantic-v2-29d077aa0bdc` only as a read-only baseline.
+Task 008's manifest, Kling failure run, aggregate, and all history remain
+unchanged. The canary is `diagnostic_only=true`, excluded from the Task 008
+product set and all three-video denominators, and is not a selective
+continuation or a new product measurement.
+
+In a separately started construction session, Task 009 may execute one Kling
+Mapper → Planner → compiler → V0 Renderer pipeline. Two provider/model calls
+are expected; one eligible identical technical retry is allowed, with a total
+ceiling of three. Every success or failure stops immediately: no RLinf, Wu Yi,
+Web, evaluator, rubric, tuning, code/dependency/runtime-data/infrastructure
+change, micro-version, commit, push, PR, deployment, V1-B, or V1-C.
+
+Task 009 currently has status
+`READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_CANARY_PASSED`. Its independent
+diagnostic run is excluded from Task 008 and all product/formal denominators; a
+successful canary can only motivate separate authorization for a wholly new
+complete three-video revision and cannot resume Task 008's remaining videos.
+
+## Latest Task 009 execution evidence — 2026-08-31
+
+The reserved run ID
+`p0b-kling-2024-semantic-v2-network-recovery-canary-009` was verified unused,
+then exactly one Kling semantic-v2 pipeline ran with only the process-scoped
+`NO_PROXY=api.deepseek.com` and `no_proxy=api.deepseek.com` overrides. The
+current `build-from-transcript-v2` path completed:
+
+```text
+Topic Mapper → Report Planner → deterministic Compiler → V0 Renderer
+```
+
+The run reached `RENDERED` with provider/model calls `2/2`; no technical retry
+was used. Both calls ended with `finish_reason=stop` and valid semantic-v2
+JSON. The diagnostic result is exactly:
+
+`READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_CANARY_PASSED`
+
+The new run records `diagnostic_only=true`, base revision
+`vr1a-semantic-v2-29d077aa0bdc`, `product_set_membership=excluded`, and
+`task008_replacement=false`. It produced 5 sections, 14 blocks, an empty asset
+manifest, and `report.html`; no evaluator, rubric, product aggregate, or formal
+measurement denominator was created. Adaptive budget diagnostics recorded a
+soft 21-block recommendation versus 14 compiled blocks and 1,055 visible
+authored characters; hard limits passed. The normalization ledger retained 3
+non-semantic events, including 1 whole-unit omission, with zero semantic
+rewrite/merge/split/synthesis events.
+
+New diagnostic evidence is retained under:
+
+`artifacts/visual-report/v1a/p0b-kling-2024-semantic-v2-network-recovery-canary-009/`
+
+The preserved Task 008 manifest
+`eval/visual-report-v1a/semantic-v2-adaptive-budget-web-closure-008-manifest.json`,
+Kling run
+`artifacts/visual-report/v1a/p0b-kling-2024-semantic-v2-e3d720ac27/`, and
+aggregate
+`artifacts/visual-report/v1a/evaluation-008/vr1a-semantic-v2-29d077aa0bdc/aggregate.json`
+were checksum-verified unchanged after execution. No other video, Web smoke,
+evaluator, rubric, tuning, contract repair, micro-version, commit, push, PR,
+deployment, V1-B, or V1-C action followed. No product-code, dependency,
+runtime, or infrastructure file changed.
+
+## Task 010 — network-recovered text/Web closure — completed — 2026-08-31
+
+The Owner explicitly authorized the full transcript-derived payloads for
+Kling, RLinf, and Wu Yi to be sent to the frozen DeepSeek endpoint. Task 010
+continued from its already-frozen manifest; it did not recreate Task 008 or
+Task 009 identities.
+
+The task card is
+[`VR-V1A-NETWORK-RECOVERED-TEXT-WEB-CLOSURE-010`](../tasks/VISUAL-REPORT-V1A-NETWORK-RECOVERED-TEXT-WEB-CLOSURE.md).
+The new frozen manifest is
+`eval/visual-report-v1a/semantic-v2-network-recovered-text-web-closure-010-manifest.json`,
+revision `vr1a-semantic-v2-e33c28c6a662`, SHA-256
+`0a003cd17d808c7d07c25036c3e3cb664c2d35a4610bc8c64f3bfcb374020d45`.
+
+### Provider-free admission and text Gate
+
+The focused planning/semantic-v2/Web suite passed `55`; three fresh retained-
+proposal replays rendered with `0/0` provider/model calls. Their six real
+browser viewport checks passed at 1080×1440 and 390×1440 with five ordered
+sections for Kling and four for RLinf/Wu Yi, and zero horizontal-overflow
+nodes. The current revision product identities then completed as follows:
+
+| Video | Run | State | Calls | Recommendation → actual blocks | Visible chars | Hard budget |
+|---|---|---|---:|---:|---:|---|
+| Kling | `p0b-kling-2024-semantic-v2-0b3956f2ad` | `RENDERED` | 2/2 | 21 → 9 | 1,251 | pass |
+| RLinf | `p0b-rlinf-2026-semantic-v2-0b3956f2ad` | `RENDERED` | 2/2 | 21 → 6 | 624 | pass |
+| Wu Yi | `p0b-wuyi-goals-semantic-v2-0b3956f2ad` | `RENDERED` | 2/2 | 18 → 14 | 988 | pass |
+
+All six product calls were Mapper → Planner, ended with `finish_reason=stop`,
+and used no technical retry. The evaluator later verified source snapshot,
+Topic Map, report plan, normalization, planning budget, Planner request
+snapshot, budget diagnostics, empty assets, report, and both screenshots for
+all three rows. Semantic rewrite/merge/split/synthesis counters were zero.
+
+### Gated Web MVP
+
+After text Gate 3/3, the existing Web MVP ran only on
+`127.0.0.1:8772`. The real browser verified source selection, canonical
+`RENDERED` state, report opening, 1080/390 layout, active-run button disabling,
+and server-side credential redaction. The allowlisted sources API returned all
+three IDs and traversal returned `404 RUN_NOT_FOUND`.
+
+The single predeclared Web identity
+`p0b-kling-2024-semantic-v2-0b3956f2ad-web-smoke` completed through the UI as
+`RENDERED`, `2/2`, no retry, with its canonical report endpoint opened. Web UI
+screenshots and the browser/API check record are retained under its run
+directory. Product calls were `6/9`, Web calls `2/3`, and Goal calls `8/12`.
+
+A provider-free supplementary browser check loaded a nonexistent run id on a
+fresh loopback Web MVP instance. The real 390×1440 page showed `WEB_ERROR`,
+`状态暂时不可用`, and `请保留当前页面并稍后重试。`; the Generate button was
+enabled after the error and provider calls remained `0`. The error screenshot
+and check record remain under the Web smoke run directory.
+
+### Evaluation and regression evidence
+
+The append-only evaluator package is
+`artifacts/visual-report/v1a/evaluation/vr1a-semantic-v2-e33c28c6a662/`.
+It records `technical_status=PASS`,
+`stop_state=READY_FOR_OWNER_V1A_REVIEW`,
+`conclusion=PROTOTYPE_REPORTS_READY`, and
+`quality_status=PENDING_OWNER_REVIEW`; all three human rubrics remain pending.
+
+Final checks passed: full pytest `93 passed`, Ruff clean, V0 renderer
+regression `10 passed`, fresh replay `0/0` inventory, `git diff --check`, and
+protected Task 008/009 SHA-256 comparisons. No V0/P0-B protected artifact,
+Task 008/009 historical evidence, commit, push, PR, deployment, publication,
+Owner acceptance, V1-B, or V1-C action was performed.
+
+The exact Task 010 terminal is:
+
+`READY_FOR_OWNER_V1_WEB_MVP_REVIEW — ADAPTIVE_TEXT_AND_WEB_LOOP_READY`
+
+This terminal hands the reports, screenshots, and pending rubrics to the Owner
+for content, visual, and Web review; it is not an acceptance record.

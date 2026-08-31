@@ -23,6 +23,7 @@
 | `TASK-VR1A-PLAN` | Canonical map exists | Full transcript + map → semantic proposal/compiled V0 plan | One model call, or two when the run's unused retry is spent here | Grounding/current V0 contract passes without semantic rewriting/merge/split | Semantic failure stops before renderer; eligible technical failure may retry once | Raw proposal/compiler ledger/compiled plan |
 | `TASK-VR1A-RENDER` | Compiled plan exists | Plan + empty assets → HTML | Reuses local renderer | Renderer exits successfully | Existing renderer failure semantics | HTML + render summary |
 | `TASK-VR1A-REVIEW` | Frozen config + review cards | Three run directories + HTML/screenshots → prototype review package | Local review files only | All attempts/diagnostics retained; three content/visual rubrics pending Owner | No schema-first-hit promotion or selective replacement | Prototype aggregate, rubrics, screenshots |
+| `TASK-VR1A-NETWORK-RECOVERY-CANARY` | Separate execution authorization after Task 008 external stop | Frozen Task 008 Kling inputs + process-only proxy override → one diagnostic run | One new single-video run; external text calls remain bounded | One complete Mapper → Planner → Compiler → V0 Renderer path or one classified terminal | Existing one-identical-technical-retry rule; no product-set continuation or evaluator | Diagnostic manifest, run trace, terminal and preserved-baseline audit |
 
 ## Semantic input contracts
 
@@ -39,6 +40,28 @@
 - Boundary: 80 valid segments and exactly 50,000 Unicode characters.
 - Invalid: overlapping segments, missing provenance, mixed video IDs, blank text,
   50,001 characters, or an absent/contradictory manifest.
+
+## Task 009 diagnostic contracts
+
+`IN-VR1A-NETWORK-CANARY/009-v1` reuses the frozen Task 008 Kling manifest and
+segment snapshot, the new run ID
+`p0b-kling-2024-semantic-v2-network-recovery-canary-009`, and the exact frozen
+semantic-v2 provider/prompt/schema/normalizer/compiler/budget/source/renderer
+tuple. It adds only the inline process variables
+`NO_PROXY=api.deepseek.com` and `no_proxy=api.deepseek.com`; global proxy
+settings, shell profile, `.env`, code, dependencies, runtime data, and
+infrastructure are not changed by this documentation session.
+
+`OUT-VR1A-NETWORK-CANARY/009-v1` is one new run directory with
+`diagnostic_only=true`, `task_id=VR-V1A-NETWORK-RECOVERY-CANARY-009`,
+`base_revision_id=vr1a-semantic-v2-29d077aa0bdc`, the exact process overrides,
+attempt/call totals, terminal classification, and the normal V1-A run artifacts
+when available. It is excluded from the Task 008 product set, all formal
+measurement denominators, evaluator outputs, and Owner quality acceptance.
+
+The diagnostic task uses the existing `run.json` state authority and no new
+runtime state vocabulary. A successful run is `RENDERED` at the run level, but
+its task-level conclusion is diagnostic-only and never product acceptance.
 
 ## Topic Mapper output contract
 
@@ -261,6 +284,66 @@ missing block evidence. Historical v1 `no repair` evidence is not relabeled.
 One identical technical retry per run is allowed only for the API/JSON anomaly
 categories in the task card; valid semantic output is never retried for quality.
 
+### Current semantic-v2 adaptive budget amendment
+
+`DEC-VR1A-065/066` replace only the aggregate semantic-v2 report-budget rules.
+The historical v1 `8–14 blocks / 2,600 visible characters` contract and every
+artifact produced under it remain unchanged. The V0 schema, renderer, field
+limits, section count, per-section block limit, grounding rules, metric gate,
+and non-semantic compiler boundary also remain unchanged.
+
+After the Topic Resolver has created the canonical Topic Map and before the
+Planner request is frozen, deterministic code computes:
+
+```text
+duration_term = duration_ms / 60_000 * 0.6
+topic_term = count(canonical topics where importance == "primary") * 2
+recommended_block_budget = clamp(
+  ceil(max(duration_term, topic_term, 6)),
+  6,
+  24
+)
+```
+
+`ceil` is the conservative integer translation of the Owner's real-valued
+formula. Duration comes from the validated source manifest; the topic count
+comes from the canonical semantic-v2 map. The result, its inputs, formula
+version, and limits are frozen in the Planner payload and run evidence. The
+model receives it as an editorial recommendation, not an exact count. It must
+not pad a report, repeat claims, or force a fixed block distribution to reach
+the recommendation.
+
+The compiler calculates `actual_compiled_block_count` after existing
+non-semantic shape/grounding handling and before V0 serialization. It may not
+omit an otherwise usable unit merely to meet a budget. Counts below or above
+the recommendation remain compilable and emit `BUDGET_UNDERSHOOT` or
+`BUDGET_OVERSHOOT`; only a count greater than `32` produces
+`PLAN_BUDGET_ERROR`. Exactly `32` is accepted when the unchanged V0 section and
+per-section contracts also pass.
+
+The existing visible-authored-character counter remains authoritative: Hero
+title/TLDR, section titles, and user-visible block strings are counted as
+Unicode characters; IDs, source refs, timestamps, type names, asset metadata,
+and renderer-generated labels are excluded. For an accepted plan with `n`
+compiled blocks, the advisory range is:
+
+```text
+recommended_visible_characters_min = n * 180
+recommended_visible_characters_max = min(n * 260, 8_000)
+```
+
+Falling outside this range emits a density diagnostic but is not a compile
+failure. More than `8,000` visible authored characters is a hard
+`PLAN_BUDGET_ERROR`; exactly `8,000` is accepted. The hard ceiling takes
+precedence when `n × 260` would exceed it. No character or block diagnostic
+authorizes truncation, semantic rewrite, merge, split, or budget-driven whole-
+unit deletion.
+
+For the latest retained source/topic snapshots, the formula yields a directional
+budget of `21` for Kling, `21` for RLinf, and `18` for Wu Yi. Wu Yi's retained
+17-unit Planner proposal therefore becomes a required zero-call replay case;
+it is not automatically promoted as a new product result.
+
 ## Semantic output contracts
 
 | Output ID | Consumer/purpose | Completion/quality | Provenance/control | Partial/failure behavior |
@@ -320,6 +403,21 @@ provider-declared incomplete/truncated output, or malformed non-decodable JSON
 may spend the run's single technical retry. The retry repeats the current stage
 with identical request/configuration and retains both attempts. Valid JSON with
 weak/invalid semantics, grounding, or V0 incompatibility is non-retryable.
+
+For `TASK-VR1A-NETWORK-RECOVERY-CANARY`, the existing error categories map to
+one task-level terminal and the process stops immediately:
+
+| Diagnostic condition | Task terminal |
+|---|---|
+| Mapper and Planner complete and the current compiler/renderer succeeds | `READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_CANARY_PASSED` |
+| Endpoint remains unreachable after the eligible retry | `READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_EXTERNAL_BLOCKED` |
+| Credential, balance, permission, or configured model access is unavailable | `READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_CONFIGURATION_BLOCKED` |
+| API/JSON technical failure remains after one eligible identical retry | `READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_RUNTIME_INCONCLUSIVE` |
+| Network succeeds but valid semantics cannot compile/render without prohibited repair | `READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_CONTENT_INSUFFICIENT` |
+| Further execution requires a prompt/provider/model/compiler/budget/source/renderer contract change | `READY_FOR_OWNER_V1A_REVIEW — NETWORK_RECOVERY_CONTRACT_CHANGE_REQUIRED` |
+
+These task terminals do not alter the canonical V1-A run states or the Task 008
+product conclusion.
 
 ## Configuration, ordering, concurrency, and idempotency
 
