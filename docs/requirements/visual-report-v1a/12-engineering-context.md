@@ -23,6 +23,10 @@
   V1-A implementation, MP4/ASR orchestration, frames/assets, OCR/VLM, Agent,
   LangGraph, RAG, database/queue/service/API/UI/deployment, public publishing,
   multi-template/free-layout work, or V1-B/C.
+- A separately gated `V1-WEB MVP` may add a localhost-only browser surface only
+  after a new three-video V1-A revision reaches `RENDERED` for all three videos.
+  That surface is not V1-A acceptance and does not relax any V1-A model,
+  compiler, renderer, evidence, or rights boundary.
 - Next-grade compatibility constraints: keep source and run identities stable,
   version schemas/prompts, preserve current renderer contracts, and make later
   adapters addable without turning proposals into canonical authority.
@@ -94,15 +98,16 @@ Routes below make that non-adoption and each project-owned seam explicit.
 | Source IDs/timestamps/lineage | required invariant | Owner | Model selects existing IDs; code binds canonical values | Model-created IDs/times or unknown refs | Binder/contract tests |
 | Renderer/layout authority | required invariant | Owner | Existing typed semantic blocks and deterministic renderer | Model HTML/CSS/SVG/style/layout/assets | Schema and render tests |
 | Failure/evidence behavior | required invariant | Owner | Unique runs, terminal state, all attempts and every allowed normalization retained; one explicit identical technical retry per run | Hidden/additional retry, valid-semantic regeneration, semantic repair, fallback, or overwrite | Raw-normalized-final attempt/replay evidence |
-| Exact model identity | implementation-delegated | Owner sets envelope; implementer selects | Explicit compatible text model, frozen and recorded | Implicit default, insufficient context, fallback | `DEC-VR1A-048` + run snapshot |
+| Exact provider/model/runtime tuple | fixed constraint for the next revision | Owner | DeepSeek `deepseek-v4-flash-vision-exp`; Chat Completions JSON object; Thinking enabled; reasoning effort high; `max_tokens=32768`; SDK retry zero; one identical application retry | Implicit defaults, Thinking/snapshot mismatch, fallback, temperature-based stability claim | `DEC-VR1A-062`, request-shape test and run snapshot |
 | Internal module/function names | implementation-delegated | Implementer | Small project-owned code within approved paths | Framework/service abstraction | Code review and tests |
 | Prompt wording before freeze | implementation-delegated | Implementer | One versioned prompt per role satisfying contracts | Role merge or post-freeze selective tuning | Prompt snapshot and product revision |
 | Historical six-run thresholds/protocol | closed historical constraint; not current prototype acceptance | None | Preserve prior requirements and evidence unchanged | Reuse it as the current denominator or overwrite it | `DEC-VR1A-049` plus historical manifests |
 | Historical Goal recovery after v3 failure | closed historical authority | None | Preserve its 22 candidates, 20 failed runs, and 36/36 calls | Continue or relabel the exhausted loop | `DEC-VR1A-051/052`, frozen commit `4ba28bf1b3288a6fb77bcc27378a45a69cd2b895` |
 | Canonical provider-conformance continuation | closed historical authority | None | Preserve the completed two-strategy no-go and its artifacts | Continue calls, mutate results, or treat it as current product acceptance | `DEC-VR1A-053/054`, strategy registry, manifests, call ledger and terminal |
 | Strict-boundary isolation | rejected/cancelled | None | Retain card as never-executed design evidence | Official OpenAI credential/call or use as current authority | `DEC-VR1A-058`, cancelled task/status |
-| Current semantic-v2 product prototype | Owner-confirmed contract; execution not authorized by this design session | Implementer after separate Owner execution instruction | Two independent semantic stages; existing DeepSeek JSON-object tuple; Mapper spans and Planner content units; logged non-semantic normalization; one product run per video; one shared technical retry per run; 9-call max; six screenshots | Semantic rewrite/merge/split, valid-semantic retry, fallback/provider comparison, per-video tuning, canary/formal loop | `DEC-VR1A-061`, task card, product manifest, attempt ledger and Owner content/visual review |
-| V1-B/C, G2, production, publishing | prohibited | Owner | Separate future requirements and authorization | Automatic continuation | New Owner decision |
+| Current semantic-v2 product prototype closure | Owner-confirmed configuration; execution not authorized by this documentation turn | Implementer after a separately issued execution prompt | Two independent semantic stages; `DEC-VR1A-062` tuple; Mapper spans and Planner content units; logged non-semantic normalization; one new complete product run per video; one shared technical retry per run; 9-call maximum | Semantic rewrite/merge/split, valid-semantic retry, fallback/provider comparison, per-video tuning, selective rerun or prompt change | `DEC-VR1A-061/062`, new task card, product manifest, attempt ledger and Owner content/visual review |
+| Local Web MVP after the 3/3 gate | implementation-delegated inside `DEC-VR1A-064` | Implementer | One local Owner; bind `127.0.0.1`; allowlisted source IDs; one active run; same planning runtime and `run.json`; server-only secrets; inspect/open report | Hosted/public service, arbitrary filesystem path API, client secrets, duplicate planner path, database/queue/accounts | Provider-free API/browser E2E, real-report opening, failure and security boundary tests |
+| V1-B/C, G2, production, publishing | prohibited | Owner | Separate future requirements and authorization; V1-B is no longer on the immediate critical path | Automatic continuation | New Owner decision |
 
 All implementation-facing decisions now have a fixed, invariant,
 implementation-delegated, or prohibited classification. The independent

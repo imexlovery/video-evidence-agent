@@ -30,7 +30,7 @@
 |---|---|---|---|---|---|---|
 | `IN-VR1A-TRANSCRIPT/VideoSegment-v1` | Existing ingest; decision source | JSONL rows with video/segment IDs, consecutive ordinal, `[start_ms,end_ms)`, text, ASR provenance | Chinese technical/knowledge video; ≤80 segments and ≤50,000 Unicode characters; named fixture exceptions within these limits | Existing Pydantic + `validate_video_segments`; full external processing Owner-authorized | Unique IDs/ordinals; chronological non-overlap | Fail before model call |
 | `IN-VR1A-MANIFEST/ingest-v1` | Existing ingest; metadata/rights | Video ID, duration, title/source/attribution/use basis | Exactly one video matching transcript | JSON object and cross-file ID/duration checks | One manifest | Fail before model call |
-| `IN-VR1A-MODEL-CONFIG/v1` | Local operator/environment | Explicit provider endpoint if non-default, model, API/response mode, timeout, prompt versions, credential-present boolean | One frozen tuple for all three product runs; temperature 0 when supported; SDK retry zero; application retry budget one per run | Secrets remain environment-only; v2 uses DeepSeek JSON-object capability and does not require provider-side business-schema enforcement | Immutable inside the three-video product set and both attempts | Configuration error |
+| `IN-VR1A-MODEL-CONFIG/v1` | Local operator/environment | Explicit provider endpoint if non-default, model, API/response mode, timeout, prompt versions, credential-present boolean | One frozen tuple for all three product runs; `thinking.type=enabled`; `reasoning_effort=high`; `max_tokens=32768`; SDK retry zero; application retry budget one per run | Secrets remain environment-only; the adapter must send and trace the actual DeepSeek controls; temperature may be recorded but is not stability evidence because Thinking mode ignores it | Immutable inside the three-video product set and both attempts | Configuration error or request/config snapshot mismatch |
 | `IN-VR1A-REVIEW-CARD/v1` | Human reviewer before product build | Must-cover topics, optional topics, known ASR traps, prohibited claims, source IDs, content/visual rubric | One card per fixed video | Source IDs validated; card revision frozen before product runs | Unique video ID | Product set cannot start |
 
 ### Valid, boundary, and invalid transcript examples
@@ -219,7 +219,13 @@ Owner cancelled the unexecuted official-OpenAI isolation proposal and then
 confirmed a DeepSeek-first product-prototype contract in `DEC-VR1A-061`. The
 full normative task is
 [`VR-V1A-CONTRACT-SIMPLIFICATION-006`](../../tasks/VISUAL-REPORT-V1A-CONTRACT-SIMPLIFICATION.md);
-execution has not started in this documentation session.
+it was subsequently implemented at `844978f08d07775b650467e31e221a969ddef3e3`.
+Its first frozen product set rendered RLinf and Wu Yi but exhausted Kling's
+single retry on `finish=length`, so it remains
+`PROTOTYPE_EXECUTION_INCONCLUSIVE`. `DEC-VR1A-062` now controls only the next
+complete three-video runtime revision: Thinking enabled, reasoning effort
+high, `max_tokens=32768`, and one identical retained retry. It does not rewrite
+the earlier attempt or change the semantic-v2/compiler contract below.
 
 The current version adds:
 
@@ -317,8 +323,10 @@ weak/invalid semantics, grounding, or V0 incompatibility is non-retryable.
 
 ## Configuration, ordering, concurrency, and idempotency
 
-- Prompt versions, model, endpoint label, temperature, timeout, and maximum
-  input envelope are fixed at run creation.
+- Prompt versions, model, endpoint label, Thinking controls, reasoning effort,
+  output ceiling, timeout, temperature trace value, and maximum input envelope
+  are fixed at run creation. Temperature is not stability evidence in the
+  frozen Thinking mode.
 - Calls are sequential and one run owns two base calls plus at most one
   eligible technical retry, for at most three admitted calls.
 - Concurrency is one local run. No lock/queue is added beyond rejecting an

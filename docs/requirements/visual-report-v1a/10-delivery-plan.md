@@ -164,7 +164,8 @@ engineering defects would have been repaired before Call 1; no Call 1 occurred.
 ## Current semantic-v2 product-prototype delivery
 
 `VR-V1A-CONTRACT-SIMPLIFICATION-006` is the Owner-confirmed product contract.
-Its future implementation runs as one continuous Goal:
+It was implemented at `844978f08d07775b650467e31e221a969ddef3e3` using the
+following continuous Goal:
 
 ```text
 preserve e72503f and every historical/cancelled artifact
@@ -198,6 +199,28 @@ First-attempt schema/JSON success remains diagnostic; three report contents and
 their 1080 px/approximately 390 px visual results drive Owner review. No
 per-video tuning, prompt micro-version, second model/provider, six-run formal,
 official OpenAI, GLM/Qwen, or semantic fabrication is allowed.
+
+The retained first product set rendered RLinf and Wu Yi, while Kling exhausted
+its one retry on an incomplete response. It therefore closed as
+`PROTOTYPE_EXECUTION_INCONCLUSIVE`; its identities and artifacts remain
+historical evidence.
+
+## Next gated text closure and local Web MVP
+
+`VR-V1-TEXT-WEB-CLOSURE-007` is the next designed construction unit. It first
+freezes and executes one wholly new three-video semantic-v2 set using the exact
+`DEC-VR1A-062` tuple: DeepSeek `deepseek-v4-flash-vision-exp`, Chat Completions
+JSON object, Thinking enabled, reasoning effort high, `max_tokens=32768`, SDK
+retry zero, and one identical retained application retry. Temperature may be
+recorded but is not stability evidence.
+
+Only a 3/3 rendered text set opens the second gate: a separate single-user,
+loopback-only Web MVP over the same runtime, `run.json`, artifacts, allowlisted
+fixtures, and server-side credential. The Web slice may select a source, start
+one unique run, observe canonical state, and open the rendered report. It adds
+no MP4/ASR, keyframe, OCR/VLM, database, queue, account, public host, V1-B, or
+V1-C authority. Its detailed call ceiling, API boundary, verification, and
+terminal states live in the task card.
 
 ## Historical v1 vertical slices
 
@@ -298,6 +321,8 @@ commercial commitments implicitly.
 
 MP4/ASR orchestration, keyframe extraction or selection, `image_caption`, OCR,
 VLM, RAG, Agent, LangGraph, tool loops, multi-agent runtime, database, cache,
-queue, API, UI, URL input, multi-video synthesis, multiple templates, free
-layout, publishing, deployment, prompt self-optimization, fine-tuning, and any
-V1-B/V1-C implementation.
+queue, general/public API or UI, URL input, multi-video synthesis, multiple
+templates, free layout, publishing, deployment, prompt self-optimization,
+fine-tuning, and any V1-B/V1-C implementation. The only UI exception is the
+bounded localhost Web MVP in `VR-V1-TEXT-WEB-CLOSURE-007`, which starts only
+after the V1-A 3/3 text gate and does not change V1-A's product contract.

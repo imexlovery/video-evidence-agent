@@ -162,8 +162,14 @@ or automated results.
 
 The Owner cancelled the unexecuted official-OpenAI isolation proposal and
 confirmed `VR-V1A-CONTRACT-SIMPLIFICATION-006` as a DeepSeek-backed product
-prototype in `DEC-VR1A-061`. Execution has not started in this documentation
-session.
+prototype in `DEC-VR1A-061`. That implementation now exists. Its first frozen
+product set rendered RLinf and Wu Yi, while Kling remained incomplete after
+the one eligible retry; the retained result is
+`PROTOTYPE_EXECUTION_INCONCLUSIVE`, not a route No-Go. `DEC-VR1A-062` defines
+one new complete set using the same semantic-v2 contracts with Thinking
+enabled, reasoning effort high, `max_tokens=32768`, SDK retry zero, and one
+identical retained application retry. Temperature may be traced but cannot be
+used to claim stability in Thinking mode.
 
 Provider-free acceptance must cover every v2 compiler rule using raw,
 normalized and final artifacts. Tests must prove that allowed rules never add,
@@ -236,8 +242,9 @@ For current v2, replace the historical execution-oriented rows with:
 ## Acceptance cases
 
 `TEST-VR1A-001` through `022` retain the implemented/historical v1 and
-provider-conformance acceptance record. `TEST-VR1A-023` through `027` define
-the current Owner-confirmed semantic-v2 product prototype.
+provider-conformance acceptance record. `TEST-VR1A-023` through `028` define
+the current Owner-confirmed semantic-v2 product prototype and its runtime
+closure.
 
 | Test ID | Given | When | Then | Links |
 |---|---|---|---|---|
@@ -268,6 +275,7 @@ the current Owner-confirmed semantic-v2 product prototype.
 | `TEST-VR1A-025` | Eligible technical failure then success/failure | V2 stage runs | Exactly one identical retry is attempt-recorded; success remains reviewable; exhaustion is technical-inconclusive | `REQ-VR1A-021` |
 | `TEST-VR1A-026` | Valid JSON with weak semantics or V0 incompatibility | Compiler rejects it | No retry, model repair, fabricated content, provider fallback, or hidden new run occurs | `REQ-VR1A-020`, `021` |
 | `TEST-VR1A-027` | Frozen three-video product set renders | Browser/content review runs | Three HTML reports, six viewport screenshots, content/grounding/structure/visual evidence exist; total calls ≤9; schema-first-hit remains diagnostic | `REQ-VR1A-022` |
+| `TEST-VR1A-028` | Next product revision is admitted | Request spy, manifest, and attempt trace are compared | Actual DeepSeek Chat Completions request and snapshot agree on `deepseek-v4-flash-vision-exp`, JSON object, Thinking enabled, reasoning effort high, `max_tokens=32768`, SDK retry zero, and one identical application retry; temperature is excluded from stability claims | `REQ-VR1A-021`, `022` |
 
 ## Invalid, partial, stale, and adversarial cases
 

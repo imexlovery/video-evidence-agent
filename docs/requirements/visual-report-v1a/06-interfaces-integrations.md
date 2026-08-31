@@ -19,7 +19,7 @@ notification surfaces are not applicable — V1-A is one foreground local CLI.
 |---|---|---|---|---|
 | `IN-VR1A-TRANSCRIPT` | Local UTF-8 JSONL path | Filesystem | ≤80 segments/50,000 characters | Full validation before provider call |
 | `IN-VR1A-MANIFEST` | Local UTF-8 JSON path | Filesystem | One matching manifest | Conflict/missing file fails |
-| `IN-VR1A-MODEL-CONFIG` | Environment + versioned source defaults | Local process/provider credential | One explicit model; temperature 0; timeout >0 | Missing/invalid config fails |
+| `IN-VR1A-MODEL-CONFIG` | Environment + versioned source defaults | Local process/provider credential | One explicit model; Thinking enabled; reasoning effort high; `max_tokens=32768`; timeout >0 | Missing/invalid config or a request/snapshot mismatch fails |
 | `OUT-VR1A-*` | Local UTF-8 JSON/JSONL/HTML | Filesystem | One unique run root | Atomic stage writes; non-zero on incomplete run |
 
 ## CLI contract
@@ -58,9 +58,12 @@ Required behavior:
 | `VISUAL_REPORT_TIMEOUT_SECONDS` | Per-call timeout | Optional default `120` | Positive; recorded in run config |
 
 The separate names protect frozen P0-B answering configuration. Prompt versions,
-temperature `0`, maximum input size, and SDK `max_retries=0` are versioned
-product policy. The project-owned single technical retry is a separate explicit
-run rule, not a hidden SDK/environment knob.
+`thinking.type=enabled`, `reasoning_effort=high`, `max_tokens=32768`, maximum
+input size, and SDK `max_retries=0` are versioned product policy. Temperature may
+remain present for SDK compatibility and trace completeness, but Thinking mode
+ignores it and no stability claim may depend on it. The project-owned single
+technical retry is a separate explicit run rule, not a hidden SDK/environment
+knob.
 
 ## Provider integration: `IF-VR1A-PROVIDER`
 
@@ -70,8 +73,8 @@ run rule, not a hidden SDK/environment knob.
 | Purpose | One Topic Mapper and one Report Planner semantic stage, with at most one eligible technical retry across the run |
 | Payload | System instruction + JSON user payload containing authorized full transcript; Planner also receives canonical Topic Map and renderer grammar |
 | Response | One valid JSON object containing the stage's shallow semantic v2 proposal; project normalization owns canonical validity |
-| Model capability | Chinese long-context text; ≥50,000-character input envelope plus output; DeepSeek Chat Completions JSON Output for the exact selected text model/API |
-| Parameters | `response_format={"type":"json_object"}`; JSON instruction/example; non-thinking; temperature 0 when supported; explicit output/timeout; no tools/streaming/SDK retry; project retry repeats one identical failed stage at most once per run |
+| Model capability | Chinese long-context text; ≥50,000-character input envelope plus output; current `deepseek-v4-flash-vision-exp` model used with text-only DeepSeek Chat Completions JSON Output |
+| Parameters | `response_format={"type":"json_object"}`; JSON instruction/example; `extra_body={"thinking":{"type":"enabled"}}`; `reasoning_effort="high"`; `max_tokens=32768`; explicit timeout; no tools/streaming/SDK retry; project retry repeats one identical failed stage at most once per run; temperature is not stability evidence |
 | Quota/cost | Provider-defined; usage recorded; two base calls/three maximum per run and nine maximum for the product set; monetary cost is `unavailable` without authoritative pricing |
 | Outage | Eligible technical failure may spend the one identical retry; exhaustion is technical-inconclusive; no alternate provider/model/cache/manual fallback |
 | Reconciliation | Raw response is advisory; deterministic source resolution/non-semantic compiler/V0 validation owns canonical acceptance and writes an ordered governance ledger |
@@ -109,13 +112,15 @@ first transcript call. No strategy changes within a run or canary set.
 
 ### Current DeepSeek semantic-v2 product contract
 
-Freeze one existing DeepSeek text model, Chat Completions JSON-object API
-surface, one Mapper/Planner prompt bundle, v2 raw/canonical schema versions,
-normalizer/compiler versions, source hashes, timeout/output settings, SDK
-version, and all three product-run identities before the first call. GLM, Qwen,
-official OpenAI, a vision model, and a second DeepSeek model are not eligible
-fallbacks or comparison arms. The official DeepSeek JSON Output warning about
-occasional empty content maps to an eligible retained technical retry; retry
+Freeze `deepseek-v4-flash-vision-exp`, the Chat Completions JSON-object API
+surface, `thinking.type=enabled`, `reasoning_effort=high`, `max_tokens=32768`,
+one Mapper/Planner prompt bundle, v2 raw/canonical schema versions,
+normalizer/compiler versions, source hashes, timeout settings, SDK version, and
+all three product-run identities before the first call. GLM, Qwen, official
+OpenAI, or a second DeepSeek model are not eligible fallbacks or comparison
+arms. The trace must distinguish input, reasoning, visible-output, and total
+tokens when supplied by the provider. The official DeepSeek JSON Output warning
+about incomplete content maps to an eligible retained technical retry; retry
 exhaustion remains technical-inconclusive rather than product-route No-Go.
 
 ## Prompt transport shape

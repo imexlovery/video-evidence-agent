@@ -1,11 +1,11 @@
 {
   "schemaVersion": "1.0",
   "generatedBy": "agent-native-requirements/validate_readiness.py",
-  "generatedAt": "2026-08-30T16:54:31.204782+00:00",
+  "generatedAt": "2026-08-30T19:08:34.845698+00:00",
   "status": "READY_FOR_ENGINEERING_HANDOFF",
   "ready": true,
   "confidence": 100.0,
-  "evaluatedArtifactSha256": "ce7fff058867da153d2c804e7a074e837b965b317fe6d0d13c097cf0f92e228a",
+  "evaluatedArtifactSha256": "9c5e61652f75720d991fcf771c5e4e88616d521a85dc78292e6ae699aff16d90",
   "evaluatedFiles": [
     {
       "path": "00-handoff.md",
@@ -21,7 +21,7 @@
     },
     {
       "path": "03-functional-spec.md",
-      "sha256": "77e877a74b7ec52dc3fca53a21b184c54f6ea696a1369aed4bd60e4da5c25c55"
+      "sha256": "3181a9b2da94ee4b78c5a69a0c95e74560dbecf93e44d3e696af61975b5d416d"
     },
     {
       "path": "04-system-design.md",
@@ -33,7 +33,7 @@
     },
     {
       "path": "06-interfaces-integrations.md",
-      "sha256": "72aa5e273e5cbf1bfc8b9e4c72a7ce3b4b9d707b0df7bba7f99b2adfa8097cd4"
+      "sha256": "e820ebf47493d7dbe40cb91f7154795e96d8726a6a0f8f7023fdee192786e86e"
     },
     {
       "path": "07-agent-behavior.md",
@@ -45,27 +45,27 @@
     },
     {
       "path": "09-test-acceptance.md",
-      "sha256": "807d3e53dc55ce61ce76c060904784f2039ed5bf118784b75c47d2428cb6f6f9"
+      "sha256": "3ee1c1087195b1ef617d38ea18452d4ddd0a1e280f50f57c42d8abef8bfe4eec"
     },
     {
       "path": "10-delivery-plan.md",
-      "sha256": "c09bc94419594376bd9287b237f24284fcf4b0ebe47697e937db23363a14b2d1"
+      "sha256": "039c96a224a02f27d2adecc5ed020d11c2dd3ebb430e3913ed1177547fcd4c10"
     },
     {
       "path": "11-decisions-risks.md",
-      "sha256": "2a269fdcef1979336ef3ae5e822b5beabcfbe6628f26a97fe84323cd17efb97b"
+      "sha256": "9ef150a16295d5f7affbc7e7e017af84526241f85e187eb7834f967467b6d272"
     },
     {
       "path": "12-engineering-context.md",
-      "sha256": "05a1e9627820a915c839756872ca779afcc8b2b4a6c02c9de39db44835ab13f0"
+      "sha256": "a920d72aa05ead214787279901d6362ee408b179778e488faa15236491ab4a09"
     },
     {
       "path": "coverage.json",
-      "sha256": "2f7fcaf1f950fe69830090fb6107c90e358477d37acbb42c318952da7be42717"
+      "sha256": "aaf6192a07b22e9e2ad10a0452fd58876565aa228b3352753ff6d77d748bb6a4"
     },
     {
       "path": "decision-evidence.jsonl",
-      "sha256": "5acc6607a915818a4b0f1ab14c7f28f96e3ed893c0cc8478792992afbe00a707"
+      "sha256": "c37d845b75a6f895a1e0cab13c0cccb26ca58bc5e526919b70f909e8d4fbcc19"
     }
   ],
   "areaBreakdown": [
@@ -160,7 +160,8 @@
     {
       "gate": "canonical_state_authority_and_status_vocabulary",
       "decisionIds": [
-        "DEC-VR1A-013"
+        "DEC-VR1A-013",
+        "DEC-VR1A-064"
       ],
       "closed": true
     },
@@ -187,7 +188,9 @@
         "DEC-VR1A-052",
         "DEC-VR1A-054",
         "DEC-VR1A-058",
-        "DEC-VR1A-061"
+        "DEC-VR1A-061",
+        "DEC-VR1A-062",
+        "DEC-VR1A-064"
       ],
       "closed": true
     },
@@ -195,7 +198,8 @@
       "gate": "data_persistence_ownership_retention_and_deletion",
       "decisionIds": [
         "DEC-VR1A-010",
-        "DEC-VR1A-027"
+        "DEC-VR1A-027",
+        "DEC-VR1A-064"
       ],
       "closed": true
     },
@@ -210,7 +214,8 @@
     {
       "gate": "delivery_surface",
       "decisionIds": [
-        "DEC-VR1A-012"
+        "DEC-VR1A-012",
+        "DEC-VR1A-064"
       ],
       "closed": true
     },
@@ -237,7 +242,9 @@
         "DEC-VR1A-053",
         "DEC-VR1A-054",
         "DEC-VR1A-058",
-        "DEC-VR1A-061"
+        "DEC-VR1A-061",
+        "DEC-VR1A-062",
+        "DEC-VR1A-064"
       ],
       "closed": true
     },
@@ -266,7 +273,8 @@
         "DEC-VR1A-053",
         "DEC-VR1A-054",
         "DEC-VR1A-058",
-        "DEC-VR1A-061"
+        "DEC-VR1A-061",
+        "DEC-VR1A-062"
       ],
       "closed": true
     },
@@ -284,7 +292,9 @@
       "gate": "first_release_scope_and_non_goals",
       "decisionIds": [
         "DEC-VR1A-003",
-        "DEC-VR1A-024"
+        "DEC-VR1A-024",
+        "DEC-VR1A-063",
+        "DEC-VR1A-064"
       ],
       "closed": true
     },
@@ -307,7 +317,9 @@
         "DEC-VR1A-052",
         "DEC-VR1A-053",
         "DEC-VR1A-054",
-        "DEC-VR1A-061"
+        "DEC-VR1A-061",
+        "DEC-VR1A-062",
+        "DEC-VR1A-064"
       ],
       "closed": true
     },
@@ -369,7 +381,9 @@
       "decisionIds": [
         "DEC-VR1A-019",
         "DEC-VR1A-031",
-        "DEC-VR1A-061"
+        "DEC-VR1A-061",
+        "DEC-VR1A-062",
+        "DEC-VR1A-064"
       ],
       "closed": true
     },
@@ -378,7 +392,9 @@
       "decisionIds": [
         "DEC-VR1A-022",
         "DEC-VR1A-041",
-        "DEC-VR1A-061"
+        "DEC-VR1A-061",
+        "DEC-VR1A-062",
+        "DEC-VR1A-064"
       ],
       "closed": true
     },
@@ -392,7 +408,10 @@
         "DEC-VR1A-052",
         "DEC-VR1A-053",
         "DEC-VR1A-054",
-        "DEC-VR1A-061"
+        "DEC-VR1A-061",
+        "DEC-VR1A-062",
+        "DEC-VR1A-063",
+        "DEC-VR1A-064"
       ],
       "closed": true
     },
@@ -490,7 +509,9 @@
         "DEC-VR1A-053",
         "DEC-VR1A-054",
         "DEC-VR1A-058",
-        "DEC-VR1A-061"
+        "DEC-VR1A-061",
+        "DEC-VR1A-063",
+        "DEC-VR1A-064"
       ],
       "closed": true
     },
@@ -499,7 +520,9 @@
       "decisionIds": [
         "DEC-VR1A-001",
         "DEC-VR1A-024",
-        "DEC-VR1A-061"
+        "DEC-VR1A-061",
+        "DEC-VR1A-063",
+        "DEC-VR1A-064"
       ],
       "closed": true
     },

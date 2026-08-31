@@ -9,7 +9,7 @@
 | Safety floor | Final source IDs/refs are strict, deterministic timestamps/IDs/compiler and current typed renderer remain authoritative, the only retry is explicit/identical/attempt-recorded, no fallback or semantic rewrite/merge/split/fabrication, every structural rule is logged, failures are retained, credentials are not disclosed |
 | Deferred risks | End-to-end MP4 quality, visual-only information, asset selection, service resilience, tenancy, support, and publishing rights remain untested |
 | Next grade/horizon | `G2 CONTROLLED_PILOT` only after V1-A quality acceptance and a separate Owner decision; no target date |
-| Promotion evidence/approvers | Six-run evidence passes the Owner-approved rubric; workload, source rights, operating/support owner, and recovery boundaries are newly defined; Owner approves |
+| Promotion evidence/approvers | The complete three-video product set passes Owner content/visual review; any later repeat-stability or G2 claim requires a newly authorized measurement plus workload, source-rights, operating/support, and recovery evidence; Owner approves |
 
 ## Decision log
 
@@ -57,6 +57,9 @@ into Owner confirmation.
 | `DEC-VR1A-059 / SYSTEM_RECOMMENDED` | Keep two calls but use shallow semantic-v2 Mapper/Planner proposals plus an observable deterministic Topic Resolver/normalizer/compiler | Requirements design after frozen DeepSeek failures | Failures were dominated by exact topic count, unique segment accounting, typed-union counts and source bounds rather than proven content quality | Keep strict v1; merge calls; free-form Markdown | More compiler governance and normalization metrics; much lower provider schema pressure | Preserve v1 schemas and switch task version | V2 fixtures, repair ledger, replay, canary and rubric |
 | `DEC-VR1A-060 / SYSTEM_RECOMMENDED` | Use one frozen DeepSeek Chat Completions JSON-object tuple, one 3-video canary, and one gated 6-run formal revision with an 18-call ceiling | Current DeepSeek access plus official JSON Output contract | Reuse available credential while retaining cross-video and repeat evidence | GLM/Qwen comparison; RLinf-only test; unbounded tune loop | No provider comparison; empty JSON remains a visible failure; 20% discard ceiling is a proposed quality bound | Owner may revise before authorization | Frozen manifests, exact call ledger, normalization-aware evaluator |
 | `DEC-VR1A-061 / USER_CONFIRMED` | Reposition semantic v2 as a three-video product prototype: non-semantic compiler only, no semantic rewrite/merge/split, one explicit recorded technical retry, content/visual quality primary, schema-first-hit diagnostic | Owner message superseding `DEC-VR1A-059/060` | Test the actual Visual Report product hypothesis without letting incidental API/JSON faults or provider conformance dominate | Keep compliance experiment; no retry; semantic normalizer; six-run formal | Loses repeat-stability evidence but produces the smallest direct product proof; retry evidence and Owner judgment become essential | New Owner revision may reopen formal stability work later | Three reports, six viewport screenshots, attempt ledger, content/visual rubrics and cross-video review |
+| `DEC-VR1A-062 / USER_CONFIRMED` | Freeze DeepSeek Chat Completions with Thinking enabled, reasoning effort high, `max_tokens=32768`, SDK retry zero, and one identical application retry; temperature is not stability evidence | Owner message after semantic-v2 product run | The failed/successful attempts all spent material output budget on reasoning; the next revision must test the intended Thinking path with enough combined reasoning/output headroom | Disable Thinking; retain 8192; rely on temperature zero | Higher bounded latency/token exposure, but directly tests the Owner-selected quality-oriented configuration | New complete three-video revision; historical run unchanged | Request-shape test, exact trace, three new retained runs and call-budget audit |
+| `DEC-VR1A-063 / USER_CONFIRMED` | Put V1-B keyframes off the critical path; close text generation first, then build a local Web MVP before optional V1-B/V1-C | Owner product-priority message | Complete the smallest usable product loop before automating low-priority media assets | Follow A→B→C order; enter full MP4 pipeline | Text-only Web reports remain visually sparse but become directly usable in a browser | Later roadmap decision | Three text reports plus local Web workflow review |
+| `DEC-VR1A-064 / USER_DELEGATED` | Use one continuous gated Goal: 3/3 text closure first, then a single-user localhost Web surface over the same run/runtime contracts | Owner request to set the next Goal | Avoid another manual session chain and avoid duplicating planning logic in a UI-specific path | Separate Goals; hosted service; static report browser only | Adds a small local HTTP/UI boundary, but no account/database/queue/deployment | Remove the Web slice without changing V1-A artifacts | Task card, provider-free Web integration, browser checks, real-report opening and protected-path review |
 
 ## Business, integration, and platform gap decisions
 
@@ -104,6 +107,8 @@ into Owner confirmation.
 | `RISK-VR1A-020` | Historical synthetic, one-video, or provider-conformance evidence is promoted as current V1-A product evidence | Medium | High | Status claims product quality without three rendered reports and six viewport screenshots | Keep historical diagnostics labeled; require the complete three-video product set and Owner content/visual review | Owner | Artifact inventory and terminal conclusion review |
 | `RISK-VR1A-021` | Deterministic compiler becomes hidden semantic author | Medium | High | A rule rewrites/truncates text, merges/splits units, moves claims, invents evidence, or cannot replay | Closed rule registry; ordered before/after ledger; whole-unit omission only; explicit no rewrite/merge/split tests; Owner inspects deltas | Implementer/Owner | Raw-normalized-final diff and 0/0 replay |
 | `RISK-VR1A-022` | Compiler omits weak or invalid whole units and a thin report is called success | Medium | High | Must-cover loss, an unexplained omission pattern, or too little grounded material for an editorial report | Record every whole-unit omission with reason; prohibit semantic reconstruction; require grounding, content sufficiency and Owner quality review; a compilable thin report does not pass | Owner | Omission ledger, final-source audit and product rubric |
+| `RISK-VR1A-023` | Thinking consumes the 32,768-token ceiling before a complete JSON answer | Medium until measured | High | `finish_reason=length`, reasoning tokens approach the ceiling, or content is absent/truncated | Send and trace the real Thinking/high controls; preserve one identical retry; freeze and run all three videos; stop honestly if any exhausts | Implementer/Owner | Request mock assertion, per-attempt usage/finish trace and 3/3 gate |
+| `RISK-VR1A-024` | A new Web surface hides or duplicates the canonical planning state | Medium | High | UI invents states, retries independently, exposes secrets/paths, or writes reports outside the run recorder | `run.json` remains authority; Web invokes the same runtime; one retry owner; localhost/allowlisted IDs only; no client secret | Implementer | API/state mapping, duplicate-submit, path traversal, failure and browser tests |
 
 ## Intelligence, source-data, stability, customer-operation, vendor, compliance, and support risks
 
@@ -111,10 +116,11 @@ into Owner confirmation.
   correct coverage, priority, or entailment; human evaluation remains required.
 - Source ASR errors and absent visual facts bound the conclusion. V1-A may
   diagnose these gaps but cannot add OCR/VLM or silently use outside knowledge.
-- Model outputs are non-deterministic even at temperature zero. This G1 product
-  prototype does not claim repeat stability: deterministic compilation/replay,
-  three different videos and explicit attempt traces separate product evidence
-  from transport anomalies. Repeat measurement is deferred.
+- Model outputs remain non-deterministic in Thinking mode, and DeepSeek ignores
+  temperature there. This G1 product prototype does not claim repeat stability:
+  deterministic compilation/replay, three different videos and explicit
+  attempt traces separate product evidence from transport anomalies. Repeat
+  measurement is deferred.
 - The configured provider is a single external dependency. Outage fails the run
   visibly; there is no availability promise or alternate provider.
 - There are no customers or support obligations. The Owner operates, reviews,
@@ -176,10 +182,18 @@ content plus desktop/mobile visual review the primary evidence. This confirms
 the product contract but does not itself authorize implementation or provider
 calls.
 
+Later on 2026-08-31, `DEC-VR1A-062` replaced only the future runtime
+configuration portion of that contract: the next complete product revision uses
+Thinking enabled, reasoning effort high, `max_tokens=32768`, and one identical
+application retry. Temperature remains trace metadata but is not a stability
+control. `DEC-VR1A-063/064` put keyframe automation off the critical path and
+delegate a gated local Web MVP after a clean 3/3 text-report result. The Web
+slice is not retroactively part of V1-A and does not authorize V1-B, V1-C,
+MP4/ASR, hosting, or production use.
+
 ## Residual non-blocking questions
 
 | Question | Why non-blocking | Owner | Default | Decision deadline |
 |---|---|---|---|---|
 | Should the six required screenshots use a browser/device preset beyond exact 1080 px and approximately 390 px widths? | Both viewports are fixed, but the capture engine and height policy do not change the product judgment | Implementer | Use the existing browser capture path, full natural page height, and record exact viewport metadata | Before product Run 1 |
 | Should raw provider response bodies be retained indefinitely? | Schema/debug evidence can be separated from long-term retention | Owner | Retain inside local run directories through Owner review, then archive/delete only by explicit Owner action | Before any G2 promotion |
-| Which currently accessible DeepSeek text model should be frozen for semantic v2? | Existing `DEC-VR1A-048` delegates exact-model choice inside an explicit capability/configuration boundary, while v2 prohibits provider/model comparison | Implementer | Choose one accessible non-vision DeepSeek text model whose current JSON-output/context envelope satisfies the task; freeze it before product Run 1 | Before the product-prototype freeze |
