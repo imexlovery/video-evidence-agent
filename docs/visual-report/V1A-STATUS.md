@@ -1,5 +1,33 @@
 # Video Visual Report V1-A — Current Status
 
+## Task 011 — public Bilibili URL local closure — handoff ready — 2026-08-31
+
+The Owner froze the completed Task 010 code and documentation at commit
+`ba7d851`, while explicitly deferring content-quality, semantic-analysis, and
+layout improvements. This freeze is a technical baseline, not content-quality
+acceptance.
+
+The Owner then fixed the scope of
+[`VR-V1-URL-INGEST-LOCAL-MVP-011`](../tasks/VISUAL-REPORT-V1-URL-INGEST-LOCAL-MVP.md)
+as a strictly bounded wiring task:
+
+```text
+public single BV URL → yt-dlp → existing ingest → existing visual-report → Web
+```
+
+Task 011 may add only the download adapter, run-local composition, URL Web
+input, minimal display stages, targeted tests, and local execution evidence.
+It must not redesign Planner/Renderer, add Cookie login, database, queue,
+deployment, public hosting, or another ASR backend. Task 010 historical runs,
+artifacts, evaluator result, and pending content rubrics remain unchanged.
+
+The Owner then narrowed this session to documentation and a copy-ready Goal
+only. All provisional product-code/test edits were removed. Task 011 is
+`DOCUMENTATION_HANDOFF_READY — IMPLEMENTATION_NOT_STARTED`; this is a bounded
+task-card/Goal publication state, not an independent readiness-validator result.
+Its implementation, download, ASR, model calls, browser run, commit, push, and
+deployment are all deferred to the separately published Goal session.
+
 This is the durable resume point for the transcript-to-plan prototype. The
 implementation task `VR-V1A-PLANNING-001` is complete at its blocked Owner
 review stop, and the separately authorized measurement task
@@ -640,3 +668,54 @@ The exact Task 010 terminal is:
 
 This terminal hands the reports, screenshots, and pending rubrics to the Owner
 for content, visual, and Web review; it is not an acceptance record.
+
+## Task 011 — public Bilibili URL local MVP — construction complete — 2026-08-31
+
+This is an append-only construction update. The earlier Task 011
+`DOCUMENTATION_HANDOFF_READY — IMPLEMENTATION_NOT_STARTED` text remains as
+historical handoff evidence; this section records the later Owner-authorized
+construction Goal without replacing it or any Task 008–010 evidence.
+
+The bounded loop is implemented and verified:
+
+`public single BV URL → yt-dlp → existing video-evidence ingest → existing
+semantic-v2 visual-report → loopback Web canonical report.html`
+
+### Verification
+
+- Frozen baseline: `visual-report` at `ba7d8512699ad04f5a9137bb9cfb7e62971263b2`.
+- Provider-free: Ruff passed; Task 011 tests `5 passed`; full pytest
+  `98 passed`; existing V0/Web regression `10 passed`; `git diff --check`
+  passed.
+- Local command:
+
+  ```bash
+  NO_PROXY=api.deepseek.com \
+  no_proxy=api.deepseek.com \
+  UV_CACHE_DIR=/private/tmp/video-evidence-agent-uv-cache \
+  uv run python -m video_evidence_agent.visual_report serve-url-web \
+    --artifact-root artifacts/visual-report/url-ingest \
+    --port 8766
+  ```
+
+  URL: `http://127.0.0.1:8766/visual-report/`. Port 8765 was occupied by the
+  existing static preview and was left untouched.
+- Real browser URL: `https://www.bilibili.com/video/BV1RxWnzbE7g`.
+- Real run ID: `url-bilibili-BV1RxWnzbE7g-73fb6cd3f6c5`.
+- Download: `artifacts/visual-report/url-ingest/url-bilibili-BV1RxWnzbE7g-73fb6cd3f6c5/download/source.mp4`
+  and `download/source.info.json`.
+- Ingest: `.../ingest/bilibili-BV1RxWnzbE7g/manifest.json` and
+  `segments.jsonl`.
+- Report: `.../report.html`, opened and read in the browser after the page
+  displayed `RENDERED`.
+- Calls: `2` provider/model calls (`topic_mapper`, `report_planner`), model
+  `deepseek-v4-flash-vision-exp`, attempt 1 for each, existing technical retry
+  unused, no fallback.
+- Browser sequence: `DOWNLOADING` → `TRANSCRIBING` → `PLANNING` →
+  `RENDERED`; the report page showed the generated report and source
+  attribution. This records wiring/runtime evidence only, not content-quality
+  or visual acceptance.
+
+The exact Task 011 terminal is:
+
+`READY_FOR_OWNER_V1_URL_LOCAL_MVP_REVIEW — PUBLIC_BV_LOOP_READY`

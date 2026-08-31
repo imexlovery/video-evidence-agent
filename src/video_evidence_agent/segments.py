@@ -12,6 +12,9 @@ class SegmentBuildError(RuntimeError):
     """Raised when ASR boundaries cannot form valid P0-A retrieval units."""
 
 
+FINAL_SEGMENT_END_TOLERANCE_MS = 1_000
+
+
 def _validate_asr_order(segments: list[AsrSegment]) -> None:
     previous_end_ms: int | None = None
     for segment in segments:
@@ -55,8 +58,9 @@ def build_video_segments(
     *,
     target_duration_ms: int = 45_000,
     max_duration_ms: int = 60_000,
+    duration_ms: int | None = None,
 ) -> list[VideoSegment]:
-    """Merge only ASR boundaries into stable, non-overlapping retrieval units."""
+    """Merge ASR boundaries, correcting only a bounded final tail overrun."""
 
     if not video_id.strip():
         raise SegmentBuildError("video_id must not be blank")
@@ -64,6 +68,8 @@ def build_video_segments(
         raise SegmentBuildError("segment durations must be positive")
     if target_duration_ms > max_duration_ms:
         raise SegmentBuildError("target duration cannot exceed maximum duration")
+    if duration_ms is not None and duration_ms <= 0:
+        raise SegmentBuildError("source duration must be positive")
 
     ordered = sorted(asr_segments, key=lambda item: (item.start_ms, item.end_ms, item.ordinal))
     if not ordered:
@@ -91,6 +97,15 @@ def build_video_segments(
     for ordinal, group in enumerate(groups):
         start = group[0]
         end = group[-1]
+        end_ms = end.end_ms
+        if (
+            ordinal == len(groups) - 1
+            and duration_ms is not None
+            and end_ms > duration_ms
+            and end_ms - duration_ms <= FINAL_SEGMENT_END_TOLERANCE_MS
+            and start.start_ms < duration_ms
+        ):
+            end_ms = duration_ms
         transcript_text = _normalise_whitespace(" ".join(item.text for item in group))
         output.append(
             VideoSegment(
@@ -98,7 +113,7 @@ def build_video_segments(
                 segment_id=f"{video_id}-seg-{ordinal:03d}",
                 ordinal=ordinal,
                 start_ms=start.start_ms,
-                end_ms=end.end_ms,
+                end_ms=end_ms,
                 transcript_text=transcript_text,
                 source_asr_ordinals=tuple(item.ordinal for item in group),
             )

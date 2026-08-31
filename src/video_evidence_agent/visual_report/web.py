@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import re
 import threading
+import uuid
 from dataclasses import dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -20,6 +21,15 @@ from .planning_runtime import (
     RunRecorder,
     build_from_transcript_v2,
     load_source,
+)
+from .url_ingest import (
+    URL_INGEST_SCHEMA_VERSION,
+    DownloadResult,
+    IngestResult,
+    UrlIngestError,
+    download_bilibili_video,
+    ingest_downloaded_video,
+    validate_bilibili_url,
 )
 
 ALLOWED_VIDEO_IDS = tuple(video_id for video_id, _, _ in FIXED_SOURCES)
@@ -41,6 +51,8 @@ class _WebRun:
     client_request_id: str
     run_id: str
     recorder: RunRecorder
+    input_url: str | None = None
+    display_stage: str | None = None
 
 
 def _safe_int(value: object) -> int:
@@ -282,6 +294,202 @@ def _html_page() -> str:
 """
 
 
+def _url_html_page() -> str:
+    return r"""<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Video Visual Report · Bilibili</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; min-height: 100%; background: #111827; color: #f8fafc;
+      overflow-x: hidden;
+    }
+    body { padding: clamp(20px, 5vw, 72px) 16px; }
+    main { width: min(760px, 100%); margin: 0 auto; }
+    .eyebrow {
+      color: #67e8f9; font-size: 12px; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 10px 0 12px; font-size: clamp(30px, 7vw, 56px);
+      line-height: 1.05; letter-spacing: -.04em;
+    }
+    .intro { color: #cbd5e1; max-width: 620px; line-height: 1.65; }
+    .card {
+      margin-top: 28px; padding: clamp(18px, 4vw, 30px); border: 1px solid #334155;
+      border-radius: 18px; background: #1e293b; box-shadow: 0 18px 50px #02061766;
+    }
+    label { display: block; margin-bottom: 9px; color: #cbd5e1; font-size: 14px; font-weight: 650; }
+    input, button { width: 100%; min-height: 48px; border-radius: 11px; font: inherit; }
+    input {
+      border: 1px solid #475569; padding: 0 13px; color: #f8fafc; background: #0f172a;
+    }
+    button {
+      margin-top: 16px; border: 0; padding: 0 18px; color: #082f49;
+      background: #67e8f9; font-weight: 750; cursor: pointer;
+    }
+    button:disabled { cursor: wait; opacity: .52; }
+    :focus-visible { outline: 3px solid #facc15; outline-offset: 3px; }
+    .source-info {
+      min-height: 24px; margin-top: 12px; color: #94a3b8; font-size: 13px;
+      line-height: 1.5; overflow-wrap: anywhere;
+    }
+    .status { margin-top: 24px; padding-top: 20px; border-top: 1px solid #334155; }
+    .status-title {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
+    }
+    .status-label { color: #f8fafc; font-size: 18px; font-weight: 750; }
+    .status-code {
+      color: #67e8f9; font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .status-detail { margin: 9px 0 0; color: #cbd5e1; line-height: 1.55; overflow-wrap: anywhere; }
+    .report-link { display: inline-block; margin-top: 14px; color: #67e8f9; font-weight: 700; }
+    [hidden] { display: none !important; }
+    @media (max-width: 520px) {
+      body { padding-top: 28px; }
+      .card { margin-top: 22px; border-radius: 14px; }
+      .status-title { display: block; }
+      .status-code { display: block; margin-top: 5px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">Video Visual Report · Local MVP</div>
+    <h1>把一个公开 BV 视频变成报告</h1>
+    <p class="intro">
+      输入一个公开的 Bilibili BV 视频地址。本地会依次下载视频、生成文字稿、完成语义规划，
+      最后打开带来源引用的 canonical report.html。
+    </p>
+    <section class="card" aria-labelledby="url-label">
+      <label id="url-label" for="url">公开 Bilibili BV URL</label>
+      <input id="url" name="url" type="url" inputmode="url"
+             placeholder="https://www.bilibili.com/video/BV..." autocomplete="off">
+      <div id="source-info" class="source-info" aria-live="polite">
+        只接受一个 canonical HTTPS Bilibili BV URL。
+      </div>
+      <button id="generate" type="button">生成 Visual Report</button>
+      <div class="status" aria-live="polite" aria-atomic="true" aria-busy="false">
+        <div class="status-title">
+          <span id="status-label" class="status-label">尚未开始</span>
+          <span id="status-code" class="status-code">READY</span>
+        </div>
+        <p id="status-detail" class="status-detail">页面加载不会触发下载或模型调用。</p>
+        <a id="report-link" class="report-link" href="#" target="_blank"
+           rel="noreferrer" hidden>打开 canonical report.html</a>
+      </div>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const url = document.querySelector('#url');
+      const generate = document.querySelector('#generate');
+      const statusBox = document.querySelector('.status');
+      const statusLabel = document.querySelector('#status-label');
+      const statusCode = document.querySelector('#status-code');
+      const statusDetail = document.querySelector('#status-detail');
+      const reportLink = document.querySelector('#report-link');
+      const labels = {
+        DOWNLOADING: '正在下载视频', TRANSCRIBING: '正在生成文字稿',
+        CREATED: '已创建 run', MAPPING: '正在映射主题', TOPIC_MAPPED: '主题已绑定',
+        PLANNING: '正在规划报告', PLAN_VALIDATED: '计划已验证',
+        RENDERED: '报告已生成', FAILED: '运行失败', CANCELLED: '运行已取消'
+      };
+      let currentRunId = null;
+      let polling = false;
+
+      function showStatus(data) {
+        const displayStage = data.stage || data.state || 'UNKNOWN';
+        statusLabel.textContent = labels[displayStage] || '状态更新';
+        statusCode.textContent = displayStage;
+        statusBox.dataset.state = data.state || displayStage;
+        statusDetail.textContent =
+          `模型调用 ${data.provider_calls ?? 0} 次；` +
+          `技术重试 ${data.retry_used ? '已使用' : '未使用'}。` +
+          (data.error_category ? ` 错误类别：${data.error_category}。` : '');
+        reportLink.hidden = !data.report_url;
+        if (data.report_url) reportLink.href = data.report_url;
+        const terminal = ['RENDERED', 'FAILED', 'CANCELLED'].includes(data.state);
+        statusBox.setAttribute('aria-busy', !terminal);
+        if (terminal) {
+          generate.disabled = false;
+          polling = false;
+        }
+      }
+
+      async function pollRun() {
+        if (!currentRunId || polling) return;
+        polling = true;
+        try {
+          const response = await fetch(
+            `/api/visual-report/runs/${encodeURIComponent(currentRunId)}`,
+            { headers: { 'Accept': 'application/json' } }
+          );
+          if (!response.ok) throw new Error('run_unavailable');
+          const data = await response.json();
+          showStatus(data);
+          if (!['RENDERED', 'FAILED', 'CANCELLED'].includes(data.state)) {
+            polling = false;
+            window.setTimeout(pollRun, 500);
+          }
+        } catch (error) {
+          polling = false;
+          statusLabel.textContent = '状态暂时不可用';
+          statusCode.textContent = 'WEB_ERROR';
+          statusDetail.textContent = '请保留当前页面并稍后重试。';
+          generate.disabled = false;
+        }
+      }
+
+      async function generateReport() {
+        const submittedUrl = url.value.trim();
+        if (generate.disabled || !submittedUrl) return;
+        generate.disabled = true;
+        reportLink.hidden = true;
+        const clientRequestId = `web-${crypto.randomUUID ? crypto.randomUUID() :
+          `${Date.now()}-${Math.random()}`}`;
+        try {
+          const response = await fetch('/api/visual-report/runs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ url: submittedUrl, client_request_id: clientRequestId })
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error_category || 'run_rejected');
+          currentRunId = data.run_id;
+          showStatus(data);
+          polling = false;
+          pollRun();
+        } catch (error) {
+          statusLabel.textContent = '无法开始运行';
+          statusCode.textContent = String(error.message || 'REQUEST_ERROR');
+          statusDetail.textContent = '没有产生新的模型调用。请检查 URL 后重试。';
+          generate.disabled = false;
+        }
+      }
+
+      generate.addEventListener('click', generateReport);
+      url.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') generateReport();
+      });
+      const initialRunId = new URLSearchParams(window.location.search).get('run_id');
+      if (initialRunId) { currentRunId = initialRunId; pollRun(); }
+    })();
+  </script>
+</body>
+</html>
+"""
+
+
 class VisualReportWebApp:
     """Own one in-memory loopback Web session and its single active run."""
 
@@ -312,6 +520,9 @@ class VisualReportWebApp:
                     "WEB_GATE_NOT_READY", "product manifest has no Web smoke identity"
                 )
             self._web_smoke_run_id = freeze.web_smoke.run_id
+
+    def page_html(self) -> str:
+        return _html_page()
 
     def _assert_product_gate(self, freeze: Any) -> None:
         if freeze.status != "FROZEN":
@@ -361,6 +572,9 @@ class VisualReportWebApp:
     def _status(self, item: _WebRun) -> dict[str, object]:
         payload = _read_json(item.recorder.run_path)
         state = str(payload.get("state", "CREATED"))
+        display_stage = (
+            state if state in _TERMINAL_STATES else item.display_stage or state
+        )
         error = payload.get("error")
         error_category = error.get("category") if isinstance(error, dict) else None
         report_url = None
@@ -370,7 +584,7 @@ class VisualReportWebApp:
             "run_id": item.run_id,
             "video_id": item.video_id,
             "state": state,
-            "stage": state,
+            "stage": display_stage,
             "provider_calls": _safe_int(payload.get("provider_calls")),
             "model_calls": _safe_int(payload.get("model_calls")),
             "retry_used": _safe_bool(payload.get("retry_used")),
@@ -475,7 +689,7 @@ class VisualReportWebApp:
     def handle_get(self, request: BaseHTTPRequestHandler) -> None:
         path = urlsplit(request.path).path
         if path == "/visual-report/":
-            _send_html(request, 200, _html_page())
+            _send_html(request, 200, self.page_html())
             return
         if path == "/api/visual-report/sources":
             try:
@@ -528,6 +742,197 @@ class VisualReportWebApp:
         status, response = self.create_run(
             payload.get("video_id"), payload.get("client_request_id")
         )
+        _send_json(request, status, response)
+
+
+class UrlIngestWebApp(VisualReportWebApp):
+    """Loopback Web mode that composes one public Bilibili URL run."""
+
+    def __init__(
+        self,
+        *,
+        artifact_root: Path,
+        provider_factory: ProviderFactory | None = None,
+        run_builder: RunBuilder = build_from_transcript_v2,
+        downloader: Callable[..., DownloadResult] | None = None,
+        ingestor: Callable[..., IngestResult] | None = None,
+    ) -> None:
+        super().__init__(
+            source_root=Path("."),
+            artifact_root=artifact_root,
+            provider_factory=provider_factory,
+            run_builder=run_builder,
+        )
+        self.downloader = downloader
+        self.ingestor = ingestor
+
+    def page_html(self) -> str:
+        return _url_html_page()
+
+    def _next_run_id(self, video_id: str) -> str:
+        return f"url-{video_id}-{uuid.uuid4().hex[:12]}"
+
+    def _record_url(self, item: _WebRun, **values: object) -> None:
+        metadata = item.recorder.payload.setdefault("url_ingest", {})
+        if isinstance(metadata, dict):
+            metadata.update(values)
+        item.recorder.save()
+
+    def _run_worker(self, item: _WebRun) -> None:
+        stage = "download"
+        try:
+            source = validate_bilibili_url(item.input_url)
+            item.display_stage = "DOWNLOADING"
+            download = (self.downloader or download_bilibili_video)(
+                source, item.recorder.run_dir
+            )
+            self._record_url(
+                item,
+                status="DOWNLOADED",
+                download={
+                    "status": "SUCCEEDED",
+                    "media_path": str(download.media_path.relative_to(item.recorder.run_dir)),
+                    "info_path": str(download.info_path.relative_to(item.recorder.run_dir)),
+                    "title": download.title,
+                    "uploader": download.uploader,
+                    "attribution": download.attribution,
+                    "command": list(download.command),
+                },
+            )
+
+            stage = "ingest"
+            item.display_stage = "TRANSCRIBING"
+            ingest = (self.ingestor or ingest_downloaded_video)(
+                download, item.recorder.run_dir
+            )
+            self._record_url(
+                item,
+                status="INGESTED",
+                ingest={
+                    "status": "SUCCEEDED",
+                    "video_id": ingest.video_id,
+                    "artifact_root": str(ingest.artifact_root.relative_to(item.recorder.run_dir)),
+                    "manifest_path": str(ingest.manifest_path.relative_to(item.recorder.run_dir)),
+                    "segments_path": str(ingest.segments_path.relative_to(item.recorder.run_dir)),
+                    "command": list(ingest.command),
+                },
+            )
+
+            stage = "planning"
+            item.display_stage = None
+            provider = self.provider_factory() if self.provider_factory is not None else None
+            self.run_builder(
+                manifest_path=ingest.manifest_path,
+                segments_path=ingest.segments_path,
+                run_id=item.run_id,
+                output_root=self.artifact_root,
+                provider=provider,
+                recorder=item.recorder,
+            )
+            self._record_url(item, status="RENDERED")
+        except UrlIngestError as exc:
+            try:
+                self._record_url(
+                    item,
+                    status="FAILED",
+                    failure={"stage": stage, "category": exc.category},
+                )
+            finally:
+                item.recorder.fail(PlanningError(exc.category, "url ingest failed"))
+        except KeyboardInterrupt:
+            error = PlanningError("CANCELLED", "run cancelled by operator")
+            item.recorder.fail(error, state="CANCELLED")
+        except PlanningError as exc:
+            item.recorder.fail(exc)
+        except Exception as exc:
+            item.recorder.fail(PlanningError("OUTPUT_IO_ERROR", type(exc).__name__))
+        finally:
+            with self._lock:
+                if self._active_run_id == item.run_id:
+                    self._active_run_id = None
+
+    def create_run(
+        self, url: object, client_request_id: object
+    ) -> tuple[int, dict[str, object]]:
+        try:
+            source = validate_bilibili_url(url)
+        except UrlIngestError as exc:
+            return 400, {"error_category": exc.category}
+        if not isinstance(client_request_id, str) or _SAFE_ID.fullmatch(client_request_id) is None:
+            return 400, {"error_category": "REQUEST_ID_INVALID"}
+        with self._lock:
+            existing = self._request_ids.get(client_request_id)
+            if existing is not None:
+                item = self._runs[existing]
+                if item.input_url != source.canonical_url:
+                    return 409, {"error_category": "REQUEST_ID_CONFLICT"}
+                return 200, {**self._status(item), "duplicate": True}
+            if self._active_run_id is not None:
+                return 409, {"error_category": "RUN_ACTIVE"}
+            run_id = self._next_run_id(source.video_id)
+            try:
+                recorder = RunRecorder.create(
+                    self.artifact_root,
+                    run_id,
+                    schema_version=SEMANTIC_V2_RUN_SCHEMA_VERSION,
+                    event_schema_version=SEMANTIC_V2_EVENT_SCHEMA_VERSION,
+                    call_schema_version=SEMANTIC_V2_CALL_SCHEMA_VERSION,
+                )
+            except PlanningError as exc:
+                return 500, {"error_category": exc.category}
+            recorder.payload["url_ingest"] = {
+                "schema_version": URL_INGEST_SCHEMA_VERSION,
+                "submitted_url": source.submitted_url,
+                "canonical_url": source.canonical_url,
+                "bvid": source.bvid,
+                "video_id": source.video_id,
+                "status": "STARTED",
+            }
+            recorder.save()
+            item = _WebRun(
+                video_id=source.video_id,
+                client_request_id=client_request_id,
+                run_id=run_id,
+                recorder=recorder,
+                input_url=source.canonical_url,
+                display_stage="DOWNLOADING",
+            )
+            self._runs[run_id] = item
+            self._request_ids[client_request_id] = run_id
+            self._active_run_id = run_id
+            thread = threading.Thread(target=self._run_worker, args=(item,), daemon=True)
+            thread.start()
+        return 202, {**self._status(item), "duplicate": False}
+
+    def handle_get(self, request: BaseHTTPRequestHandler) -> None:
+        path = urlsplit(request.path).path
+        if path == "/api/visual-report/sources":
+            _send_json(request, 404, {"error_category": "NOT_FOUND"})
+            return
+        super().handle_get(request)
+
+    def handle_post(self, request: BaseHTTPRequestHandler) -> None:
+        if urlsplit(request.path).path != "/api/visual-report/runs":
+            _send_json(request, 404, {"error_category": "NOT_FOUND"})
+            return
+        length_raw = request.headers.get("Content-Length", "")
+        try:
+            length = int(length_raw)
+        except ValueError:
+            length = -1
+        if length < 0 or length > _MAX_REQUEST_BYTES:
+            _send_json(request, 400, {"error_category": "REQUEST_TOO_LARGE"})
+            return
+        try:
+            body = request.rfile.read(length)
+            payload = json.loads(body.decode("utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            _send_json(request, 400, {"error_category": "REQUEST_INVALID"})
+            return
+        if not isinstance(payload, dict) or set(payload) != {"url", "client_request_id"}:
+            _send_json(request, 400, {"error_category": "REQUEST_INVALID"})
+            return
+        status, response = self.create_run(payload.get("url"), payload.get("client_request_id"))
         _send_json(request, status, response)
 
 
@@ -610,9 +1015,28 @@ def serve_web(
         server.server_close()
 
 
+def serve_url_web(*, artifact_root: Path, port: int) -> None:
+    """Run the public-Bilibili URL MVP on loopback only."""
+    app = UrlIngestWebApp(artifact_root=artifact_root)
+    server = create_web_server(app, port=port)
+    actual_port = server.server_address[1]
+    print(
+        f"Video Visual Report URL Web MVP listening on "
+        f"http://127.0.0.1:{actual_port}/visual-report/"
+    )
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+
+
 __all__ = [
     "ALLOWED_VIDEO_IDS",
     "VisualReportWebApp",
+    "UrlIngestWebApp",
     "create_web_server",
     "serve_web",
+    "serve_url_web",
 ]

@@ -320,6 +320,7 @@ def _ingest(args: argparse.Namespace) -> int:
             full_run.segments,
             target_duration_ms=args.target_segment_ms,
             max_duration_ms=args.max_segment_ms,
+            duration_ms=source_duration_ms,
         )
         _write_jsonl(
             segments_path,

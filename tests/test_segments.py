@@ -42,3 +42,29 @@ def test_single_long_asr_segment_keeps_its_real_range() -> None:
 
     assert len(segments) == 1
     assert (segments[0].start_ms, segments[0].end_ms) == (5_000, 80_000)
+
+
+def test_final_segment_tail_rounding_is_clamped_to_source_duration() -> None:
+    segments = build_video_segments(
+        "smoke-001",
+        [
+            _asr(0, 0, 45_000, "前段内容"),
+            _asr(1, 45_000, 46_000, "末尾内容"),
+        ],
+        duration_ms=45_500,
+    )
+
+    assert [(segment.start_ms, segment.end_ms) for segment in segments] == [
+        (0, 45_000),
+        (45_000, 45_500),
+    ]
+
+
+def test_large_final_segment_overrun_is_not_silently_clamped() -> None:
+    segments = build_video_segments(
+        "smoke-001",
+        [_asr(0, 5_000, 47_000, "明显越界的末尾内容")],
+        duration_ms=45_500,
+    )
+
+    assert (segments[0].start_ms, segments[0].end_ms) == (5_000, 47_000)

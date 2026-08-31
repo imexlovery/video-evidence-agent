@@ -23,7 +23,7 @@ from .planning_runtime import (
     replay_semantic_v2_proposals,
 )
 from .renderer import RenderError, render_report
-from .web import serve_web
+from .web import serve_url_web, serve_web
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -59,6 +59,13 @@ def _parser() -> argparse.ArgumentParser:
     )
     serve.add_argument("--product-manifest", required=True, type=Path)
     serve.add_argument("--port", type=int, default=8765)
+    serve_url = commands.add_parser(
+        "serve-url-web", help="serve the public Bilibili URL Web MVP on loopback"
+    )
+    serve_url.add_argument(
+        "--artifact-root", type=Path, default=Path("artifacts/visual-report/url-ingest")
+    )
+    serve_url.add_argument("--port", type=int, default=8765)
     freeze_product = commands.add_parser(
         "freeze-product-prototype",
         aliases=["freeze-semantic-v2-product"],
@@ -308,6 +315,13 @@ def main(argv: list[str] | None = None) -> int:
                 port=args.port,
                 product_manifest=args.product_manifest,
             )
+        except PlanningError as exc:
+            print(f"{exc.category}: {exc.message}", file=sys.stderr)
+            return 2
+        return 0
+    if args.command == "serve-url-web":
+        try:
+            serve_url_web(artifact_root=args.artifact_root, port=args.port)
         except PlanningError as exc:
             print(f"{exc.category}: {exc.message}", file=sys.stderr)
             return 2
