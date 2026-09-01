@@ -13,6 +13,7 @@ from urllib.parse import parse_qsl, urlsplit
 
 from dotenv import load_dotenv
 
+from ..transcript_foundation import select_subtitle_file
 from .planning import PlanningError
 
 BILIBILI_HOSTS = frozenset({"bilibili.com", "www.bilibili.com"})
@@ -50,6 +51,7 @@ class DownloadResult:
     uploader: str
     attribution: str
     command: tuple[str, ...]
+    subtitle_file: Path | None = None
 
 
 @dataclass(frozen=True)
@@ -185,6 +187,7 @@ def download_bilibili_video(
     run_dir: Path,
     *,
     runner: CommandRunner | None = None,
+    request_subtitles: bool = False,
 ) -> DownloadResult:
     """Run the frozen yt-dlp command and verify its run-local output."""
 
@@ -211,8 +214,18 @@ def download_bilibili_video(
         "--write-info-json",
         "--print",
         "after_move:filepath",
-        source.canonical_url,
     ]
+    if request_subtitles:
+        command.extend(
+            [
+                "--write-subs",
+                "--sub-langs",
+                "all",
+                "--sub-format",
+                "srt/vtt/ass/best",
+            ]
+        )
+    command.append(source.canonical_url)
     completed = _run_command(command, runner, category="DOWNLOAD_ERROR")
     if getattr(completed, "returncode", 1) != 0:
         raise UrlIngestError("DOWNLOAD_ERROR", "yt-dlp failed")
@@ -228,6 +241,7 @@ def download_bilibili_video(
     if not info_path.is_file():
         raise UrlIngestError("DOWNLOAD_ERROR", "yt-dlp metadata file is missing")
     title, uploader, attribution = _metadata(info_path, source)
+    subtitle_file = select_subtitle_file(download_dir.iterdir())
     return DownloadResult(
         source=source,
         media_path=media_path,
@@ -236,6 +250,7 @@ def download_bilibili_video(
         uploader=uploader,
         attribution=attribution,
         command=tuple(command),
+        subtitle_file=subtitle_file,
     )
 
 
@@ -244,6 +259,10 @@ def ingest_downloaded_video(
     run_dir: Path,
     *,
     runner: CommandRunner | None = None,
+    transcript_mode: str | None = None,
+    ocr_mode: str | None = None,
+    ocr_roi: str | None = None,
+    subtitle_file: Path | None = None,
 ) -> IngestResult:
     """Invoke the existing ``video-evidence ingest`` command once."""
 
@@ -272,6 +291,15 @@ def ingest_downloaded_video(
         "--source-use-note",
         "Task 011 local MVP; public Bilibili source; raw media remains local",
     ]
+    selected_subtitle = subtitle_file or download.subtitle_file
+    if transcript_mode is not None:
+        command.extend(["--transcript-mode", transcript_mode])
+    if ocr_mode is not None:
+        command.extend(["--ocr-mode", ocr_mode])
+    if ocr_roi is not None:
+        command.extend(["--ocr-roi", ocr_roi])
+    if selected_subtitle is not None:
+        command.extend(["--subtitle-file", str(selected_subtitle)])
     load_dotenv(Path(__file__).resolve().parents[3] / ".env", override=False)
     completed = _run_command(command, runner, category="INGEST_ERROR")
     artifact_root = ingest_root / video_id

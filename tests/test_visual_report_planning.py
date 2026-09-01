@@ -697,7 +697,17 @@ def test_freeze_and_evaluate_predeclare_all_runs_without_fabricating_scores(tmp_
     assert len(list((tmp_path / "evaluation" / freeze.revision_id / "rubrics").glob("*.json"))) == 6
 
 
-def test_provider_conformance_freezes_two_native_candidates_before_calls(tmp_path: Path) -> None:
+def _configure_legacy_deepseek(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "legacy-test-key")
+    monkeypatch.setenv("OPENAI_BASE_URL", "https://api.deepseek.com")
+    monkeypatch.setenv("VIDEO_EVIDENCE_MODEL", "deepseek-v4-flash-vision-exp")
+    monkeypatch.setenv("VISUAL_REPORT_TIMEOUT_SECONDS", "120")
+
+
+def test_provider_conformance_freezes_two_native_candidates_before_calls(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _configure_legacy_deepseek(monkeypatch)
     manifest_path = tmp_path / "provider-conformance-manifest.json"
     manifest = freeze_provider_conformance(
         repository_root=Path.cwd(),
@@ -728,7 +738,10 @@ def test_provider_conformance_freezes_two_native_candidates_before_calls(tmp_pat
     assert len(selected["strategy_manifest_sha256"]) == 64
 
 
-def test_provider_conformance_result_retains_unexecuted_canary_denominator(tmp_path: Path) -> None:
+def test_provider_conformance_result_retains_unexecuted_canary_denominator(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _configure_legacy_deepseek(monkeypatch)
     manifest_path = tmp_path / "provider-conformance-manifest.json"
     freeze_provider_conformance(
         repository_root=Path.cwd(),

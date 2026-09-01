@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Iterable
+from typing import Any
 
 from video_evidence_agent.schemas import AsrSegment, VideoSegment
 
@@ -116,6 +117,93 @@ def build_video_segments(
                 end_ms=end_ms,
                 transcript_text=transcript_text,
                 source_asr_ordinals=tuple(item.ordinal for item in group),
+            )
+        )
+
+    validate_video_segments(output)
+    return output
+
+
+def build_video_segments_from_transcript(
+    video_id: str,
+    transcript_units: Iterable[Any],
+    *,
+    target_duration_ms: int = 45_000,
+    max_duration_ms: int = 60_000,
+    duration_ms: int | None = None,
+) -> list[VideoSegment]:
+    """Batch canonical units while retaining both unit and ASR provenance."""
+
+    if not video_id.strip():
+        raise SegmentBuildError("video_id must not be blank")
+    if target_duration_ms <= 0 or max_duration_ms <= 0:
+        raise SegmentBuildError("segment durations must be positive")
+    if target_duration_ms > max_duration_ms:
+        raise SegmentBuildError("target duration cannot exceed maximum duration")
+    if duration_ms is not None and duration_ms <= 0:
+        raise SegmentBuildError("source duration must be positive")
+
+    ordered = sorted(
+        transcript_units,
+        key=lambda item: (item.start_ms, item.end_ms, item.unit_id),
+    )
+    if not ordered:
+        raise SegmentBuildError("canonical transcript returned no units")
+    previous_end_ms: int | None = None
+    for unit in ordered:
+        if unit.end_ms <= unit.start_ms:
+            raise SegmentBuildError("canonical transcript unit has invalid boundaries")
+        if previous_end_ms is not None and unit.start_ms < previous_end_ms:
+            raise SegmentBuildError("canonical transcript units overlap")
+        previous_end_ms = unit.end_ms
+
+    groups: list[list[Any]] = []
+    current: list[Any] = []
+    for candidate in ordered:
+        if current:
+            current_duration_ms = current[-1].end_ms - current[0].start_ms
+            candidate_duration_ms = candidate.end_ms - current[0].start_ms
+            if current_duration_ms >= target_duration_ms or candidate_duration_ms > max_duration_ms:
+                groups.append(current)
+                current = []
+        current.append(candidate)
+    if current:
+        groups.append(current)
+
+    output: list[VideoSegment] = []
+    for ordinal, group in enumerate(groups):
+        start_ms = group[0].start_ms
+        end_ms = group[-1].end_ms
+        if (
+            ordinal == len(groups) - 1
+            and duration_ms is not None
+            and end_ms > duration_ms
+            and end_ms - duration_ms <= FINAL_SEGMENT_END_TOLERANCE_MS
+            and start_ms < duration_ms
+        ):
+            end_ms = duration_ms
+        asr_ordinals: list[int] = []
+        for unit in group:
+            provenance = getattr(unit, "provenance", {})
+            values = provenance.get("asr_ordinals", []) if isinstance(provenance, dict) else []
+            if isinstance(values, int):
+                values = [values]
+            if isinstance(values, (list, tuple)):
+                for value in values:
+                    if isinstance(value, int) and value not in asr_ordinals:
+                        asr_ordinals.append(value)
+        output.append(
+            VideoSegment(
+                video_id=video_id,
+                segment_id=f"{video_id}-seg-{ordinal:03d}",
+                ordinal=ordinal,
+                start_ms=start_ms,
+                end_ms=end_ms,
+                transcript_text=_normalise_whitespace(
+                    " ".join(str(unit.canonical_text) for unit in group)
+                ),
+                source_asr_ordinals=tuple(asr_ordinals),
+                source_transcript_unit_ids=tuple(unit.unit_id for unit in group),
             )
         )
 

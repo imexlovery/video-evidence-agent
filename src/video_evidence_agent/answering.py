@@ -13,6 +13,12 @@ from typing import Any
 from dotenv import load_dotenv
 from openai import OpenAI
 
+from video_evidence_agent.llm_config import (
+    OPENAI_API_KEY_ENV,
+    OPENAI_BASE_URL_ENV,
+    OPENAI_MODEL_ENV,
+    normalize_openai_base_url,
+)
 from video_evidence_agent.schemas import AnswerProposal, AnswerStatus, RetrievalHit
 
 # Load only the project-local, gitignored file. Existing process environment
@@ -56,16 +62,16 @@ For an unsupported answer, return:
 
 
 def _configured_client() -> tuple[OpenAI, str]:
-    api_key = os.getenv("OPENAI_API_KEY", "").strip()
-    model = os.getenv("VIDEO_EVIDENCE_MODEL", "").strip()
+    api_key = os.getenv(OPENAI_API_KEY_ENV, "").strip()
+    model = os.getenv(OPENAI_MODEL_ENV, "").strip()
     if not api_key:
         raise AnsweringConfigurationError("OPENAI_API_KEY is required; no mock fallback exists")
     if not model:
         raise AnsweringConfigurationError(
-            "VIDEO_EVIDENCE_MODEL is required; no implicit provider model is selected"
+            f"{OPENAI_MODEL_ENV} is required; no implicit provider model is selected"
         )
 
-    base_url = os.getenv("OPENAI_BASE_URL", "").strip()
+    base_url = normalize_openai_base_url(os.getenv(OPENAI_BASE_URL_ENV, ""))
     options: dict[str, Any] = {"api_key": api_key}
     if base_url:
         options["base_url"] = base_url
@@ -164,7 +170,7 @@ def request_answer_traced(
     if not response.choices or response.choices[0].message.content is None:
         return AnswerTrace(
             proposal=_invalid_model_output(),
-            provider=os.getenv("OPENAI_BASE_URL", "openai-compatible") or "openai-compatible",
+            provider=os.getenv(OPENAI_BASE_URL_ENV, "openai-compatible") or "openai-compatible",
             model=model,
             latency_ms=latency_ms,
             usage=usage,
@@ -177,7 +183,7 @@ def request_answer_traced(
     except (json.JSONDecodeError, ValueError, TypeError):
         return AnswerTrace(
             proposal=_invalid_model_output(),
-            provider=os.getenv("OPENAI_BASE_URL", "openai-compatible") or "openai-compatible",
+            provider=os.getenv(OPENAI_BASE_URL_ENV, "openai-compatible") or "openai-compatible",
             model=model,
             latency_ms=latency_ms,
             usage=usage,
@@ -186,7 +192,7 @@ def request_answer_traced(
         )
     return AnswerTrace(
         proposal=proposal,
-        provider=os.getenv("OPENAI_BASE_URL", "openai-compatible") or "openai-compatible",
+        provider=os.getenv(OPENAI_BASE_URL_ENV, "openai-compatible") or "openai-compatible",
         model=model,
         latency_ms=latency_ms,
         usage=usage,

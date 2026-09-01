@@ -22,8 +22,9 @@ FastAPI, UI, workers, and multi-video evaluation are outside P0-A.
 Copy `.env.example` to `.env` and fill `OPENAI_API_KEY` outside version control.
 The CLI automatically loads this project-local, gitignored file; explicit
 process environment variables take precedence. You do not need to re-enter the
-key for every command or terminal. The current template targets DeepSeek's
-OpenAI-compatible endpoint with `deepseek-v4-flash`.
+key for every command or terminal. The current template targets the
+OpenAI-compatible GLM-5.3-Flash endpoint; change the environment values when
+switching providers or models.
 
 ## Reproduce P0-A
 

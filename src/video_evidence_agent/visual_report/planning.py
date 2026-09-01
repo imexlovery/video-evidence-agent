@@ -30,9 +30,8 @@ MAX_OUTPUT_TOKENS = 8_192
 THINKING_MODE = "disabled"
 
 # The historical strict-schema v1/provider-conformance path above keeps its
-# original controls.  Semantic v2 has its own frozen runtime tuple so a new
-# product revision cannot silently rewrite historical configuration evidence.
-SEMANTIC_V2_MODEL = "deepseek-v4-flash-vision-exp"
+# original controls. Semantic v2 freezes request controls, while its
+# OpenAI-compatible provider, key, and model come from the shared environment.
 SEMANTIC_V2_MAX_OUTPUT_TOKENS = 32_768
 SEMANTIC_V2_THINKING_MODE = "enabled"
 SEMANTIC_V2_REASONING_EFFORT = "high"

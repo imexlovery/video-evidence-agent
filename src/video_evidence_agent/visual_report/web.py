@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Callable
 from urllib.parse import unquote, urlsplit
 
+from ..transcript_foundation import OcrError, parse_roi
 from .evaluation import FIXED_SOURCES, load_semantic_v2_product_freeze
 from .planning import PlanningError
 from .planning_runtime import (
@@ -54,6 +55,10 @@ class _WebRun:
     recorder: RunRecorder
     input_url: str | None = None
     display_stage: str | None = None
+    transcript_mode: str = "fused"
+    ocr_mode: str = "auto"
+    ocr_roi: str | None = None
+    subtitle_file: str | None = None
 
 
 def _safe_int(value: object) -> int:
@@ -78,6 +83,16 @@ def _read_json(path: Path) -> dict[str, object]:
     if not isinstance(payload, dict):
         raise PlanningError("OUTPUT_IO_ERROR", "run status is unavailable")
     return payload
+
+
+def _run_relative_path(path: Path, run_dir: Path) -> str:
+    """Keep run-local paths compact while allowing an explicit external input."""
+
+    resolved_path = path.resolve()
+    try:
+        return str(resolved_path.relative_to(run_dir.resolve()))
+    except ValueError:
+        return str(resolved_path)
 
 
 def _html_page() -> str:
@@ -179,7 +194,9 @@ def _html_page() -> str:
       const statusDetail = document.querySelector('#status-detail');
       const reportLink = document.querySelector('#report-link');
       const labels = {
-        CREATED: '已创建 run', MAPPING: '正在映射主题', TOPIC_MAPPED: '主题已绑定',
+        CREATED: '已创建 run', TRANSCRIBING: '正在生成文字稿', OCR: '正在识别字幕',
+        FUSING: '正在融合文字稿', READY: '已完成', DEGRADED: '文字稿已降级但可继续',
+        MAPPING: '正在映射主题', TOPIC_MAPPED: '主题已绑定',
         PLANNING: '正在规划报告', PLAN_VALIDATED: '计划已验证', RENDERED: '报告已生成',
         FAILED: '运行失败', CANCELLED: '运行已取消'
       };
@@ -188,8 +205,9 @@ def _html_page() -> str:
 
       function showStatus(data) {
         const state = data.state || 'UNKNOWN';
-        statusLabel.textContent = labels[state] || '状态更新';
-        statusCode.textContent = state;
+        const displayStage = data.stage || state;
+        statusLabel.textContent = labels[displayStage] || '状态更新';
+        statusCode.textContent = displayStage;
         statusBox.dataset.state = state;
         statusDetail.textContent =
           `模型调用 ${data.provider_calls ?? 0} 次；` +
@@ -415,6 +433,16 @@ def _url_html_page() -> str:
       <label id="url-label" for="url">公开 Bilibili BV URL</label>
       <input id="url" name="url" type="url" inputmode="url"
              placeholder="https://www.bilibili.com/video/BV..." autocomplete="off">
+      <label for="ocr-mode" style="margin-top:16px">字幕 OCR 模式</label>
+      <select id="ocr-mode" name="ocr_mode">
+        <option value="auto" selected>Auto ROI（不稳定时自动降级）</option>
+        <option value="roi">显式 ROI（可靠主路径）</option>
+        <option value="off">关闭 OCR</option>
+      </select>
+      <label for="ocr-roi" style="margin-top:16px">显式 ROI（可选，x1,y1,x2,y2）</label>
+      <input id="ocr-roi" name="ocr_roi" inputmode="decimal" placeholder="0.05,0.72,0.95,0.98">
+      <label for="subtitle-file" style="margin-top:16px">本地字幕文件（可选，SRT/VTT/ASS）</label>
+      <input id="subtitle-file" name="subtitle_file" placeholder="/path/to/subtitle.srt">
       <div id="source-info" class="source-info" aria-live="polite">
         仅支持公开的 Bilibili BV 视频链接。
       </div>
@@ -452,9 +480,13 @@ def _url_html_page() -> str:
       const progressFill = document.querySelector('#progress-fill');
       const progressSteps = [...document.querySelectorAll('.progress-step')];
       const reportLink = document.querySelector('#report-link');
+      const ocrMode = document.querySelector('#ocr-mode');
+      const ocrRoi = document.querySelector('#ocr-roi');
+      const subtitleFile = document.querySelector('#subtitle-file');
       const labels = {
         QUEUED: '等待处理',
-        DOWNLOADING: '正在下载视频', TRANSCRIBING: '正在生成文字稿',
+        DOWNLOADING: '正在下载视频', TRANSCRIBING: '正在生成文字稿', OCR: '正在识别字幕',
+        FUSING: '正在融合文字稿', READY: '已完成', DEGRADED: '文字稿已降级但可继续',
         CREATED: '已创建 run', MAPPING: '正在映射主题', TOPIC_MAPPED: '主题已绑定',
         PLANNING: '正在规划报告', PLAN_VALIDATED: '计划已验证',
         RENDERED: '报告已生成', FAILED: '运行失败', CANCELLED: '运行已取消'
@@ -464,7 +496,8 @@ def _url_html_page() -> str:
 
       function updateProgress(displayStage, state) {
         const stepByStage = {
-          QUEUED: 0, DOWNLOADING: 1, TRANSCRIBING: 2, CREATED: 1,
+          QUEUED: 0, DOWNLOADING: 1, TRANSCRIBING: 2, OCR: 2, FUSING: 2,
+          DEGRADED: 2, READY: 4, CREATED: 1,
           MAPPING: 3, TOPIC_MAPPED: 3, PLANNING: 4, PLAN_VALIDATED: 4, RENDERED: 4
         };
         const step = stepByStage[displayStage] || 0;
@@ -541,7 +574,14 @@ def _url_html_page() -> str:
           const response = await fetch('/api/visual-report/runs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({ url: submittedUrl, client_request_id: clientRequestId })
+            body: JSON.stringify({
+              url: submittedUrl,
+              client_request_id: clientRequestId,
+              transcript_mode: 'fused',
+              ocr_mode: ocrMode.value,
+              ocr_roi: ocrRoi.value.trim() || null,
+              subtitle_file: subtitleFile.value.trim() || null
+            })
           });
           const data = await response.json();
           if (!response.ok) throw new Error(data.error_category || 'run_rejected');
@@ -861,6 +901,8 @@ class UrlIngestWebApp(VisualReportWebApp):
 
     def _status(self, item: _WebRun) -> dict[str, object]:
         status = super()._status(item)
+        status["transcript_mode"] = item.transcript_mode
+        status["ocr_mode"] = item.ocr_mode
         pending = tuple(self._pending_run_ids)
         if item.run_id in pending:
             status["stage"] = "QUEUED"
@@ -894,37 +936,88 @@ class UrlIngestWebApp(VisualReportWebApp):
         try:
             source = validate_bilibili_url(item.input_url)
             item.display_stage = "DOWNLOADING"
-            download = (self.downloader or download_bilibili_video)(
-                source, item.recorder.run_dir
-            )
+            if self.downloader is not None:
+                download = self.downloader(source, item.recorder.run_dir)
+            else:
+                download = download_bilibili_video(
+                    source,
+                    item.recorder.run_dir,
+                    request_subtitles=True,
+                )
             self._record_url(
                 item,
                 status="DOWNLOADED",
                 download={
                     "status": "SUCCEEDED",
-                    "media_path": str(download.media_path.relative_to(item.recorder.run_dir)),
-                    "info_path": str(download.info_path.relative_to(item.recorder.run_dir)),
+                    "media_path": _run_relative_path(
+                        download.media_path, item.recorder.run_dir
+                    ),
+                    "info_path": _run_relative_path(
+                        download.info_path, item.recorder.run_dir
+                    ),
                     "title": download.title,
                     "uploader": download.uploader,
                     "attribution": download.attribution,
+                    "subtitle_file": (
+                        _run_relative_path(download.subtitle_file, item.recorder.run_dir)
+                        if download.subtitle_file is not None
+                        else None
+                    ),
                     "command": list(download.command),
                 },
             )
 
             stage = "ingest"
             item.display_stage = "TRANSCRIBING"
-            ingest = (self.ingestor or ingest_downloaded_video)(
-                download, item.recorder.run_dir
-            )
+            if self.ingestor is not None:
+                ingest = self.ingestor(download, item.recorder.run_dir)
+            else:
+                ingest = ingest_downloaded_video(
+                    download,
+                    item.recorder.run_dir,
+                    transcript_mode=item.transcript_mode,
+                    ocr_mode=item.ocr_mode,
+                    ocr_roi=item.ocr_roi,
+                    subtitle_file=(
+                        Path(item.subtitle_file).expanduser()
+                        if item.subtitle_file
+                        else None
+                    ),
+                )
+            transcript_manifest = ingest.artifact_root / "transcript-manifest.json"
+            if transcript_manifest.is_file():
+                try:
+                    transcript_payload = json.loads(
+                        transcript_manifest.read_text(encoding="utf-8")
+                    )
+                except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+                    transcript_payload = {}
+                transcript_status = transcript_payload.get("status")
+                item.display_stage = (
+                    "DEGRADED" if transcript_status == "DEGRADED" else "FUSING"
+                )
+            else:
+                item.display_stage = "FUSING"
             self._record_url(
                 item,
                 status="INGESTED",
                 ingest={
                     "status": "SUCCEEDED",
                     "video_id": ingest.video_id,
-                    "artifact_root": str(ingest.artifact_root.relative_to(item.recorder.run_dir)),
-                    "manifest_path": str(ingest.manifest_path.relative_to(item.recorder.run_dir)),
-                    "segments_path": str(ingest.segments_path.relative_to(item.recorder.run_dir)),
+                    "artifact_root": _run_relative_path(
+                        ingest.artifact_root, item.recorder.run_dir
+                    ),
+                    "manifest_path": _run_relative_path(
+                        ingest.manifest_path, item.recorder.run_dir
+                    ),
+                    "segments_path": _run_relative_path(
+                        ingest.segments_path, item.recorder.run_dir
+                    ),
+                    "transcript_manifest_path": (
+                        _run_relative_path(transcript_manifest, item.recorder.run_dir)
+                        if transcript_manifest.is_file()
+                        else None
+                    ),
                     "command": list(ingest.command),
                 },
             )
@@ -961,7 +1054,14 @@ class UrlIngestWebApp(VisualReportWebApp):
             self._finish_and_start_next(item)
 
     def create_run(
-        self, url: object, client_request_id: object
+        self,
+        url: object,
+        client_request_id: object,
+        *,
+        transcript_mode: object = "fused",
+        ocr_mode: object = "auto",
+        ocr_roi: object = None,
+        subtitle_file: object = None,
     ) -> tuple[int, dict[str, object]]:
         try:
             source = validate_bilibili_url(url)
@@ -969,6 +1069,26 @@ class UrlIngestWebApp(VisualReportWebApp):
             return 400, {"error_category": exc.category}
         if not isinstance(client_request_id, str) or _SAFE_ID.fullmatch(client_request_id) is None:
             return 400, {"error_category": "REQUEST_ID_INVALID"}
+        if transcript_mode not in {"asr-only", "fused"}:
+            return 400, {"error_category": "TRANSCRIPT_MODE_INVALID"}
+        if ocr_mode not in {"off", "roi", "auto"}:
+            return 400, {"error_category": "OCR_MODE_INVALID"}
+        if ocr_mode == "roi":
+            if not isinstance(ocr_roi, str) or not ocr_roi.strip():
+                return 400, {"error_category": "OCR_ROI_REQUIRED"}
+            try:
+                parse_roi(ocr_roi)
+            except OcrError:
+                return 400, {"error_category": "OCR_ROI_INVALID"}
+        if ocr_roi is not None and not isinstance(ocr_roi, str):
+            return 400, {"error_category": "OCR_ROI_INVALID"}
+        if subtitle_file is not None and (
+            not isinstance(subtitle_file, str)
+            or not subtitle_file.strip()
+            or len(subtitle_file) > 1024
+            or "\x00" in subtitle_file
+        ):
+            return 400, {"error_category": "SUBTITLE_FILE_INVALID"}
         start_now = False
         with self._lock:
             existing = self._request_ids.get(client_request_id)
@@ -995,6 +1115,10 @@ class UrlIngestWebApp(VisualReportWebApp):
                 "bvid": source.bvid,
                 "video_id": source.video_id,
                 "status": "QUEUED" if self._active_run_id is not None else "STARTED",
+                "transcript_mode": transcript_mode,
+                "ocr_mode": ocr_mode,
+                "ocr_roi": ocr_roi.strip() if isinstance(ocr_roi, str) else None,
+                "subtitle_file": subtitle_file.strip() if isinstance(subtitle_file, str) else None,
             }
             recorder.save()
             item = _WebRun(
@@ -1004,6 +1128,10 @@ class UrlIngestWebApp(VisualReportWebApp):
                 recorder=recorder,
                 input_url=source.canonical_url,
                 display_stage="QUEUED" if self._active_run_id is not None else "DOWNLOADING",
+                transcript_mode=str(transcript_mode),
+                ocr_mode=str(ocr_mode),
+                ocr_roi=ocr_roi.strip() if isinstance(ocr_roi, str) else None,
+                subtitle_file=subtitle_file.strip() if isinstance(subtitle_file, str) else None,
             )
             self._runs[run_id] = item
             self._request_ids[client_request_id] = run_id
@@ -1041,10 +1169,28 @@ class UrlIngestWebApp(VisualReportWebApp):
         except (OSError, UnicodeDecodeError, json.JSONDecodeError):
             _send_json(request, 400, {"error_category": "REQUEST_INVALID"})
             return
-        if not isinstance(payload, dict) or set(payload) != {"url", "client_request_id"}:
+        allowed = {
+            "url",
+            "client_request_id",
+            "transcript_mode",
+            "ocr_mode",
+            "ocr_roi",
+            "subtitle_file",
+        }
+        if not isinstance(payload, dict) or not {"url", "client_request_id"} <= set(payload):
             _send_json(request, 400, {"error_category": "REQUEST_INVALID"})
             return
-        status, response = self.create_run(payload.get("url"), payload.get("client_request_id"))
+        if set(payload) - allowed:
+            _send_json(request, 400, {"error_category": "REQUEST_INVALID"})
+            return
+        status, response = self.create_run(
+            payload.get("url"),
+            payload.get("client_request_id"),
+            transcript_mode=payload.get("transcript_mode", "fused"),
+            ocr_mode=payload.get("ocr_mode", "auto"),
+            ocr_roi=payload.get("ocr_roi"),
+            subtitle_file=payload.get("subtitle_file"),
+        )
         _send_json(request, status, response)
 
 

@@ -35,7 +35,22 @@ from video_evidence_agent.p0b_schemas import (
 )
 from video_evidence_agent.retrieval import retrieve
 from video_evidence_agent.schemas import QuestionSpec, RetrievalHit, VideoSegment
-from video_evidence_agent.segments import build_video_segments, validate_video_segments
+from video_evidence_agent.segments import validate_video_segments
+from video_evidence_agent.transcript_foundation import (
+    OcrError,
+    TranscriptFoundationError,
+    asr_events_from_payload,
+    build_canonical_transcript,
+    detect_auto_roi,
+    discover_subtitle_source,
+    extract_subtitle_ocr_events,
+    frame_candidate_rows,
+    load_event_jsonl,
+    parse_roi,
+    parse_subtitle_file,
+    parse_subtitle_or_event_file,
+    write_transcript_artifacts,
+)
 
 
 class CliError(RuntimeError):
@@ -230,6 +245,286 @@ def _evaluate_asr(args: argparse.Namespace) -> int:
     return 0
 
 
+def _transcript_ocr(args: argparse.Namespace) -> int:
+    video_id = _validate_identifier(args.video_id, "video_id")
+    video_path = Path(args.video_path).expanduser()
+    if not video_path.is_file():
+        raise CliError(f"video input does not exist: {video_path}")
+    try:
+        roi = parse_roi(args.roi)
+        events = extract_subtitle_ocr_events(
+            video_path,
+            roi,
+            sample_fps=args.sample_fps,
+            start_ms=args.start_ms,
+            end_ms=args.end_ms,
+        )
+    except OcrError as exc:
+        raise CliError(str(exc)) from exc
+    _write_jsonl(args.output, [event.model_dump(mode="json") for event in events])
+    candidates_path = args.output.parent / "subtitle-ocr-frame-candidates.jsonl"
+    _write_jsonl(candidates_path, frame_candidate_rows(events))
+    print(
+        f"OCR {video_id}: {len(events)} deduplicated subtitle events -> {args.output}; "
+        f"{len(frame_candidate_rows(events))} frame candidates -> {candidates_path}"
+    )
+    return 0
+
+
+def _manifest_video_details(manifest: dict[str, Any]) -> tuple[str, int]:
+    video_id = manifest.get("video_id")
+    source = manifest.get("source")
+    duration_ms = source.get("duration_ms") if isinstance(source, dict) else None
+    if not isinstance(video_id, str) or not video_id.strip():
+        raise CliError("manifest video_id is missing")
+    if not isinstance(duration_ms, int) or duration_ms <= 0:
+        raise CliError("manifest source.duration_ms is invalid")
+    return video_id, duration_ms
+
+
+def _ocr_coverage_from_events(
+    events: list[Any], *, video_duration_ms: int
+) -> dict[str, Any]:
+    """Project OCR run coverage into the manifest without inferring it from event times."""
+
+    if not events:
+        return {
+            "coverage_status": "UNKNOWN",
+            "processed_start_ms": None,
+            "processed_end_ms": None,
+            "video_duration_ms": video_duration_ms,
+            "coverage_ratio": None,
+        }
+    provenance = events[0].provenance
+    required = (
+        "processed_start_ms",
+        "processed_end_ms",
+        "video_duration_ms",
+        "coverage_ratio",
+        "coverage_status",
+    )
+    if not all(key in provenance for key in required):
+        return {
+            "coverage_status": "UNKNOWN",
+            "processed_start_ms": None,
+            "processed_end_ms": None,
+            "video_duration_ms": video_duration_ms,
+            "coverage_ratio": None,
+        }
+    return {key: provenance[key] for key in required}
+
+
+def _fuse_transcript(args: argparse.Namespace) -> int:
+    input_manifest = _read_json(args.manifest)
+    video_id, duration_ms = _manifest_video_details(input_manifest)
+    asr_payload = _read_json(args.asr)
+    try:
+        asr_events = asr_events_from_payload(asr_payload, payload_path=args.asr)
+        ocr_events = load_event_jsonl(args.ocr, expected_source="ocr") if args.ocr else []
+        subtitle_events = (
+            parse_subtitle_or_event_file(args.subtitle) if args.subtitle else []
+        )
+        ocr_coverage = (
+            _ocr_coverage_from_events(ocr_events, video_duration_ms=duration_ms)
+            if args.ocr
+            else {}
+        )
+        source_status: dict[str, dict[str, Any]] = {
+            "asr": {"status": "READY", "count": len(asr_events), "path": args.asr.name},
+            "subtitle_track": {
+                "status": "READY" if subtitle_events else "ABSENT",
+                "count": len(subtitle_events),
+                "path": args.subtitle.name if args.subtitle else None,
+            },
+            "ocr": {
+                "status": "READY" if ocr_events else "OFF",
+                "count": len(ocr_events),
+                "path": args.ocr.name if args.ocr else None,
+                **ocr_coverage,
+            },
+        }
+        coverage_status = ocr_coverage.get("coverage_status")
+        coverage_warnings = (
+            [f"OCR_{coverage_status}_COVERAGE"]
+            if coverage_status in {"PARTIAL", "UNKNOWN"}
+            else []
+        )
+        build = build_canonical_transcript(
+            video_id=video_id,
+            duration_ms=duration_ms,
+            asr_events=asr_events,
+            subtitle_events=subtitle_events,
+            ocr_events=ocr_events,
+            transcript_mode=args.transcript_mode,
+            source_status=source_status,
+            warnings=coverage_warnings,
+        )
+    except TranscriptFoundationError as exc:
+        raise CliError(str(exc)) from exc
+    paths = write_transcript_artifacts(
+        build,
+        args.output_root,
+        base_manifest=input_manifest,
+        write_ocr_events=bool(args.ocr),
+    )
+    print(
+        f"fused {video_id}: {len(build.canonical_units)} units, "
+        f"{len(build.segments)} segments, status={build.manifest.status} -> "
+        f"{paths['transcript_manifest']}"
+    )
+    return 0
+
+
+def _ingest_transcript(
+    args: argparse.Namespace,
+    *,
+    source_path: Path,
+    artifact_root: Path,
+    asr_path: Path,
+    source_duration_ms: int,
+    manifest: dict[str, Any],
+) -> tuple[Any, dict[str, Path], dict[str, dict[str, Any]]]:
+    transcript_mode = getattr(args, "transcript_mode", "asr-only")
+    ocr_mode = getattr(args, "ocr_mode", "off")
+    if transcript_mode not in {"asr-only", "fused"}:
+        raise CliError("transcript_mode must be asr-only or fused")
+    if ocr_mode not in {"off", "roi", "auto"}:
+        raise CliError("ocr_mode must be off, roi, or auto")
+    asr_payload = _read_json(asr_path)
+    asr_events = asr_events_from_payload(asr_payload, payload_path=asr_path)
+    warnings: list[str] = []
+    source_status: dict[str, dict[str, Any]] = {
+        "asr": {"status": "READY", "count": len(asr_events), "path": asr_path.name},
+        "subtitle_track": {"status": "OFF", "count": 0, "path": None},
+        "ocr": {"status": "OFF", "count": 0, "path": None},
+    }
+    subtitle_events: list[Any] = []
+    if transcript_mode == "fused":
+        explicit_subtitle = getattr(args, "subtitle_file", None)
+        explicit_path = Path(explicit_subtitle).expanduser() if explicit_subtitle else None
+        try:
+            discovery = discover_subtitle_source(
+                source_path,
+                explicit_path=explicit_path,
+                artifact_root=artifact_root,
+            )
+        except OSError:
+            discovery = None
+        if discovery is None:
+            source_status["subtitle_track"] = {
+                "status": "FAILED",
+                "count": 0,
+                "path": str(explicit_path) if explicit_path else None,
+            }
+            warnings.append("SUBTITLE_DISCOVERY_FAILED")
+        elif discovery.status == "AVAILABLE" and discovery.path is not None:
+            source_status["subtitle_track"] = {
+                "status": "READY",
+                "count": 0,
+                "path": str(discovery.path),
+                "format": discovery.format,
+                "track_index": discovery.track_index,
+                "language": discovery.language,
+            }
+            try:
+                subtitle_events = parse_subtitle_file(discovery.path)
+                source_status["subtitle_track"]["count"] = len(subtitle_events)
+            except Exception:
+                source_status["subtitle_track"]["status"] = "FAILED"
+                warnings.append("SUBTITLE_PARSE_FAILED")
+        else:
+            source_status["subtitle_track"] = {
+                "status": discovery.status,
+                "count": 0,
+                "path": None,
+            }
+            if discovery.warning and discovery.warning != "SUBTITLE_ABSENT":
+                warnings.append(discovery.warning)
+    if transcript_mode == "fused" and ocr_mode != "off":
+        write_ocr_events = True
+        if ocr_mode == "roi":
+            try:
+                requested_roi = parse_roi(getattr(args, "ocr_roi", None))
+            except OcrError as exc:
+                raise CliError(str(exc)) from exc
+        else:
+            requested_roi = None
+        try:
+            if ocr_mode == "roi":
+                roi = requested_roi
+            else:
+                auto = detect_auto_roi(source_path, sample_fps=1.0)
+                warnings.extend(auto.warnings)
+                if auto.roi is None:
+                    source_status["ocr"] = {"status": "UNSTABLE", "count": 0, "path": None}
+                    roi = None
+                else:
+                    roi = auto.roi
+            if roi is not None:
+                ocr_events = extract_subtitle_ocr_events(
+                    source_path,
+                    roi,
+                    sample_fps=2.0,
+                    duration_ms=source_duration_ms,
+                    roi_mode="explicit" if ocr_mode == "roi" else "auto",
+                )
+                source_status["ocr"] = {
+                    "status": "READY" if ocr_events else "ABSENT",
+                    "count": len(ocr_events),
+                    "path": "subtitle-ocr-events.jsonl",
+                    "roi": list(roi),
+                    "coverage_status": "FULL",
+                    "processed_start_ms": 0,
+                    "processed_end_ms": source_duration_ms,
+                    "video_duration_ms": source_duration_ms,
+                    "coverage_ratio": 1.0,
+                }
+                if not ocr_events:
+                    warnings.append("OCR_NO_EVENTS")
+        except Exception:
+            source_status["ocr"] = {
+                "status": "FAILED",
+                "count": 0,
+                "path": "subtitle-ocr-events.jsonl",
+            }
+            warnings.append("OCR_FAILED")
+            ocr_events = []
+    else:
+        write_ocr_events = False
+        ocr_events = []
+
+    build = build_canonical_transcript(
+        video_id=manifest["video_id"],
+        duration_ms=source_duration_ms,
+        asr_events=asr_events,
+        subtitle_events=subtitle_events,
+        ocr_events=ocr_events,
+        transcript_mode=transcript_mode,
+        source_status=source_status,
+        warnings=warnings,
+        target_segment_ms=args.target_segment_ms,
+        max_segment_ms=args.max_segment_ms,
+    )
+    manifest_for_transcript = dict(manifest)
+    manifest_for_transcript["source"] = {
+        **dict(manifest.get("source") or {}),
+        "duration_ms": source_duration_ms,
+    }
+    manifest_for_transcript["segmenting"] = {
+        "target_duration_ms": args.target_segment_ms,
+        "max_duration_ms": args.max_segment_ms,
+        "segment_count": len(build.segments),
+        "path": "segments.jsonl",
+    }
+    paths = write_transcript_artifacts(
+        build,
+        artifact_root,
+        base_manifest=manifest_for_transcript,
+        write_ocr_events=write_ocr_events,
+    )
+    return build, paths, source_status
+
+
 def _ingest(args: argparse.Namespace) -> int:
     video_id = _validate_identifier(args.video_id, "video_id")
     source_path = Path(args.video_path).expanduser()
@@ -313,20 +608,18 @@ def _ingest(args: argparse.Namespace) -> int:
             },
         )
 
-        stage = "segment_build"
+        stage = "transcript_foundation"
         phase_started_at = perf_counter()
-        segments = build_video_segments(
-            video_id,
-            full_run.segments,
-            target_duration_ms=args.target_segment_ms,
-            max_duration_ms=args.max_segment_ms,
-            duration_ms=source_duration_ms,
+        transcript_build, transcript_paths, _ = _ingest_transcript(
+            args,
+            source_path=source_path,
+            artifact_root=artifact_root,
+            asr_path=asr_path,
+            source_duration_ms=source_duration_ms,
+            manifest=manifest,
         )
-        _write_jsonl(
-            segments_path,
-            [segment.model_dump(mode="json") for segment in segments],
-        )
-        timing["segment_build"] = _elapsed_ms(phase_started_at)
+        segments = list(transcript_build.segments)
+        timing["transcript_foundation"] = _elapsed_ms(phase_started_at)
     except (Exception, KeyboardInterrupt) as exc:
         manifest.update(
             {
@@ -373,6 +666,13 @@ def _ingest(args: argparse.Namespace) -> int:
                 "segment_count": len(segments),
                 "path": segments_path.name,
             },
+            "transcript": transcript_build.manifest.model_copy(
+                update={
+                    "artifacts": {
+                        key: path.name for key, path in transcript_paths.items()
+                    }
+                }
+            ).model_dump(mode="json"),
             "phase_elapsed_ms": timing,
         }
     )
@@ -1075,6 +1375,33 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--artifacts-dir", type=Path, default=Path("artifacts"))
     evaluate.set_defaults(handler=_evaluate_asr)
 
+    transcript_ocr = subparsers.add_parser(
+        "transcript-ocr",
+        help="extract deduplicated burned-in subtitle OCR events from one local video",
+    )
+    transcript_ocr.add_argument("video_path")
+    transcript_ocr.add_argument("--video-id", required=True)
+    transcript_ocr.add_argument("--roi", required=True, help="normalized x1,y1,x2,y2")
+    transcript_ocr.add_argument("--sample-fps", type=float, default=2.0)
+    transcript_ocr.add_argument("--start-ms", type=int, default=0)
+    transcript_ocr.add_argument("--end-ms", type=int)
+    transcript_ocr.add_argument("--output", type=Path, required=True)
+    transcript_ocr.set_defaults(handler=_transcript_ocr)
+
+    fuse = subparsers.add_parser(
+        "fuse-transcript",
+        help="align ASR, subtitle-track, and OCR events into the canonical transcript",
+    )
+    fuse.add_argument("--manifest", type=Path, required=True)
+    fuse.add_argument("--asr", type=Path, required=True)
+    fuse.add_argument("--ocr", type=Path)
+    fuse.add_argument("--subtitle", type=Path)
+    fuse.add_argument("--output-root", type=Path, required=True)
+    fuse.add_argument(
+        "--transcript-mode", choices=("asr-only", "fused"), default="fused"
+    )
+    fuse.set_defaults(handler=_fuse_transcript)
+
     ingest = subparsers.add_parser("ingest", help="extract, transcribe, and segment one MP4")
     ingest.add_argument("video_path")
     ingest.add_argument("--video-id", required=True)
@@ -1087,6 +1414,12 @@ def build_parser() -> argparse.ArgumentParser:
     ingest.add_argument("--preview-seconds", type=int, default=300)
     ingest.add_argument("--target-segment-ms", type=int, default=45_000)
     ingest.add_argument("--max-segment-ms", type=int, default=60_000)
+    ingest.add_argument(
+        "--transcript-mode", choices=("asr-only", "fused"), default="fused"
+    )
+    ingest.add_argument("--ocr-mode", choices=("off", "roi", "auto"), default="off")
+    ingest.add_argument("--ocr-roi", help="normalized x1,y1,x2,y2 for explicit ROI OCR")
+    ingest.add_argument("--subtitle-file", type=Path)
     ingest.add_argument("--source-url")
     ingest.add_argument("--source-license")
     ingest.add_argument("--source-attribution")

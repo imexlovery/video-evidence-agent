@@ -16,7 +16,7 @@ For normative detail, follow the source-of-truth order below.
 | Next allowed stop | `READY_FOR_OWNER_VISUAL_REVIEW` |
 | V1-A requirements | `READY_FOR_ENGINEERING_HANDOFF`; latest runtime override is `DEC-VR1A-062` |
 | V1-A implementation | Latest text closure stopped at `TEXT_CONTENT_INSUFFICIENT`; V0 renderer remains unchanged |
-| Later stages | Local Web MVP is next after a 3/3 text gate; V1-B/V1-C remain deferred and unauthorized |
+| Current V1 roadmap | The runnable V1-A/URL baseline is now named `V1.0`; `V1.1 Transcript Foundation` is the next construction task; see `V1-STATUS.md` |
 
 ## Objective
 
@@ -65,10 +65,11 @@ authority before continuing.
 
 ## Next action
 
-V0 remains frozen at its Owner visual-review boundary. For current automation
-work, consult `docs/visual-report/V1A-STATUS.md` and the latest bounded Goal
-card. Requirements readiness or a task-card draft alone does not permit model
-calls, Web construction, deployment, V1-B, or V1-C.
+V0 remains frozen at its historical Owner visual-review boundary. For current
+product work, consult `docs/visual-report/V1-STATUS.md`,
+`docs/visual-report/V1-ROADMAP.md`, and the active V1.1 task card. The old
+`V1A-STATUS.md` is a historical compatibility index. A task card alone does not
+authorize implementation, model calls, deployment, V1.2, or V1.3.
 
 ## Status history
 
@@ -82,3 +83,4 @@ calls, Web construction, deployment, V1-B, or V1-C.
 | 2026-08-30 | `V1A_READY_FOR_ENGINEERING_HANDOFF` | Owner confirmed the exact-model delegation envelope and six-run thresholds; the independent requirements validator returned confidence 100.0 with zero blockers/errors. V1-A implementation and V1-B/C remain unauthorized. |
 | 2026-08-31 | `V1_TEXT_WEB_PRIORITY_SET` | Owner selected a new Thinking/high/32768 V1-A runtime closure and placed a localhost Web MVP before the optional keyframe and full-MP4 stages. V0 renderer contracts remain unchanged; this documentation event authorizes no implementation or provider call. |
 | 2026-08-31 | `V1_TEXT_WEB_CLOSURE_STOPPED` | The authorized text closure executed one frozen three-video set: Kling and RLinf rendered, Wu Yi failed the unchanged V0 compiler's block budget. Gate A did not open the Web slice; V0 implementation and Owner visual-review boundary remain unchanged. |
+| 2026-09-01 | `V1_NAMING_UPDATED` | Current V1-A/URL/FIFO implementation is named `V1.0`; the next bounded task is `V1.1 Transcript Foundation`. Historical V0/V1-A identifiers and evidence remain unchanged. |
