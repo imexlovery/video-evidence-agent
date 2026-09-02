@@ -18,7 +18,7 @@ IDs, tests, paths, and retained evidence. No compatibility rename is planned.
 
 ## V1.1 — Transcript Foundation
 
-Status: `MODEL_REFRESH_READY_FOR_CONSTRUCTION`
+Status: `READY_FOR_OWNER_V1.1_MODEL_REVIEW`
 
 Objective: build one general, traceable transcript layer from ASR, text subtitle
 tracks, and burned-in subtitle OCR, then project it back into the current V1.0
@@ -62,14 +62,24 @@ review; it does not authorize V1.2.
 That bounded repair is now the completed `V1.1 Fusion` construction baseline.
 The next task must build directly on that existing commit/worktree and must not
 reimplement or loosen Fusion. Owner review chose not to freeze V1.1 yet because
-upstream ASR and OCR errors remain visible. One last bounded model refresh is
-construction-ready: Large V3 Turbo ASR plus PP-OCRv6 Medium detection and
+upstream ASR and OCR errors remain visible. One last bounded model refresh was
+construction-ready: Large V3 Turbo ASR plus PP-OCRv6 Small detection and
 recognition, followed by a complete fresh-video ASR-only/Fused comparison.
+Fresh Semantic-v2 uses the already configured Zhipu GLM endpoint and
+`glm-5.3-flash`; it does not return to the historical DeepSeek provider.
 Limited or mixed quality gain is a valid measured result and ends the task
 rather than triggering another transcript subsystem redesign.
 
 Model-refresh execution card:
 [`docs/tasks/VISUAL-REPORT-V1-1-MODEL-UPGRADE.md`](../tasks/VISUAL-REPORT-V1-1-MODEL-UPGRADE.md).
+
+The authorized model-refresh execution is complete. The final Small/Large
+fresh run reached full-video OCR coverage and generated new ASR-only/Fused
+Semantic-v2 reports with the unchanged Zhipu GLM path. The measured result is
+mixed: selected Large V3 Turbo ASR terms improve, while unchanged Fusion
+accepts fewer OCR replacements than Task 013. The roadmap therefore stops at
+`READY_FOR_OWNER_V1.1_MODEL_REVIEW`; it does not imply V1.1 freeze or authorize
+V1.2.
 
 ## V1.2 — Semantic Quality
 

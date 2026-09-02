@@ -6,12 +6,14 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import cv2
+import numpy as np
 import pytest
 
 from video_evidence_agent import cli
 from video_evidence_agent.transcript_foundation import (
     ALIGNMENT_JITTER_MS,
     OcrDetection,
+    RapidOcrAdapter,
     SampledFrame,
     SourceTextEvent,
     Stability,
@@ -157,6 +159,9 @@ def test_explicit_ocr_merges_repeated_samples_and_retains_provenance(
     assert events[0].provenance["video_duration_ms"] == 2_000
     assert events[0].provenance["coverage_ratio"] == 1.0
     assert events[0].provenance["coverage_status"] == "FULL"
+    assert events[0].provenance["ocr_engine"] == "onnxruntime"
+    assert events[0].provenance["ocr_detection_model"] == "PP-OCRv6-small"
+    assert events[0].provenance["ocr_recognition_model"] == "PP-OCRv6-small"
     assert events[0].end_ms == events[0].provenance["frame_timestamps_ms"][-1] + 500
 
 
@@ -184,6 +189,68 @@ def test_rapidocr_row_shape_is_coerced_without_combining_scores() -> None:
             points=((12.0, 4.0), (80.0, 4.0), (80.0, 24.0), (12.0, 24.0)),
         )
     ]
+
+
+def test_unified_rapidocr_output_maps_to_existing_detection_boundary() -> None:
+    from video_evidence_agent.transcript_foundation import _recognize
+
+    class FakeRapidOcr:
+        def recognize(self, image_path: Path):
+            return SimpleNamespace(
+                boxes=np.asarray([[[12, 4], [80, 4], [80, 24], [12, 24]]]),
+                txts=("星象房",),
+                scores=(0.94,),
+            )
+
+    detections = _recognize(FakeRapidOcr(), Path("frame.jpg"))
+
+    assert detections == [
+        OcrDetection(
+            text="星象房",
+            confidence=0.94,
+            points=((12.0, 4.0), (80.0, 4.0), (80.0, 24.0), (12.0, 24.0)),
+        )
+    ]
+
+
+def test_unified_rapidocr_empty_output_maps_to_no_detections() -> None:
+    from video_evidence_agent.transcript_foundation import _recognize
+
+    class FakeRapidOcr:
+        def recognize(self, image_path: Path):
+            return SimpleNamespace(boxes=None, txts=None, scores=None)
+
+    assert _recognize(FakeRapidOcr(), Path("frame.jpg")) == []
+
+
+def test_rapidocr_adapter_requests_ppocrv6_small_onnxruntime(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import rapidocr
+
+    captured: dict[str, object] = {}
+
+    class FakeEngine:
+        def __init__(self, *, params):
+            captured.update(params)
+
+        def __call__(self, image_path: str):
+            return SimpleNamespace(boxes=None, txts=None, scores=None)
+
+    monkeypatch.setattr(rapidocr, "RapidOCR", FakeEngine)
+    adapter = RapidOcrAdapter()
+
+    assert captured == {
+        "Det.engine_type": rapidocr.EngineType.ONNXRUNTIME,
+        "Det.lang_type": rapidocr.LangDet.CH,
+        "Det.model_type": rapidocr.ModelType.SMALL,
+        "Det.ocr_version": rapidocr.OCRVersion.PPOCRV6,
+        "Rec.engine_type": rapidocr.EngineType.ONNXRUNTIME,
+        "Rec.lang_type": rapidocr.LangRec.CH,
+        "Rec.model_type": rapidocr.ModelType.SMALL,
+        "Rec.ocr_version": rapidocr.OCRVersion.PPOCRV6,
+    }
+    assert adapter.recognize(Path("frame.jpg")).txts is None
 
 
 def test_auto_roi_selects_a_recurring_lower_sentence_band(tmp_path: Path, monkeypatch) -> None:

@@ -16,7 +16,7 @@ are not the active roadmap vocabulary.
 | Active design | `V1.1 — Transcript Foundation` |
 | Existing construction baseline | Completed `V1.1 Fusion` / `VR-V1.1-TRANSCRIPT-FOUNDATION-013` |
 | Active V1.1 task | `VR-V1.1-MODEL-UPGRADE-014` |
-| V1.1 task status | `READY_FOR_CONSTRUCTION` |
+| V1.1 task status | `READY_FOR_OWNER_V1.1_MODEL_REVIEW` |
 | V1.2 | `Semantic Quality — BRIEF_ONLY / NOT_AUTHORIZED` |
 | V1.3 | `Renderer Quality — BRIEF_ONLY / NOT_AUTHORIZED` |
 | Deployment / multi-tenant work | Deferred; not part of V1.1 |
@@ -225,8 +225,9 @@ bounded source-model refresh:
 ```text
 existing V1.1 Fusion baseline
   + mlx-community/whisper-large-v3-turbo
-  + PP-OCRv6 Medium detection/recognition on ONNX Runtime
+  + PP-OCRv6 Small detection/recognition on ONNX Runtime
   → unchanged consensus/alignment/Fusion
+  → existing Zhipu GLM / glm-5.3-flash Semantic-v2
   → full-video fresh ASR-only and Fused Semantic/Render comparison
 ```
 
@@ -234,8 +235,22 @@ The construction-ready card is
 [`VR-V1.1-MODEL-UPGRADE-014`](../tasks/VISUAL-REPORT-V1-1-MODEL-UPGRADE.md).
 It does not authorize starting from the older V1.0 baseline, redoing Fusion,
 running a model bake-off, adding terminology rules, changing semantic prompts,
-or changing the renderer. The next construction run must stop at
+switching the current GLM Semantic provider/model, or changing the renderer.
+Historical DeepSeek run records remain historical evidence and are not the
+provider contract for Task 014. The next construction run must stop at
 `READY_FOR_OWNER_V1.1_MODEL_REVIEW` even if the measured quality gain is small.
+
+Task 014 is now complete at that stop. The final fresh Small/Large run
+`v11-model-upgrade-small-game-20260902-r3` used the same 1,566,677 ms video and
+Explicit ROI, reached full OCR coverage (`545` OCR events, `coverage_ratio=1.0`),
+and produced fresh Fused and ASR-only Canonical/segments, Semantic-v2, and
+reports under new run identities. The unchanged Fusion path accepted `6`
+OCR replacements versus `20` in the Task 013 bounded baseline; Large V3 Turbo
+improved selected ASR terms but overall source-model quality was mixed rather
+than a broad accuracy gain. Focused tests (`55`), full pytest (`137`), Ruff,
+`uv lock --check`, and `git diff --check` all passed. The active V1.1 state is
+`READY_FOR_OWNER_V1.1_MODEL_REVIEW`; no freeze, V1.2 start, or release action
+is recorded.
 
 ## Historical sources
 

@@ -15,7 +15,7 @@ from time import perf_counter
 from typing import Any
 
 from video_evidence_agent.answering import request_answer
-from video_evidence_agent.asr import transcribe_audio
+from video_evidence_agent.asr import DEFAULT_ASR_MODEL, transcribe_audio
 from video_evidence_agent.audio import extract_audio, probe_media_duration_ms
 from video_evidence_agent.chinese_lips import prepare_chinese_lips_mini
 from video_evidence_agent.evaluation import evaluate_asr, load_asr_segments, load_ground_truth
@@ -1408,7 +1408,7 @@ def build_parser() -> argparse.ArgumentParser:
     ingest.add_argument("--artifacts-dir", type=Path, default=Path("artifacts"))
     ingest.add_argument(
         "--asr-model",
-        default=os.getenv("VIDEO_EVIDENCE_ASR_MODEL", "mlx-community/whisper-large-v3-turbo"),
+        default=os.getenv("VIDEO_EVIDENCE_ASR_MODEL", DEFAULT_ASR_MODEL),
         help="MLX Whisper model ID or local model path",
     )
     ingest.add_argument("--preview-seconds", type=int, default=300)

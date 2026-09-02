@@ -50,7 +50,7 @@ already present, the bounded preparation and evaluation path is:
       artifacts/chinese-lips-mini-val-kj-001/composite.mp4 \
       --video-id chinese-lips-mini-val-kj-001 \
       --preview-seconds 60 \
-      --asr-model mlx-community/whisper-small-mlx
+      --asr-model mlx-community/whisper-large-v3-turbo
     uv run video-evidence evaluate-asr \
       --video-id chinese-lips-mini-val-kj-001
     uv run video-evidence smoke chinese-lips-mini-val-kj-001 \

@@ -10,6 +10,8 @@ from typing import Any
 
 from video_evidence_agent.schemas import AsrSegment
 
+DEFAULT_ASR_MODEL = "mlx-community/whisper-large-v3-turbo"
+
 
 class AsrError(RuntimeError):
     """Raised when mlx-whisper cannot produce usable timestamped segments."""

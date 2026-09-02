@@ -30,7 +30,10 @@ from video_evidence_agent.segments import build_video_segments_from_transcript
 TRANSCRIPT_SCHEMA_VERSION = "visual-report-transcript-foundation.v1"
 NORMALIZER_VERSION = "nfkc-whitespace-punctuation-opencc-t2s.v1"
 FUSION_VERSION = "local-span-fusion.v1"
-OCR_VERSION = "rapidocr-explicit-roi.v1"
+OCR_VERSION = "rapidocr-ppocrv6-small-onnxruntime.v1"
+OCR_ENGINE = "onnxruntime"
+OCR_DETECTION_MODEL = "PP-OCRv6-small"
+OCR_RECOGNITION_MODEL = "PP-OCRv6-small"
 ALIGNMENT_JITTER_MS = 1_500
 OCR_MIN_CONFIDENCE = 0.55
 LOCAL_DIFF_SEPARATOR_MIN_CHARACTERS = 3
@@ -65,7 +68,7 @@ class SubtitleParseError(TranscriptFoundationError):
 
 
 class _OcrAdapter(Protocol):
-    def recognize(self, image_path: Path) -> Sequence[object]:
+    def recognize(self, image_path: Path) -> object:
         """Return OCR rows for one local image."""
 
 
@@ -466,6 +469,21 @@ def _recognize(adapter: _OcrAdapter, image_path: Path) -> list[OcrDetection]:
         raise OcrError(f"local OCR failed: {type(exc).__name__}") from exc
     if result is None:
         return []
+    boxes = getattr(result, "boxes", None)
+    texts = getattr(result, "txts", None)
+    scores = getattr(result, "scores", None)
+    if texts is not None:
+        result = [
+            OcrDetection(
+                text=text,
+                confidence=(scores[index] if scores is not None else None),
+                points=_coerce_points(
+                    boxes[index].tolist() if boxes is not None else ()
+                ),
+            )
+            for index, text in enumerate(texts)
+            if isinstance(text, str) and text.strip()
+        ]
     if isinstance(result, tuple) and result and isinstance(result[0], (list, tuple)):
         result = result[0]
     if not isinstance(result, (list, tuple)):
@@ -479,14 +497,31 @@ class RapidOcrAdapter:
 
     def __init__(self) -> None:
         try:
-            from rapidocr_onnxruntime import RapidOCR
+            from rapidocr import (
+                EngineType,
+                LangDet,
+                LangRec,
+                ModelType,
+                OCRVersion,
+                RapidOCR,
+            )
         except ImportError as exc:  # pragma: no cover - dependency is locked
-            raise OcrError("rapidocr-onnxruntime is not installed") from exc
-        self._engine = RapidOCR()
+            raise OcrError("rapidocr is not installed") from exc
+        self._engine = RapidOCR(
+            params={
+                "Det.engine_type": EngineType.ONNXRUNTIME,
+                "Det.lang_type": LangDet.CH,
+                "Det.model_type": ModelType.SMALL,
+                "Det.ocr_version": OCRVersion.PPOCRV6,
+                "Rec.engine_type": EngineType.ONNXRUNTIME,
+                "Rec.lang_type": LangRec.CH,
+                "Rec.model_type": ModelType.SMALL,
+                "Rec.ocr_version": OCRVersion.PPOCRV6,
+            }
+        )
 
-    def recognize(self, image_path: Path) -> Sequence[object]:
-        rows, _ = self._engine(str(image_path))
-        return rows or ()
+    def recognize(self, image_path: Path) -> object:
+        return self._engine(str(image_path))
 
 
 def _ocr_text(detections: Sequence[OcrDetection]) -> tuple[str, float | None]:
@@ -650,6 +685,9 @@ def _merge_ocr_samples(
                     "frame_candidates": [_candidate_row(item, roi) for item in group],
                     "sampling": "sparse_visual_change_filtered_perceptual_dedup",
                     "ocr_version": OCR_VERSION,
+                    "ocr_engine": OCR_ENGINE,
+                    "ocr_detection_model": OCR_DETECTION_MODEL,
+                    "ocr_recognition_model": OCR_RECOGNITION_MODEL,
                 },
             )
         )
