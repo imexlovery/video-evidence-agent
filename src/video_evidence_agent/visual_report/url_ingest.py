@@ -32,12 +32,17 @@ class BilibiliSource:
     """The validated public source URL and its stable BVID identity."""
 
     bvid: str
+    page_number: int
     submitted_url: str
     canonical_url: str
 
     @property
     def video_id(self) -> str:
-        return f"bilibili-{self.bvid}"
+        return f"bilibili-{self.bvid}-p{self.page_number}"
+
+    @property
+    def cache_key(self) -> str:
+        return f"{self.bvid}/P{self.page_number}"
 
 
 @dataclass(frozen=True)
@@ -52,6 +57,7 @@ class DownloadResult:
     attribution: str
     command: tuple[str, ...]
     subtitle_file: Path | None = None
+    cache_hit: bool = False
 
 
 @dataclass(frozen=True)
@@ -69,7 +75,7 @@ class UrlIngestError(PlanningError):
     """A safe, stable failure from the URL/download/ingest boundary."""
 
 
-def _parse_bilibili_url(value: object) -> tuple[str, str, str]:
+def _parse_bilibili_url(value: object) -> tuple[str, str, int, str]:
     if not isinstance(value, str):
         raise UrlIngestError("URL_INVALID", "url must be a string")
     submitted_url = value.strip()
@@ -89,35 +95,155 @@ def _parse_bilibili_url(value: object) -> tuple[str, str, str]:
     if match is None or _BVID_PATTERN.fullmatch(match.group(1)) is None:
         raise UrlIngestError("URL_INVALID", "url must use /video/<BVID>")
     bvid = match.group(1)
-    page = next(
-        (
-            value
-            for key, value in parse_qsl(parsed.query, keep_blank_values=True)
-            if key == "p" and _PAGE_PATTERN.fullmatch(value) is not None
-        ),
-        None,
-    )
+    page_values = [
+        query_value
+        for key, query_value in parse_qsl(parsed.query, keep_blank_values=True)
+        if key == "p"
+    ]
+    if len(page_values) > 1 or (
+        page_values and _PAGE_PATTERN.fullmatch(page_values[0]) is None
+    ):
+        raise UrlIngestError("URL_INVALID", "p must be one positive page number")
+    page_number = int(page_values[0]) if page_values else 1
+    if page_number < 1:
+        raise UrlIngestError("URL_INVALID", "p must be one positive page number")
     canonical_url = f"https://www.bilibili.com/video/{bvid}/"
-    if page is not None:
-        canonical_url += f"?p={page}"
-    return submitted_url, bvid, canonical_url
+    if page_values:
+        canonical_url += f"?p={page_number}"
+    return submitted_url, bvid, page_number, canonical_url
 
 
 def clean_bilibili_url(value: object) -> str:
     """Keep the BVID and an optional numeric page, dropping other URL data."""
 
-    return _parse_bilibili_url(value)[2]
+    return _parse_bilibili_url(value)[3]
 
 
 def validate_bilibili_url(value: object) -> BilibiliSource:
     """Validate and clean one public Bilibili BV URL without side effects."""
 
-    submitted_url, bvid, canonical_url = _parse_bilibili_url(value)
+    submitted_url, bvid, page_number, canonical_url = _parse_bilibili_url(value)
     return BilibiliSource(
         bvid=bvid,
+        page_number=page_number,
         submitted_url=submitted_url,
         canonical_url=canonical_url,
     )
+
+
+def _link_or_copy(source: Path, destination: Path) -> None:
+    try:
+        destination.hardlink_to(source)
+    except OSError:
+        shutil.copy2(source, destination)
+
+
+def _cached_download(
+    source: BilibiliSource, download_dir: Path, cache_dir: Path
+) -> DownloadResult | None:
+    marker_path = cache_dir / "download.complete.json"
+    info_path = cache_dir / "source.info.json"
+    try:
+        marker = json.loads(marker_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    if not isinstance(marker, dict) or marker.get("video_id") != source.video_id:
+        return None
+    media_name = marker.get("media_name")
+    if not isinstance(media_name, str) or Path(media_name).name != media_name:
+        return None
+    media_path = cache_dir / media_name
+    if (
+        not media_path.is_file()
+        or media_path.stat().st_size == 0
+        or not info_path.is_file()
+        or info_path.stat().st_size == 0
+    ):
+        return None
+    title, uploader, attribution = _metadata(info_path, source)
+    for cached_path in cache_dir.iterdir():
+        if cached_path.is_file() and cached_path.name.startswith("source."):
+            _link_or_copy(cached_path, download_dir / cached_path.name)
+    linked_media = download_dir / media_name
+    linked_info = download_dir / "source.info.json"
+    subtitle_file = select_subtitle_file(download_dir.iterdir())
+    command = marker.get("command")
+    return DownloadResult(
+        source=source,
+        media_path=linked_media.resolve(),
+        info_path=linked_info.resolve(),
+        title=title,
+        uploader=uploader,
+        attribution=attribution,
+        command=tuple(command) if isinstance(command, list) else (),
+        subtitle_file=subtitle_file,
+        cache_hit=True,
+    )
+
+
+def _store_download_cache(download: DownloadResult, cache_dir: Path) -> None:
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    for source_path in download.media_path.parent.iterdir():
+        if source_path.is_file() and source_path.name.startswith("source."):
+            destination = cache_dir / source_path.name
+            if destination.exists():
+                destination.unlink()
+            _link_or_copy(source_path, destination)
+    marker = {
+        "video_id": download.source.video_id,
+        "cache_key": download.source.cache_key,
+        "media_name": download.media_path.name,
+        "command": list(download.command),
+    }
+    (cache_dir / "download.complete.json").write_text(
+        json.dumps(marker, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+
+
+def _seed_cache_from_completed_run(
+    source: BilibiliSource, runs_root: Path, cache_dir: Path
+) -> None:
+    if (cache_dir / "download.complete.json").is_file():
+        return
+    for run_dir in sorted(runs_root.glob(f"url-bilibili-{source.bvid}-*"), reverse=True):
+        try:
+            payload = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            continue
+        url_ingest = payload.get("url_ingest") if isinstance(payload, dict) else None
+        if (
+            payload.get("state") != "RENDERED"
+            or not isinstance(url_ingest, dict)
+            or url_ingest.get("canonical_url") != source.canonical_url
+        ):
+            continue
+        download_dir = run_dir / "download"
+        info_path = download_dir / "source.info.json"
+        media_path = download_dir / "source.mp4"
+        if (
+            not info_path.is_file()
+            or info_path.stat().st_size == 0
+            or not media_path.is_file()
+            or media_path.stat().st_size == 0
+        ):
+            continue
+        title, uploader, attribution = _metadata(info_path, source)
+        download_record = url_ingest.get("download")
+        command = download_record.get("command") if isinstance(download_record, dict) else None
+        _store_download_cache(
+            DownloadResult(
+                source=source,
+                media_path=media_path.resolve(),
+                info_path=info_path.resolve(),
+                title=title,
+                uploader=uploader,
+                attribution=attribution,
+                command=tuple(command) if isinstance(command, list) else (),
+                subtitle_file=select_subtitle_file(download_dir.iterdir()),
+            ),
+            cache_dir,
+        )
+        return
 
 
 def _run_command(
@@ -188,17 +314,30 @@ def download_bilibili_video(
     *,
     runner: CommandRunner | None = None,
     request_subtitles: bool = False,
+    cache_dir: Path | None = None,
+    existing_runs_root: Path | None = None,
 ) -> DownloadResult:
     """Run the frozen yt-dlp command and verify its run-local output."""
 
-    executable = shutil.which("yt-dlp")
-    if executable is None:
-        raise UrlIngestError("DOWNLOAD_ERROR", "yt-dlp is unavailable")
     download_dir = run_dir.resolve() / "download"
     try:
         download_dir.mkdir(parents=True, exist_ok=True)
     except OSError as exc:
         raise UrlIngestError("DOWNLOAD_ERROR", "download directory is unavailable") from exc
+    if cache_dir is not None:
+        if existing_runs_root is not None:
+            try:
+                _seed_cache_from_completed_run(
+                    source, existing_runs_root.resolve(), cache_dir.resolve()
+                )
+            except OSError as exc:
+                raise UrlIngestError("DOWNLOAD_ERROR", "download cache is unavailable") from exc
+        cached = _cached_download(source, download_dir, cache_dir.resolve())
+        if cached is not None:
+            return cached
+    executable = shutil.which("yt-dlp")
+    if executable is None:
+        raise UrlIngestError("DOWNLOAD_ERROR", "yt-dlp is unavailable")
     command = [
         executable,
         "--ignore-config",
@@ -242,7 +381,7 @@ def download_bilibili_video(
         raise UrlIngestError("DOWNLOAD_ERROR", "yt-dlp metadata file is missing")
     title, uploader, attribution = _metadata(info_path, source)
     subtitle_file = select_subtitle_file(download_dir.iterdir())
-    return DownloadResult(
+    result = DownloadResult(
         source=source,
         media_path=media_path,
         info_path=info_path.resolve(),
@@ -252,6 +391,12 @@ def download_bilibili_video(
         command=tuple(command),
         subtitle_file=subtitle_file,
     )
+    if cache_dir is not None:
+        try:
+            _store_download_cache(result, cache_dir.resolve())
+        except OSError as exc:
+            raise UrlIngestError("DOWNLOAD_ERROR", "download cache is unavailable") from exc
+    return result
 
 
 def ingest_downloaded_video(
