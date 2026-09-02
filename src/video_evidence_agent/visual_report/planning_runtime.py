@@ -19,6 +19,12 @@ from dotenv import load_dotenv
 from openai import APITimeoutError, OpenAI
 from pydantic import ValidationError
 
+from video_evidence_agent.llm_config import (
+    OPENAI_API_KEY_ENV,
+    OPENAI_BASE_URL_ENV,
+    OPENAI_MODEL_ENV,
+    normalize_openai_base_url,
+)
 from video_evidence_agent.schemas import VideoSegment
 from video_evidence_agent.segments import SegmentBuildError, validate_video_segments
 
@@ -36,7 +42,6 @@ from .planning import (
     SEMANTIC_V2_MAPPER_PROMPT_VERSION,
     SEMANTIC_V2_MAPPER_SYSTEM_INSTRUCTION,
     SEMANTIC_V2_MAX_OUTPUT_TOKENS,
-    SEMANTIC_V2_MODEL,
     SEMANTIC_V2_NORMALIZATION_SCHEMA_VERSION,
     SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
     SEMANTIC_V2_PLANNER_PROMPT_VERSION,
@@ -80,7 +85,6 @@ SCHEMA_MECHANISM = "responses.text.format.json_schema"
 SEMANTIC_V2_API_SURFACE = "chat_completions"
 SEMANTIC_V2_RESPONSE_MODE = "json_object"
 SEMANTIC_V2_SCHEMA_MECHANISM = "chat.completions.response_format.json_object"
-SEMANTIC_V2_PROVIDER_ENDPOINT = "https://api.deepseek.com"
 REASONING_EFFORT = "none"
 TEMPERATURE = 0
 
@@ -564,8 +568,6 @@ def semantic_v2_chat_completion_request(
 
 def _validate_semantic_v2_request_config(config: PlanningConfig) -> None:
     expected = {
-        "provider_label": SEMANTIC_V2_PROVIDER_ENDPOINT,
-        "model": SEMANTIC_V2_MODEL,
         "response_mode": SEMANTIC_V2_RESPONSE_MODE,
         "api_surface": SEMANTIC_V2_API_SURFACE,
         "schema_mechanism": SEMANTIC_V2_SCHEMA_MECHANISM,
@@ -586,7 +588,7 @@ def _validate_semantic_v2_request_config(config: PlanningConfig) -> None:
 
 
 class OpenAISemanticV2PlanningProvider:
-    """The current DeepSeek-compatible Chat Completions provider seam."""
+    """The current OpenAI-compatible Chat Completions provider seam."""
 
     def __init__(self, client: OpenAI, config: PlanningConfig) -> None:
         self.client = client
@@ -595,23 +597,13 @@ class OpenAISemanticV2PlanningProvider:
     @classmethod
     def from_environment(cls) -> "OpenAISemanticV2PlanningProvider":
         load_dotenv(Path(__file__).resolve().parents[3] / ".env", override=False)
-        api_key = os.getenv("OPENAI_API_KEY", "").strip()
-        base_url = os.getenv("OPENAI_BASE_URL", "").strip()
-        model = os.getenv("VISUAL_REPORT_MODEL", "").strip()
+        api_key = os.getenv(OPENAI_API_KEY_ENV, "").strip()
+        base_url = normalize_openai_base_url(os.getenv(OPENAI_BASE_URL_ENV, ""))
+        model = os.getenv(OPENAI_MODEL_ENV, "").strip()
         if not api_key:
             raise PlanningError("CONFIGURATION_ERROR", "OPENAI_API_KEY is required")
-        if base_url.rstrip("/") != SEMANTIC_V2_PROVIDER_ENDPOINT:
-            raise PlanningError(
-                "CONFIGURATION_ERROR",
-                "OPENAI_BASE_URL must be https://api.deepseek.com for semantic-v2",
-            )
         if not model:
-            raise PlanningError("CONFIGURATION_ERROR", "VISUAL_REPORT_MODEL is required")
-        if model != SEMANTIC_V2_MODEL:
-            raise PlanningError(
-                "CONFIGURATION_ERROR",
-                f"VISUAL_REPORT_MODEL must be {SEMANTIC_V2_MODEL} for semantic-v2",
-            )
+            raise PlanningError("CONFIGURATION_ERROR", f"{OPENAI_MODEL_ENV} is required")
         try:
             timeout_seconds = float(os.getenv("VISUAL_REPORT_TIMEOUT_SECONDS", "120"))
         except ValueError as exc:

@@ -22,8 +22,9 @@ FastAPI, UI, workers, and multi-video evaluation are outside P0-A.
 Copy `.env.example` to `.env` and fill `OPENAI_API_KEY` outside version control.
 The CLI automatically loads this project-local, gitignored file; explicit
 process environment variables take precedence. You do not need to re-enter the
-key for every command or terminal. The current template targets DeepSeek's
-OpenAI-compatible endpoint with `deepseek-v4-flash`.
+key for every command or terminal. The current template targets the
+OpenAI-compatible GLM-5.3-Flash endpoint; change the environment values when
+switching providers or models.
 
 ## Reproduce P0-A
 
@@ -49,7 +50,7 @@ already present, the bounded preparation and evaluation path is:
       artifacts/chinese-lips-mini-val-kj-001/composite.mp4 \
       --video-id chinese-lips-mini-val-kj-001 \
       --preview-seconds 60 \
-      --asr-model mlx-community/whisper-small-mlx
+      --asr-model mlx-community/whisper-large-v3-turbo
     uv run video-evidence evaluate-asr \
       --video-id chinese-lips-mini-val-kj-001
     uv run video-evidence smoke chinese-lips-mini-val-kj-001 \

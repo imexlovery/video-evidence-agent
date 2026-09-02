@@ -1,6 +1,30 @@
 import pytest
 
-from video_evidence_agent.asr import AsrError, normalize_asr_segments
+from video_evidence_agent import cli
+from video_evidence_agent.asr import DEFAULT_ASR_MODEL, AsrError, normalize_asr_segments
+
+
+def test_current_ingest_default_is_large_v3_turbo_and_override_is_retained(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("VIDEO_EVIDENCE_ASR_MODEL", raising=False)
+    parser = cli.build_parser()
+
+    default_args = parser.parse_args(["ingest", "video.mp4", "--video-id", "sample"])
+    override_args = parser.parse_args(
+        [
+            "ingest",
+            "video.mp4",
+            "--video-id",
+            "sample",
+            "--asr-model",
+            "local/override",
+        ]
+    )
+
+    assert DEFAULT_ASR_MODEL == "mlx-community/whisper-large-v3-turbo"
+    assert default_args.asr_model == DEFAULT_ASR_MODEL
+    assert override_args.asr_model == "local/override"
 
 
 def test_empty_raw_asr_segments_are_retained_as_explicit_non_indexed_provenance() -> None:

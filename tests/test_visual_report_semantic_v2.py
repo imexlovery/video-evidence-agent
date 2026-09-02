@@ -7,13 +7,13 @@ from types import SimpleNamespace
 
 import pytest
 
+import video_evidence_agent.visual_report.planning_runtime as planning_runtime
 from video_evidence_agent.schemas import VideoSegment
 from video_evidence_agent.visual_report.planning import (
     SEMANTIC_V2_COMPILER_VERSION,
     SEMANTIC_V2_HARD_MAX_COMPILED_BLOCKS,
     SEMANTIC_V2_HARD_MAX_VISIBLE_CHARACTERS,
     SEMANTIC_V2_MAX_OUTPUT_TOKENS,
-    SEMANTIC_V2_MODEL,
     SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
     SEMANTIC_V2_PLANNER_SYSTEM_INSTRUCTION,
     SEMANTIC_V2_REASONING_EFFORT,
@@ -468,7 +468,7 @@ def test_semantic_v2_provider_uses_chat_json_object_request() -> None:
     client = SimpleNamespace(chat=SimpleNamespace(completions=Completions()))
     config = PlanningConfig(
         provider_label="https://api.deepseek.com",
-        model=SEMANTIC_V2_MODEL,
+        model="test-semantic-v2-model",
         timeout_seconds=10,
         credential_present=True,
         response_mode=SEMANTIC_V2_RESPONSE_MODE,
@@ -494,10 +494,37 @@ def test_semantic_v2_provider_uses_chat_json_object_request() -> None:
     assert "full" in messages[1]["content"]
 
 
+def test_semantic_v2_provider_reads_shared_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    client_options: dict[str, object] = {}
+
+    class FakeOpenAI:
+        def __init__(self, **kwargs: object) -> None:
+            client_options.update(kwargs)
+
+    monkeypatch.setattr(planning_runtime, "OpenAI", FakeOpenAI)
+    monkeypatch.setenv("OPENAI_API_KEY", "glm-test-key")
+    monkeypatch.setenv(
+        "OPENAI_BASE_URL", "https://open.bigmodel.cn/api/paas/v4/chat/completions"
+    )
+    monkeypatch.setenv("VIDEO_EVIDENCE_MODEL", "glm-5.3-flash")
+    monkeypatch.delenv("VISUAL_REPORT_MODEL", raising=False)
+
+    provider = planning_runtime.OpenAISemanticV2PlanningProvider.from_environment()
+
+    assert client_options == {
+        "api_key": "glm-test-key",
+        "base_url": "https://open.bigmodel.cn/api/paas/v4",
+        "timeout": 120.0,
+        "max_retries": 0,
+    }
+    assert provider.config.provider_label == "https://open.bigmodel.cn"
+    assert provider.config.model == "glm-5.3-flash"
+
+
 def test_semantic_v2_request_shape_and_hash_are_stable() -> None:
     config = PlanningConfig(
         provider_label="https://api.deepseek.com",
-        model=SEMANTIC_V2_MODEL,
+        model="test-semantic-v2-model",
         timeout_seconds=10,
         credential_present=True,
         response_mode=SEMANTIC_V2_RESPONSE_MODE,
@@ -511,7 +538,7 @@ def test_semantic_v2_request_shape_and_hash_are_stable() -> None:
     payload = {"transcript_segments": ["full"], "output_contract": {"json_schema": {}}}
     request = semantic_v2_chat_completion_request("topic_mapper", "system", payload, config)
     assert request == {
-        "model": SEMANTIC_V2_MODEL,
+        "model": "test-semantic-v2-model",
         "messages": [
             {"role": "system", "content": "system"},
             {

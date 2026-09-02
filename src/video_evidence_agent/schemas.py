@@ -48,6 +48,7 @@ class VideoSegment(BaseModel):
     end_ms: int = Field(ge=1)
     transcript_text: str
     source_asr_ordinals: tuple[int, ...] = ()
+    source_transcript_unit_ids: tuple[str, ...] = ()
 
     @field_validator("transcript_text")
     @classmethod
@@ -60,8 +61,10 @@ class VideoSegment(BaseModel):
     def validate_boundaries(self) -> "VideoSegment":
         if self.end_ms <= self.start_ms:
             raise ValueError("VideoSegment end_ms must be greater than start_ms")
-        if not self.source_asr_ordinals:
-            raise ValueError("VideoSegment must retain source ASR provenance")
+        if not self.source_asr_ordinals and not self.source_transcript_unit_ids:
+            raise ValueError(
+                "VideoSegment must retain source ASR or transcript-unit provenance"
+            )
         return self
 
 

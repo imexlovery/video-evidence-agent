@@ -20,6 +20,12 @@ from urllib.parse import urlsplit
 from dotenv import load_dotenv
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
+from video_evidence_agent.llm_config import (
+    OPENAI_API_KEY_ENV,
+    OPENAI_BASE_URL_ENV,
+    OPENAI_MODEL_ENV,
+)
+
 from .models import AssetManifest, ReportPlan
 from .planning import (
     CALL_SCHEMA_VERSION,
@@ -36,7 +42,6 @@ from .planning import (
     SEMANTIC_V2_MAPPER_PROMPT_VERSION,
     SEMANTIC_V2_MAPPER_SYSTEM_INSTRUCTION,
     SEMANTIC_V2_MAX_OUTPUT_TOKENS,
-    SEMANTIC_V2_MODEL,
     SEMANTIC_V2_NORMALIZATION_SCHEMA_VERSION,
     SEMANTIC_V2_PLAN_PROPOSAL_SCHEMA_VERSION,
     SEMANTIC_V2_PLANNER_PROMPT_VERSION,
@@ -69,7 +74,6 @@ from .planning_runtime import (
     RESPONSE_MODE,
     SCHEMA_MECHANISM,
     SEMANTIC_V2_API_SURFACE,
-    SEMANTIC_V2_PROVIDER_ENDPOINT,
     SEMANTIC_V2_RESPONSE_MODE,
     SEMANTIC_V2_SCHEMA_MECHANISM,
     SourceSnapshot,
@@ -325,12 +329,14 @@ def _sanitized_provider_label(base_url: str) -> str:
     return "openai-compatible-custom-endpoint"
 
 
-def environment_snapshot(repository_root: Path) -> dict[str, object]:
+def environment_snapshot(
+    repository_root: Path, *, model_env: str = OPENAI_MODEL_ENV
+) -> dict[str, object]:
     """Return only non-secret provider admission facts."""
     load_dotenv(repository_root / ".env", override=False)
-    api_key_present = bool(os.getenv("OPENAI_API_KEY", "").strip())
-    model = os.getenv("VISUAL_REPORT_MODEL", "").strip()
-    base_url = os.getenv("OPENAI_BASE_URL", "").strip()
+    api_key_present = bool(os.getenv(OPENAI_API_KEY_ENV, "").strip())
+    model = os.getenv(model_env, "").strip()
+    base_url = os.getenv(OPENAI_BASE_URL_ENV, "").strip()
     timeout_raw = os.getenv("VISUAL_REPORT_TIMEOUT_SECONDS", "120").strip()
     try:
         timeout_seconds = float(timeout_raw)
@@ -340,7 +346,7 @@ def environment_snapshot(repository_root: Path) -> dict[str, object]:
     if not api_key_present:
         blockers.append("OPENAI_API_KEY is not present")
     if not model:
-        blockers.append("VISUAL_REPORT_MODEL is not configured")
+        blockers.append(f"{model_env} is not configured")
     if timeout_seconds is None:
         blockers.append("VISUAL_REPORT_TIMEOUT_SECONDS is not numeric")
     elif timeout_seconds <= 0:
@@ -1673,17 +1679,11 @@ def _semantic_v2_product_source_rows(source_root: Path) -> list[dict[str, object
 
 
 def _semantic_v2_provider_snapshot(repository_root: Path) -> dict[str, object]:
-    snapshot = environment_snapshot(repository_root)
+    snapshot = environment_snapshot(repository_root, model_env=OPENAI_MODEL_ENV)
     blockers = list(snapshot.get("blockers", []))
-    provider = str(snapshot.get("provider", ""))
-    model = str(snapshot.get("model", ""))
-    if provider != SEMANTIC_V2_PROVIDER_ENDPOINT:
-        blockers.append("current product prototype requires https://api.deepseek.com")
-    if model != SEMANTIC_V2_MODEL:
-        blockers.append(f"current product prototype requires {SEMANTIC_V2_MODEL}")
     snapshot.update(
         {
-            "provider_family": "DeepSeek",
+            "provider_family": "OpenAI-compatible",
             "api_surface": SEMANTIC_V2_API_SURFACE,
             "response_mode": SEMANTIC_V2_RESPONSE_MODE,
             "schema_mechanism": SEMANTIC_V2_SCHEMA_MECHANISM,

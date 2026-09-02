@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Video Evidence Agent：项目架构",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "viewBox": [1240, 860],
+    "repository": {
+      "url": "https://github.com/imexlovery/video-evidence-agent.git",
+      "revision": "96ea23845f57cc5dd1aabc89a9f7c7645298021a"
+    },
+    "views": [
+      {
+        "id": "p0b-evidence-chain",
+        "label": "P0-B 证据链",
+        "focus": ["media", "ingest", "segments", "artifacts", "retrieval", "provider", "gate"],
+        "note": "从本地中文视频到受限回答，沿着可追溯的时间戳与 Evidence Gate 前进。"
+      },
+      {
+        "id": "visual-report-chain",
+        "label": "Visual Report 链",
+        "focus": ["artifacts", "v0-input", "v1a-planning", "renderer", "report"],
+        "note": "V0 手工输入与 V1-A 规划运行时共享确定性 Renderer，输出离线报告。"
+      },
+      {
+        "id": "review-boundaries",
+        "label": "边界与停止点",
+        "focus": ["gate", "evaluation", "renderer", "report"],
+        "note": "冻结证据与本地实验彼此隔离；报告当前停在 READY_FOR_OWNER_V1A_REVIEW。"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "media",
+      "type": "external",
+      "label": "本地中文视频",
+      "sublabel": "MP4 · fixed fixture",
+      "tag": "INPUT",
+      "pos": [24, 170],
+      "size": [140, 82],
+      "sources": [{ "path": "eval/p0b/corpus.jsonl", "label": "P0-B fixture metadata" }]
+    },
+    {
+      "id": "ingest",
+      "type": "backend",
+      "label": "媒体与 ASR",
+      "sublabel": "FFmpeg · MLX Whisper",
+      "tag": "LOCAL",
+      "pos": [194, 170],
+      "size": [140, 82],
+      "sources": [
+        { "path": "src/video_evidence_agent/asr.py", "label": "ASR" },
+        { "path": "src/video_evidence_agent/audio.py", "label": "audio" }
+      ]
+    },
+    {
+      "id": "segments",
+      "type": "backend",
+      "label": "VideoSegment",
+      "sublabel": "时间戳与段落不变量",
+      "tag": "CONTRACT",
+      "pos": [364, 170],
+      "size": [140, 82],
+      "sources": [{ "path": "src/video_evidence_agent/segments.py", "label": "segments" }]
+    },
+    {
+      "id": "artifacts",
+      "type": "database",
+      "label": "文件工件",
+      "sublabel": "JSONL · manifests · reports",
+      "tag": "FILE-BACKED",
+      "pos": [534, 170],
+      "size": [140, 82],
+      "sources": [{ "path": "docs/visual-report/V0-STATUS.md", "label": "artifact contract" }]
+    },
+    {
+      "id": "retrieval",
+      "type": "backend",
+      "label": "检索与回答准备",
+      "sublabel": "n-gram · TF-IDF · Top-K",
+      "tag": "P0-B",
+      "pos": [704, 170],
+      "size": [140, 82],
+      "sources": [
+        { "path": "src/video_evidence_agent/retrieval.py", "label": "retrieval" },
+        { "path": "src/video_evidence_agent/answering.py", "label": "answering" }
+      ]
+    },
+    {
+      "id": "provider",
+      "type": "external",
+      "label": "回答 Provider",
+      "sublabel": "当前 Top-K 文本上下文",
+      "tag": "TEXT ONLY",
+      "pos": [874, 170],
+      "size": [140, 82],
+      "sources": [{ "path": "src/video_evidence_agent/answering.py", "label": "provider boundary" }]
+    },
+    {
+      "id": "gate",
+      "type": "security",
+      "label": "Evidence Gate",
+      "sublabel": "引用来源必须可追溯",
+      "tag": "FAIL CLOSED",
+      "pos": [1044, 170],
+      "size": [140, 82],
+      "sources": [{ "path": "src/video_evidence_agent/evidence.py", "label": "evidence gate" }]
+    },
+    {
+      "id": "evaluation",
+      "type": "backend",
+      "label": "P0-B 评估",
+      "sublabel": "grade · report · audit",
+      "tag": "FROZEN HISTORY",
+      "pos": [1050, 390],
+      "size": [150, 82],
+      "sources": [{ "path": "src/video_evidence_agent/p0b_eval.py", "label": "P0-B eval" }]
+    },
+    {
+      "id": "v0-input",
+      "type": "external",
+      "label": "V0 输入",
+      "sublabel": "report-plan.json + assets.json",
+      "tag": "HAND-AUTHORED",
+      "pos": [180, 610],
+      "size": [160, 82],
+      "sources": [{ "path": "docs/requirements/visual-report-v0/03-functional-spec.md", "label": "V0 input contract" }]
+    },
+    {
+      "id": "v1a-planning",
+      "type": "backend",
+      "label": "V1-A Planning Runtime",
+      "sublabel": "Topic Mapper → Report Planner",
+      "tag": "EXPERIMENTAL",
+      "pos": [390, 610],
+      "size": [180, 82],
+      "sources": [
+        { "path": "src/video_evidence_agent/visual_report/planning.py", "label": "planning" },
+        { "path": "src/video_evidence_agent/visual_report/planning_runtime.py", "label": "runtime" }
+      ]
+    },
+    {
+      "id": "renderer",
+      "type": "backend",
+      "label": "确定性 Renderer",
+      "sublabel": "Pydantic · HTML/CSS/SVG",
+      "tag": "NO LLM LAYOUT",
+      "pos": [640, 610],
+      "size": [170, 82],
+      "sources": [
+        { "path": "src/video_evidence_agent/visual_report/models.py", "label": "schema" },
+        { "path": "src/video_evidence_agent/visual_report/renderer.py", "label": "renderer" }
+      ]
+    },
+    {
+      "id": "report",
+      "type": "frontend",
+      "label": "离线 report.html",
+      "sublabel": "canonical · local",
+      "tag": "OWNER REVIEW",
+      "pos": [850, 610],
+      "size": [170, 82],
+      "sources": [{ "path": "docs/tasks/VISUAL-REPORT-V0-RENDERER.md", "label": "canonical report contract" }]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "P0-B：冻结的本地证据与评估边界",
+      "wraps": ["ingest", "segments", "artifacts", "retrieval", "gate", "evaluation"],
+      "pad": 28
+    },
+    {
+      "kind": "region",
+      "label": "Visual Report：本地实验边界",
+      "wraps": ["v0-input", "v1a-planning", "renderer", "report"],
+      "pad": 28
+    }
+  ],
+  "connections": [
+    { "id": "media-ingest", "from": "media", "to": "ingest", "label": "ingest", "variant": "emphasis", "labelDy": 65 },
+    { "id": "ingest-segments", "from": "ingest", "to": "segments", "label": "timestamped transcript", "labelDy": 65 },
+    { "id": "segments-artifacts", "from": "segments", "to": "artifacts", "label": "persist JSONL", "labelDy": 65 },
+    { "id": "artifacts-retrieval", "from": "artifacts", "to": "retrieval", "label": "same-video segments", "labelDy": 65 },
+    { "id": "retrieval-provider", "from": "retrieval", "to": "provider", "label": "question + Top-K", "variant": "emphasis", "labelDy": 65 },
+    { "id": "provider-gate", "from": "provider", "to": "gate", "label": "AnswerProposal", "labelDy": 65 },
+    { "id": "artifacts-evaluation", "from": "artifacts", "to": "evaluation", "label": "metrics inputs", "fromSide": "bottom", "toSide": "top" },
+    { "id": "gate-evaluation", "from": "gate", "to": "evaluation", "label": "accepted / refusal", "fromSide": "bottom", "toSide": "top" },
+    { "id": "artifacts-v1a", "from": "artifacts", "to": "v1a-planning", "label": "full transcript", "variant": "dashed", "fromSide": "bottom", "toSide": "top" },
+    { "id": "v0-input-renderer", "from": "v0-input", "to": "renderer", "label": "plan + selected frames", "variant": "emphasis", "fromSide": "bottom", "toSide": "bottom", "via": [[260, 740], [725, 740]] },
+    { "id": "v1a-renderer", "from": "v1a-planning", "to": "renderer", "label": "compiled V0 plan", "labelDy": 65 },
+    { "id": "renderer-report", "from": "renderer", "to": "report", "label": "deterministic render", "variant": "emphasis", "labelDy": 65 }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "运行时主线",
+      "items": [
+        "P0-B：本地视频 → ASR → VideoSegment → 文件工件 → Top-K → Provider → Evidence Gate",
+        "引用与时间戳留在受限证据链内，Provider 只接收文本上下文。"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "报告主线",
+      "items": [
+        "V0 手工 plan/assets 与 V1-A 双阶段规划都汇入同一个确定性 Renderer",
+        "report.html 是离线 canonical artifact，不是第二套导出器。"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "当前停止点",
+      "items": [
+        "V0：READY_FOR_OWNER_VISUAL_REVIEW；Owner 视觉验收仍待进行",
+        "V1-A：文本/Web closure 已停止；不把自动化、部署或发布画成已完成。"
+      ]
+    }
+  ]
+}
