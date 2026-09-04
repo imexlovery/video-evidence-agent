@@ -1,9 +1,10 @@
 # Visual Report V1 — Roadmap
 
-Updated: 2026-09-02
+Updated: 2026-09-04
 
-The roadmap is intentionally sequential. Each version isolates one quality
-layer so later work is not used to conceal an earlier defect.
+The roadmap preserves separately testable quality layers, but V1.2 now designs
+their Agent coordination and shared contracts end to end. Internal construction
+slices are sequencing boundaries, not separate architecture designs.
 
 ## V1.0 — Runnable Alpha baseline
 
@@ -18,7 +19,7 @@ IDs, tests, paths, and retained evidence. No compatibility rename is planned.
 
 ## V1.1 — Transcript Foundation
 
-Status: `READY_FOR_OWNER_V1.1_MODEL_REVIEW`
+Status: `V1.1_FROZEN`
 
 Objective: build one general, traceable transcript layer from ASR, text subtitle
 tracks, and burned-in subtitle OCR, then project it back into the current V1.0
@@ -41,9 +42,9 @@ Key boundaries:
 Execution card:
 [`docs/tasks/VISUAL-REPORT-V1-1-TRANSCRIPT-FOUNDATION.md`](../tasks/VISUAL-REPORT-V1-1-TRANSCRIPT-FOUNDATION.md).
 
-The Owner authorized the continuous construction Goal on 2026-09-01. A/B/C are
-implemented and locally validated; Owner acceptance is pending and no automatic
-promotion to V1.2 is implied.
+The Owner authorized the continuous construction Goal on 2026-09-01. A/B/C were
+implemented and locally validated. Their completion did not automatically
+promote the project to V1.2.
 
 The full-video coverage correction completed local OCR and Fusion for one
 1,566,677 ms real video at `coverage_ratio=1.0`. The regenerated Canonical
@@ -73,46 +74,78 @@ rather than triggering another transcript subsystem redesign.
 Model-refresh execution card:
 [`docs/tasks/VISUAL-REPORT-V1-1-MODEL-UPGRADE.md`](../tasks/VISUAL-REPORT-V1-1-MODEL-UPGRADE.md).
 
-The authorized model-refresh execution is complete. The final Small/Large
+The authorized model-refresh execution completed. The final Small/Large
 fresh run reached full-video OCR coverage and generated new ASR-only/Fused
 Semantic-v2 reports with the unchanged Zhipu GLM path. The measured result is
 mixed: selected Large V3 Turbo ASR terms improve, while unchanged Fusion
-accepts fewer OCR replacements than Task 013. The roadmap therefore stops at
-`READY_FOR_OWNER_V1.1_MODEL_REVIEW`; it does not imply V1.1 freeze or authorize
-V1.2.
+accepts fewer OCR replacements than Task 013. That construction run stopped at
+`READY_FOR_OWNER_V1.1_MODEL_REVIEW`.
 
-## V1.2 — Semantic Quality
+On 2026-09-04, the Owner accepted HEAD `2bce883` as the V1.1 baseline and ended
+V1.1. The mixed source-model outcome and residual recognition errors remain
+documented limitations rather than triggers for more V1.1 tuning. This decision
+freezes the V1.1 input contract and separately authorizes V1.2 requirements and
+technical design; it does not authorize V1.2 product implementation.
 
-Status: `BRIEF_ONLY / NOT_AUTHORIZED`
+## V1.2 — Visual Editorial Agent / Harness
 
-After V1.1 makes transcript truth inspectable, V1.2 will revisit how the full
-canonical transcript is understood, mapped into topics, compressed, and turned
-into a report plan. The future design should compare semantic behavior against
-the V1.1 transcript rather than compensate for ASR mistakes inside prompts.
+Status: `REQUIREMENTS_AND_TECHNICAL_DESIGN_AUTHORIZED / IMPLEMENTATION_NOT_AUTHORIZED`
 
-No prompt, Topic Mapper, Report Planner, RAG, Agent, or model-routing redesign
-belongs to V1.1.
+V1.2 will design one source-grounded, end-to-end Harness that transforms the
+frozen V1.1 Canonical Transcript into a visually reviewed report while keeping
+each quality layer independently observable. The shared workflow comprises:
 
-## V1.3 — Renderer Quality
+1. Canonical Transcript to Claim Graph;
+2. Claim Graph to Editorial Plan;
+3. one bounded Semantic Critic and local semantic revision;
+4. Editorial Plan to Presentation Plan;
+5. deterministic rendering;
+6. DOM and screenshot observation;
+7. one bounded Visual Critic and local presentation revision; and
+8. final validation plus complete run-artifact retention.
 
-Status: `BRIEF_ONLY / NOT_AUTHORIZED`
+The design must define the common state model, artifact schemas, issue routing,
+patch authority, revision budgets, failure behavior, evidence lineage, and stop
+conditions before any internal slice is implemented. Tentative construction
+slices are:
 
-After transcript and semantic quality are stable, V1.3 will improve visual
-hierarchy, typography, component selection, information density, and
-cross-video presentation quality while preserving deterministic rendering.
+- **A — Editorial intelligence:** Claim Graph, Editorial Plan, grounding,
+  Semantic Critic, and semantic patching;
+- **B — Presentation intelligence:** Presentation Plan, visual grammar, and the
+  deterministic Renderer contract;
+- **C — Closed-loop quality:** Browser Observation, Visual Critic, global issue
+  routing, bounded revision, comparison evaluation, and run freezing.
 
-No renderer redesign, new template system, VLM-selected keyframes, or visual
-export expansion belongs to V1.1.
+These slices share one design and one Controller. They may be implemented and
+evaluated incrementally, but must not introduce throwaway cross-version
+contracts. V1.2 should compare semantic behavior against the V1.1 transcript
+rather than compensate for ASR mistakes inside prompts.
+
+The current authority permits documentation and read-only inspection only. No
+prompt, Topic Mapper, Report Planner, Agent runtime, Renderer, browser tool,
+dependency, model call, or generated runtime artifact may be changed or
+executed under this design authorization.
+
+## V1.3 — Post-Harness evolution
+
+Status: `DEFERRED / SCOPE_TO_BE_DECIDED_AFTER_V1.2`
+
+V1.3 is intentionally not preassigned to a renderer-only redesign because
+Presentation, Renderer, Browser Observation, and visual repair now belong to
+the integrated V1.2 Harness. Evidence from V1.2 will determine whether V1.3
+should focus on multi-style templates, Skill/plugin packaging, broader content
+domains, quality hardening, or another explicitly approved direction.
 
 ## Promotion order
 
 ```text
 V1.0 runnable baseline
-  → V1.1 trustworthy transcript foundation
-  → V1.2 semantic/report-planning quality
-  → V1.3 renderer and visual quality
+  → V1.1 frozen transcript foundation
+  → V1.2 integrated Visual Editorial Agent / Harness
+  → V1.3 evidence-selected post-Harness evolution
   → later deployment/multi-user work only when product quality warrants it
 ```
 
-There is no date or automatic promotion. Completion of one version only makes
-the next version discussable; it does not authorize it.
+There is no date or automatic promotion. Requirements/design authority,
+implementation authority, validation, Owner acceptance, deployment, and
+publication remain separate decisions.
