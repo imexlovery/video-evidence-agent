@@ -2,34 +2,47 @@
 
 These instructions apply to the entire repository.
 
-## Visual Report V1.0 / V1.1 current context
+## Visual Report current context
 
 The active product naming and roadmap are now:
 
 - `V1.0`: the runnable local MP4/Bilibili URL → ASR → semantic-v2 → renderer
   baseline that was historically developed under `V1-A` and related task IDs;
-- `V1.1`: Transcript Foundation;
-- `V1.2`: Semantic quality work, deferred;
-- `V1.3`: Renderer quality work, deferred.
+- `V1.1`: frozen Transcript Foundation accepted at commit `2bce883`;
+- `V1.2`: integrated Visual Editorial Agent / Harness Design Baseline spanning
+  Semantic, Presentation, deterministic Renderer, Browser Observation, and
+  bounded Revision; implementation is not authorized;
+- `V1.3`: post-Harness evolution selected from V1.2 evidence, deferred.
 
-Before V1.0/V1.1 work, read only this current package in order:
+Before current Visual Report work, read this package in order:
 
 1. `docs/visual-report/V1-STATUS.md`
 2. `docs/visual-report/V1-ROADMAP.md`
-3. `docs/tasks/VISUAL-REPORT-V1-1-TRANSCRIPT-FOUNDATION.md` when V1.1 is in scope
-4. `docs/tasks/VISUAL-REPORT-V1-1-MODEL-UPGRADE.md` when the V1.1 model refresh is in scope
-5. The directly affected source and tests
+3. `docs/requirements/visual-report-v1-2/requirements-readiness.json`,
+   `00-handoff.md`, and `12-engineering-context.md` when V1.2 is in scope
+4. The task-relevant V1.2 canonical specifications, especially `03`, `04`,
+   `06`, `07`, `09`, `10`, and `11`
+5. `docs/tasks/VISUAL-REPORT-V1-1-TRANSCRIPT-FOUNDATION.md` or
+   `docs/tasks/VISUAL-REPORT-V1-1-MODEL-UPGRADE.md` only when frozen V1.1
+   behavior or evidence is directly in scope
+6. The directly affected source and tests
 
-The V1.1 task card is a construction-ready specification, not standing
-implementation authorization. Product code, dependency changes, real OCR/model
-runs, or other runtime work begin only after a new explicit Owner Goal message.
+The V1.2 package is a complete Design Baseline, not the Final V1.2 Spec and not
+standing implementation authorization. Product code, dependency changes,
+Provider calls, Browser Observer execution, calibration, formal evaluation,
+default-path promotion, and deployment begin only after the corresponding new
+explicit Owner Goal message.
 
-For an authorized V1.1 Goal, its task card overrides the historical V1-A ban on
-OCR only inside the bounded Transcript Foundation scope. It does not reopen or
-rewrite frozen V1-A experiments. A/B/C are one continuous execution sequence,
-not Owner gates. Do not add a readiness-validator package, formal measurement,
-VLM, keyframes, full-scene OCR, semantic-prompt changes, renderer redesign,
-database, multi-tenancy, or deployment.
+For an authorized V1.2 Goal, the V1.2 package overrides historical V0/V1-A bans
+on Agent, presentation planning, and Browser Observation only inside the
+versioned V1.2 path. It does not rewrite legacy contracts or frozen evidence.
+Use project-owned Python/Pydantic and typed Artifact boundaries; do not add a
+general Agent framework, multi-Agent runtime, free ReAct/browser/tool loop,
+Patch DSL, hidden chunking, image discovery/generation, database, accounts,
+multi-tenancy, hosting, or deployment.
+
+V1.1 is frozen. Further Transcript Foundation or source-model work requires an
+explicit scope reopen and must preserve its historical evidence.
 
 ## Visual Report V0 context load
 

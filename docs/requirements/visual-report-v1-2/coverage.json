@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "1.0",
+  "areas": {
+    "outcome_and_success": {
+      "decision_ids": ["DEC-VR12-002", "DEC-VR12-004", "DEC-VR12-018", "DEC-VR12-029", "DEC-VR12-031", "DEC-VR12-034"]
+    },
+    "users_and_scenarios": {
+      "decision_ids": ["DEC-VR12-002", "DEC-VR12-003", "DEC-VR12-018", "DEC-VR12-022"]
+    },
+    "scope_and_non_goals": {
+      "decision_ids": ["DEC-VR12-003", "DEC-VR12-014", "DEC-VR12-017", "DEC-VR12-018", "DEC-VR12-020", "DEC-VR12-022", "DEC-VR12-023", "DEC-VR12-024", "DEC-VR12-026", "DEC-VR12-027", "DEC-VR12-031"]
+    },
+    "input_contracts": {
+      "decision_ids": ["DEC-VR12-003", "DEC-VR12-014", "DEC-VR12-019", "DEC-VR12-020", "DEC-VR12-022", "DEC-VR12-036"]
+    },
+    "output_contracts": {
+      "decision_ids": ["DEC-VR12-017", "DEC-VR12-021", "DEC-VR12-029", "DEC-VR12-035", "DEC-VR12-036"]
+    },
+    "surface_and_workflow": {
+      "decision_ids": ["DEC-VR12-003", "DEC-VR12-006", "DEC-VR12-013", "DEC-VR12-017", "DEC-VR12-018", "DEC-VR12-021", "DEC-VR12-026"]
+    },
+    "functional_rules_and_edge_cases": {
+      "decision_ids": ["DEC-VR12-006", "DEC-VR12-007", "DEC-VR12-019", "DEC-VR12-020", "DEC-VR12-021", "DEC-VR12-025", "DEC-VR12-028", "DEC-VR12-029", "DEC-VR12-032", "DEC-VR12-033", "DEC-VR12-035", "DEC-VR12-036", "DEC-VR12-037"]
+    },
+    "data_sources_state_and_memory": {
+      "decision_ids": ["DEC-VR12-008", "DEC-VR12-013", "DEC-VR12-014", "DEC-VR12-019", "DEC-VR12-022", "DEC-VR12-026", "DEC-VR12-036", "DEC-VR12-037"]
+    },
+    "agent_ai_behavior_and_authority": {
+      "decision_ids": ["DEC-VR12-007", "DEC-VR12-008", "DEC-VR12-009", "DEC-VR12-013", "DEC-VR12-015", "DEC-VR12-018", "DEC-VR12-019", "DEC-VR12-023", "DEC-VR12-025", "DEC-VR12-028", "DEC-VR12-030", "DEC-VR12-032", "DEC-VR12-033", "DEC-VR12-035", "DEC-VR12-036", "DEC-VR12-037"]
+    },
+    "interfaces_and_integrations": {
+      "decision_ids": ["DEC-VR12-003", "DEC-VR12-006", "DEC-VR12-014", "DEC-VR12-015", "DEC-VR12-017", "DEC-VR12-022", "DEC-VR12-026", "DEC-VR12-030"]
+    },
+    "identity_security_privacy_compliance": {
+      "decision_ids": ["DEC-VR12-002", "DEC-VR12-003", "DEC-VR12-013", "DEC-VR12-015", "DEC-VR12-022", "DEC-VR12-026", "DEC-VR12-030"]
+    },
+    "load_performance_reliability_cost": {
+      "decision_ids": ["DEC-VR12-002", "DEC-VR12-004", "DEC-VR12-007", "DEC-VR12-020", "DEC-VR12-029", "DEC-VR12-032", "DEC-VR12-034"]
+    },
+    "deployment_operations_and_commercial_readiness": {
+      "decision_ids": ["DEC-VR12-002", "DEC-VR12-003", "DEC-VR12-022", "DEC-VR12-023", "DEC-VR12-026", "DEC-VR12-031", "DEC-VR12-034"]
+    },
+    "existing_system_and_engineering_context": {
+      "decision_ids": ["DEC-VR12-001", "DEC-VR12-003", "DEC-VR12-023", "DEC-VR12-026", "DEC-VR12-027", "DEC-VR12-030"]
+    },
+    "acceptance_and_delivery_constraints": {
+      "decision_ids": ["DEC-VR12-001", "DEC-VR12-004", "DEC-VR12-012", "DEC-VR12-029", "DEC-VR12-031", "DEC-VR12-034"]
+    }
+  },
+  "critical_gates": {
+    "target_implementation_grade_allowed_use_and_promotion_path": {
+      "decision_ids": ["DEC-VR12-001", "DEC-VR12-002", "DEC-VR12-003", "DEC-VR12-026", "DEC-VR12-031"]
+    },
+    "primary_user_and_target_outcome": {
+      "decision_ids": ["DEC-VR12-002", "DEC-VR12-018"]
+    },
+    "first_release_scope_and_non_goals": {
+      "decision_ids": ["DEC-VR12-003", "DEC-VR12-014", "DEC-VR12-017", "DEC-VR12-018", "DEC-VR12-020", "DEC-VR12-022", "DEC-VR12-023", "DEC-VR12-024", "DEC-VR12-027"]
+    },
+    "delivery_surface": {
+      "decision_ids": ["DEC-VR12-003", "DEC-VR12-017", "DEC-VR12-026"]
+    },
+    "happy_failure_and_recovery_paths": {
+      "decision_ids": ["DEC-VR12-007", "DEC-VR12-019", "DEC-VR12-025", "DEC-VR12-029", "DEC-VR12-032", "DEC-VR12-037"]
+    },
+    "input_contracts_validation_and_limits": {
+      "decision_ids": ["DEC-VR12-014", "DEC-VR12-019", "DEC-VR12-020", "DEC-VR12-022", "DEC-VR12-036"]
+    },
+    "output_contracts_consumers_quality_and_errors": {
+      "decision_ids": ["DEC-VR12-017", "DEC-VR12-021", "DEC-VR12-029", "DEC-VR12-035", "DEC-VR12-036"]
+    },
+    "canonical_state_authority_and_status_vocabulary": {
+      "decision_ids": ["DEC-VR12-007", "DEC-VR12-011", "DEC-VR12-029"]
+    },
+    "data_persistence_ownership_retention_and_deletion": {
+      "decision_ids": ["DEC-VR12-013", "DEC-VR12-026", "DEC-VR12-031"]
+    },
+    "existing_data_database_and_creative_asset_inventory": {
+      "decision_ids": ["DEC-VR12-003", "DEC-VR12-014", "DEC-VR12-022", "DEC-VR12-026"]
+    },
+    "mutation_lifecycle_versioning_and_undo": {
+      "decision_ids": ["DEC-VR12-025", "DEC-VR12-026", "DEC-VR12-028", "DEC-VR12-031", "DEC-VR12-037"]
+    },
+    "data_source_authority_rights_quality_lineage_and_freshness": {
+      "decision_ids": ["DEC-VR12-008", "DEC-VR12-019", "DEC-VR12-022", "DEC-VR12-036", "DEC-VR12-037"]
+    },
+    "identity_and_access": {
+      "decision_ids": ["DEC-VR12-002", "DEC-VR12-003", "DEC-VR12-022"]
+    },
+    "high_impact_action_approvals": {
+      "decision_ids": ["DEC-VR12-002", "DEC-VR12-003", "DEC-VR12-013", "DEC-VR12-031"]
+    },
+    "consent_and_revocation": {
+      "decision_ids": ["DEC-VR12-002", "DEC-VR12-022"]
+    },
+    "external_dependencies_credentials_and_outage": {
+      "decision_ids": ["DEC-VR12-015", "DEC-VR12-022", "DEC-VR12-030", "DEC-VR12-032"]
+    },
+    "long_running_partial_and_degraded_behavior": {
+      "decision_ids": ["DEC-VR12-007", "DEC-VR12-019", "DEC-VR12-020", "DEC-VR12-029", "DEC-VR12-032"]
+    },
+    "peak_load_and_traffic_volume": {
+      "decision_ids": ["DEC-VR12-002", "DEC-VR12-003", "DEC-VR12-020"]
+    },
+    "latency_and_reliability": {
+      "decision_ids": ["DEC-VR12-004", "DEC-VR12-007", "DEC-VR12-029", "DEC-VR12-032", "DEC-VR12-034"]
+    },
+    "production_service_levels_support_and_incident_ownership": {
+      "decision_ids": ["DEC-VR12-002", "DEC-VR12-003", "DEC-VR12-022", "DEC-VR12-031"]
+    },
+    "deployment_environment_and_operating_owner": {
+      "decision_ids": ["DEC-VR12-002", "DEC-VR12-022", "DEC-VR12-023"]
+    },
+    "system_lifecycle_admin_and_change_governance": {
+      "decision_ids": ["DEC-VR12-001", "DEC-VR12-012", "DEC-VR12-026", "DEC-VR12-031", "DEC-VR12-034"]
+    },
+    "existing_system_baseline_and_change_boundary": {
+      "decision_ids": ["DEC-VR12-001", "DEC-VR12-023", "DEC-VR12-026", "DEC-VR12-027"]
+    },
+    "downstream_framework_constraints_and_decision_authority": {
+      "decision_ids": ["DEC-VR12-023", "DEC-VR12-031", "DEC-VR12-033"]
+    },
+    "development_base_and_hypha_recommendation_disposition": {
+      "decision_ids": ["DEC-VR12-023"]
+    },
+    "measurable_acceptance_and_go_live_evidence": {
+      "decision_ids": ["DEC-VR12-004", "DEC-VR12-012", "DEC-VR12-029", "DEC-VR12-031", "DEC-VR12-034"]
+    },
+    "agent_module_routes_dependency_mode_availability_fallback_and_rollback": {
+      "decision_ids": ["DEC-VR12-013", "DEC-VR12-023", "DEC-VR12-025", "DEC-VR12-026", "DEC-VR12-030", "DEC-VR12-032", "DEC-VR12-033"]
+    },
+    "intelligence_target_non_ai_baseline_and_autonomy": {
+      "decision_ids": ["DEC-VR12-002", "DEC-VR12-004", "DEC-VR12-006", "DEC-VR12-013"]
+    },
+    "model_vs_deterministic_responsibility": {
+      "decision_ids": ["DEC-VR12-006", "DEC-VR12-009", "DEC-VR12-013", "DEC-VR12-015", "DEC-VR12-030", "DEC-VR12-035", "DEC-VR12-036"]
+    },
+    "hard_constraints_and_safety_precedence": {
+      "decision_ids": ["DEC-VR12-007", "DEC-VR12-019", "DEC-VR12-020", "DEC-VR12-029", "DEC-VR12-032", "DEC-VR12-035", "DEC-VR12-036", "DEC-VR12-037"]
+    },
+    "tool_permissions_and_approvals": {
+      "decision_ids": ["DEC-VR12-013", "DEC-VR12-015", "DEC-VR12-023"]
+    },
+    "context_memory_access_and_lifecycle": {
+      "decision_ids": ["DEC-VR12-013", "DEC-VR12-026"]
+    },
+    "grounding_uncertainty_abstention_and_escalation": {
+      "decision_ids": ["DEC-VR12-008", "DEC-VR12-019", "DEC-VR12-025", "DEC-VR12-036", "DEC-VR12-037"]
+    },
+    "multi_agent_topology_and_partial_failure": {
+      "decision_ids": ["DEC-VR12-007", "DEC-VR12-013", "DEC-VR12-023", "DEC-VR12-029", "DEC-VR12-032"]
+    },
+    "high_priority_interrupt_and_late_output_handling": {
+      "decision_ids": ["DEC-VR12-007", "DEC-VR12-013", "DEC-VR12-029", "DEC-VR12-032"]
+    },
+    "representative_quality_evaluation_and_unacceptable_behavior": {
+      "decision_ids": ["DEC-VR12-004", "DEC-VR12-029", "DEC-VR12-031", "DEC-VR12-034"]
+    },
+    "production_quality_drift_feedback_promotion_and_rollback": {
+      "decision_ids": ["DEC-VR12-004", "DEC-VR12-026", "DEC-VR12-031", "DEC-VR12-034"]
+    },
+    "fallback_behavior": {
+      "decision_ids": ["DEC-VR12-020", "DEC-VR12-026", "DEC-VR12-030", "DEC-VR12-032"]
+    },
+    "cost_boundary": {
+      "decision_ids": ["DEC-VR12-004", "DEC-VR12-007", "DEC-VR12-020", "DEC-VR12-030", "DEC-VR12-034"]
+    }
+  }
+}

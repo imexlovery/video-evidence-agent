@@ -16,7 +16,8 @@ are not the active roadmap vocabulary.
 | Active design | `V1.2 — Visual Editorial Agent / Harness` |
 | V1.1 task | `VR-V1.1-MODEL-UPGRADE-014 — CLOSED` |
 | V1.1 status | `V1.1_FROZEN` |
-| V1.2 | `REQUIREMENTS_AND_TECHNICAL_DESIGN_AUTHORIZED / IMPLEMENTATION_NOT_AUTHORIZED` |
+| V1.2 | `DESIGN_BASELINE_COMPLETE / IMPLEMENTATION_NOT_AUTHORIZED` |
+| Current V1.2 deliverable | `DESIGN_BASELINE_COMPLETE / NOT_FINAL_FROZEN_SPEC` |
 | V1.3 | `DEFERRED / SCOPE_TO_BE_DECIDED_AFTER_V1.2` |
 | Deployment / multi-tenant work | Deferred; not part of V1.2 design authority |
 
@@ -26,7 +27,7 @@ are not the active roadmap vocabulary.
 |---|---|---|
 | `V1.0` | Current runnable local Alpha baseline | Existing `V1-A`, `vr1a`, `semantic-v2`, Task 001–012 names remain unchanged in code, paths, schemas, tests, and evidence |
 | `V1.1` | Frozen Transcript Foundation: ASR + subtitle track + burned-in subtitle OCR → Canonical Transcript | Accepted baseline at `2bce883` |
-| `V1.2` | One end-to-end Visual Editorial Agent / Harness spanning semantic planning, presentation planning, deterministic rendering, browser observation, and bounded critic repair | Requirements and technical design only |
+| `V1.2` | One end-to-end Visual Editorial Agent / Harness spanning semantic planning, presentation planning, deterministic rendering, browser observation, and bounded critic repair | Design Baseline complete; implementation not authorized |
 | `V1.3` | Post-Harness evolution selected from V1.2 evidence | Scope intentionally unassigned |
 
 Do not mass-rename historical identifiers. `V1.0` is the product name going
@@ -266,6 +267,40 @@ Semantic, Presentation, deterministic Renderer, Browser Observation, and
 bounded Critic repair as one workflow. It does not authorize product code,
 dependency changes, provider calls, browser execution, real V1.2 runs,
 deployment, publication, or V1.3 implementation.
+
+The first V1.2 design round fixes one Design System with a controlled
+Presentation Vocabulary rather than either a single rigid template or
+free-form style generation. The deterministic Renderer is followed by required
+runtime Browser/DOM Screenshot Observation. Defects share one run-wide budget
+of at most two revision attempts: no more than one Semantic Revision, while both
+may be Presentation Revisions. Exhaustion terminates as `COMPLETE`, `DEGRADED`,
+or `FAILED`.
+
+V1.2 uses one run-level Provider/model configuration for every model-mediated
+role, with `GLM-5.3-Flash` as the current reference model. It does not define
+role-level models, model routing, or fallback. The current documentation ends
+at the V1.2 Design Baseline. A separately authorized minimal implementation and
+calibration must precede Architecture Ablation and Owner freeze of the Final
+V1.2 Spec; calibration cannot reopen already confirmed semantic or authority
+boundaries.
+
+The Design Baseline fixes required semantic review, real Render/Observe,
+visual review, post-Revision revalidation, and Controller termination, but not
+a permanent one-model-call-per-role topology. Historical samples are for
+calibration only. Formal evaluation uses untuned locked samples and repeated
+legacy/no-Revision/full-V1.2 conditions; calibration evidence determines the
+final sample and repeat counts.
+
+The complete package is
+[`docs/requirements/visual-report-v1-2/`](../requirements/visual-report-v1-2/00-handoff.md).
+It contains the 13-document engineering contract, 37 append-only Owner decision
+records, coverage mapping, glossary/ADR integration, and a validator-generated
+`requirements-readiness.json`. The validator reports
+`READY_FOR_ENGINEERING_HANDOFF`, 100% area coverage, every critical gate closed,
+and no blocker/error. That machine status means the design package is complete
+enough to support a future engineering goal; it does not authorize code,
+dependencies, Provider/browser execution, implementation calibration, Final
+Spec freeze, formal evaluation, product acceptance, or default-path promotion.
 
 ## Historical sources
 
