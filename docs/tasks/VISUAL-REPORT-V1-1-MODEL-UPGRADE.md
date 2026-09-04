@@ -1,6 +1,6 @@
 # VR-V1.1-MODEL-UPGRADE-014 — Local ASR/OCR Model Refresh
 
-Updated: 2026-09-02
+Updated: 2026-09-04
 
 ## Task metadata
 
@@ -9,10 +9,10 @@ Updated: 2026-09-02
 | Product version | `Visual Report V1.1` |
 | Task ID | `VR-V1.1-MODEL-UPGRADE-014` |
 | Target | Local Alpha / controlled real-video validation |
-| Task-card status | `READY_FOR_OWNER_V1.1_MODEL_REVIEW` |
+| Task-card status | `CLOSED — V1.1_FROZEN` |
 | Starting point | Existing construction commit/worktree: completed `V1.1 Fusion` (Task 013) |
 | Existing Semantic provider | Zhipu GLM OpenAI-compatible endpoint / `glm-5.3-flash` |
-| Required final stop | `READY_FOR_OWNER_V1.1_MODEL_REVIEW` or one explicit hard blocker |
+| Required construction stop | `READY_FOR_OWNER_V1.1_MODEL_REVIEW` or one explicit hard blocker |
 | Execution style | One bounded model refresh and one complete fresh rerun |
 | Deployment / publication | Excluded |
 
@@ -340,3 +340,15 @@ The bounded execution is complete and stops at
 `READY_FOR_OWNER_V1.1_MODEL_REVIEW`. No commit, push, PR, deployment,
 publication, V1.2, model bake-off, or further experiment was performed after
 the final Small rerun.
+
+## Owner closure
+
+On 2026-09-04, the Owner accepted repository HEAD `2bce883` as the V1.1
+baseline and ended V1.1. This closes the task as `V1.1_FROZEN` with the measured
+mixed model-refresh result and known residual recognition errors retained. No
+additional model run or implementation change was requested as part of the
+closure.
+
+The Owner separately authorized V1.2 requirements and technical design for an
+integrated Visual Editorial Agent / Harness. Product implementation remains
+unauthorized.

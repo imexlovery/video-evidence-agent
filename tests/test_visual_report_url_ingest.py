@@ -470,6 +470,10 @@ def test_url_web_composes_one_run_and_serves_canonical_report(tmp_path: Path) ->
         assert 'id="history-open"' in page_text
         assert "/api/visual-report/current" in page_text
         assert "/api/visual-report/reports" in page_text
+        assert page_text.index("仅支持公开的 Bilibili BV 视频链接。") < page_text.index(
+            "字幕 OCR 模式"
+        )
+        assert "启用 OCR 可提高字幕识别准确率，但会延长报告生成时间。" in page_text
         assert "animation: step-breathe" in page_text
         assert "OPENAI_API_KEY" not in page_text
 

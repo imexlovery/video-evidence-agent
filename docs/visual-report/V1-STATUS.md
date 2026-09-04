@@ -1,6 +1,6 @@
 # Visual Report V1 — Current Status
 
-Updated: 2026-09-02
+Updated: 2026-09-04
 
 This is the short resume point for current Visual Report work. Historical V0,
 V1-A task IDs, schema names, paths, and evidence remain valid records, but they
@@ -10,25 +10,24 @@ are not the active roadmap vocabulary.
 
 | Field | Value |
 |---|---|
-| Current product baseline | `V1.0 — RUNNABLE_ALPHA_BASELINE` |
+| Current product baseline | `V1.1 — TRANSCRIPT_FOUNDATION_FROZEN_BASELINE` |
 | Product-quality judgment | `NOT_ACCEPTED — output text and presentation still need material improvement` |
-| Code baseline before this documentation update | branch `visual-report`, commit `065a592a8aa77829bdccc31828edadebc68a6d63` |
-| Active design | `V1.1 — Transcript Foundation` |
-| Existing construction baseline | Completed `V1.1 Fusion` / `VR-V1.1-TRANSCRIPT-FOUNDATION-013` |
-| Active V1.1 task | `VR-V1.1-MODEL-UPGRADE-014` |
-| V1.1 task status | `READY_FOR_OWNER_V1.1_MODEL_REVIEW` |
-| V1.2 | `Semantic Quality — BRIEF_ONLY / NOT_AUTHORIZED` |
-| V1.3 | `Renderer Quality — BRIEF_ONLY / NOT_AUTHORIZED` |
-| Deployment / multi-tenant work | Deferred; not part of V1.1 |
+| Frozen code baseline | branch `visual-report`, commit `2bce883` |
+| Active design | `V1.2 — Visual Editorial Agent / Harness` |
+| V1.1 task | `VR-V1.1-MODEL-UPGRADE-014 — CLOSED` |
+| V1.1 status | `V1.1_FROZEN` |
+| V1.2 | `REQUIREMENTS_AND_TECHNICAL_DESIGN_AUTHORIZED / IMPLEMENTATION_NOT_AUTHORIZED` |
+| V1.3 | `DEFERRED / SCOPE_TO_BE_DECIDED_AFTER_V1.2` |
+| Deployment / multi-tenant work | Deferred; not part of V1.2 design authority |
 
 ## Version naming
 
 | Current name | Meaning | Historical compatibility |
 |---|---|---|
 | `V1.0` | Current runnable local Alpha baseline | Existing `V1-A`, `vr1a`, `semantic-v2`, Task 001–012 names remain unchanged in code, paths, schemas, tests, and evidence |
-| `V1.1` | Transcript Foundation: ASR + subtitle track + burned-in subtitle OCR → Canonical Transcript | New active construction task |
-| `V1.2` | Improve semantic understanding and report planning after transcript quality is stable | Roadmap note only |
-| `V1.3` | Improve the deterministic renderer and visual language after semantic quality is stable | Roadmap note only |
+| `V1.1` | Frozen Transcript Foundation: ASR + subtitle track + burned-in subtitle OCR → Canonical Transcript | Accepted baseline at `2bce883` |
+| `V1.2` | One end-to-end Visual Editorial Agent / Harness spanning semantic planning, presentation planning, deterministic rendering, browser observation, and bounded critic repair | Requirements and technical design only |
+| `V1.3` | Post-Harness evolution selected from V1.2 evidence | Scope intentionally unassigned |
 
 Do not mass-rename historical identifiers. `V1.0` is the product name going
 forward, not a migration of frozen artifact identities.
@@ -69,10 +68,12 @@ The quality stack should be improved in this order:
 3. **Render:** the deterministic renderer works, but its current visual result
    is not yet consistently attractive or information-dense enough.
 
-V1.1 isolates the first problem. V1.2 and V1.3 stay unchanged until V1.1 is
-complete.
+V1.1 isolates the first problem and is now frozen at `2bce883`. V1.2 is no
+longer split from a separately predesigned renderer phase: its authorized design
+must define one end-to-end Harness contract while retaining semantic,
+presentation, rendering, and observation as separately testable layers.
 
-## Active V1.1 target
+## Frozen V1.1 target
 
 ```text
 Video
@@ -214,9 +215,9 @@ semantic-v2/Renderer path. Fused
 `READY_FOR_OWNER_V1.1_FREEZE_REVIEW`; no V1.1 freeze or V1.2/V1.3
 authorization is recorded.
 
-## Active V1.1 model refresh
+## Final V1.1 model refresh
 
-The current construction commit/worktree is the completed `V1.1 Fusion`
+The construction commit/worktree was the completed `V1.1 Fusion`
 submission described by Task 013; it is the required baseline for all following
 work. Owner review did not freeze V1.1. The Owner judged the remaining upstream
 ASR/OCR error rate too high to justify more Fusion tuning and selected one final
@@ -240,7 +241,7 @@ Historical DeepSeek run records remain historical evidence and are not the
 provider contract for Task 014. The next construction run must stop at
 `READY_FOR_OWNER_V1.1_MODEL_REVIEW` even if the measured quality gain is small.
 
-Task 014 is now complete at that stop. The final fresh Small/Large run
+Task 014 completed at that stop. The final fresh Small/Large run
 `v11-model-upgrade-small-game-20260902-r3` used the same 1,566,677 ms video and
 Explicit ROI, reached full OCR coverage (`545` OCR events, `coverage_ratio=1.0`),
 and produced fresh Fused and ASR-only Canonical/segments, Semantic-v2, and
@@ -248,9 +249,23 @@ reports under new run identities. The unchanged Fusion path accepted `6`
 OCR replacements versus `20` in the Task 013 bounded baseline; Large V3 Turbo
 improved selected ASR terms but overall source-model quality was mixed rather
 than a broad accuracy gain. Focused tests (`55`), full pytest (`137`), Ruff,
-`uv lock --check`, and `git diff --check` all passed. The active V1.1 state is
-`READY_FOR_OWNER_V1.1_MODEL_REVIEW`; no freeze, V1.2 start, or release action
-is recorded.
+`uv lock --check`, and `git diff --check` all passed. That execution stopped at
+`READY_FOR_OWNER_V1.1_MODEL_REVIEW`.
+
+## Owner closure and V1.2 authority
+
+On 2026-09-04, the Owner accepted commit `2bce883` as the V1.1 baseline and
+ended V1.1. The accepted baseline retains the measured mixed ASR/OCR result and
+known residual recognition errors; it does not claim perfect transcript
+quality. Further Transcript Foundation or source-model tuning requires an
+explicit scope reopen.
+
+The same Owner decision authorizes V1.2 requirements and technical design for
+one integrated Visual Editorial Agent / Harness. The design must cover
+Semantic, Presentation, deterministic Renderer, Browser Observation, and
+bounded Critic repair as one workflow. It does not authorize product code,
+dependency changes, provider calls, browser execution, real V1.2 runs,
+deployment, publication, or V1.3 implementation.
 
 ## Historical sources
 

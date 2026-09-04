@@ -505,18 +505,21 @@ def _url_html_page() -> str:
       <label id="url-label" for="url">公开 Bilibili BV URL</label>
       <input id="url" name="url" type="url" inputmode="url"
              placeholder="https://www.bilibili.com/video/BV..." autocomplete="off">
+      <div id="source-info" class="source-info" aria-live="polite">
+        仅支持公开的 Bilibili BV 视频链接。
+      </div>
       <label for="ocr-mode" style="margin-top:16px">字幕 OCR 模式</label>
       <select id="ocr-mode" name="ocr_mode">
         <option value="auto" selected>Auto ROI（不稳定时自动降级）</option>
         <option value="roi">显式 ROI（可靠主路径）</option>
         <option value="off">关闭 OCR</option>
       </select>
+      <div class="source-info">
+        启用 OCR 可提高字幕识别准确率，但会延长报告生成时间。
+      </div>
       <div id="ocr-roi-field" class="field-group" hidden>
         <label for="ocr-roi">显式 ROI（x1,y1,x2,y2）</label>
         <input id="ocr-roi" name="ocr_roi" inputmode="decimal" placeholder="0.05,0.72,0.95,0.98">
-      </div>
-      <div id="source-info" class="source-info" aria-live="polite">
-        仅支持公开的 Bilibili BV 视频链接。
       </div>
       <button id="generate" type="button">生成 Visual Report</button>
       <div class="status" aria-live="polite" aria-atomic="true" aria-busy="false">
